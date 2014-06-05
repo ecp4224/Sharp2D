@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sharp2D.Core.Logic
 {
-    public interface ILogical
+    public interface ILogical : IDisposable
     {
         void Update();
     }

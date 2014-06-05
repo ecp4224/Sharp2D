@@ -62,29 +62,43 @@ namespace Sharp2D.Core.Graphics
             }
         }
 
+        public static ILogicContainer LogicContainer
+        {
+            set
+            {
+                lock (logic_lock)
+                {
+                    logics = value;
+                }
+            }
+            get
+            {
+                return logics;
+            }
+        }
+
+        public static IRenderJobContainer RenderJobContainer
+        {
+            set
+            {
+                lock (job_lock)
+                {
+                    renders = value;
+                }
+            }
+            get
+            {
+                return renders;
+            }
+        }
+
         private static int _tickAtStart;
         private static ILogicContainer logics;
+        private static IRenderJobContainer renders;
         private static GameWindow window;
-        private static List<IRenderJob> jobs = new List<IRenderJob>();
 
         private static object job_lock = new object();
         private static object logic_lock = new object();
-
-        public static void AddJob(IRenderJob job)
-        {
-            lock (job_lock)
-            {
-                jobs.Add(job);
-            }
-        }
-
-        public static void RemoveJob(IRenderJob job)
-        {
-            lock (job_lock)
-            {
-                jobs.Remove(job);
-            }
-        }
 
         public static void DisplayScreen()
         {
@@ -100,14 +114,6 @@ namespace Sharp2D.Core.Graphics
             _gameLoop();
         }
 
-        public static void ProvideLogicalContainer(ILogicContainer container)
-        {
-            lock (logic_lock)
-            {
-                logics = container;
-            }
-        }
-
         public static void TerminateScreen()
         {
             IsRunning = false;
@@ -116,6 +122,18 @@ namespace Sharp2D.Core.Graphics
                 DisplayThread.Interrupt();
                 DisplayThread.Join();
             }
+        }
+
+        public static void ValidateOpenGLSafe(string MethodName)
+        {
+            if (DisplayThread != null && DisplayThread != Thread.CurrentThread)
+                throw new InvalidOperationException("The method \"" + MethodName + "\" must be called inside an OpenGL safe thread!");
+        }
+
+        public static void ValidateOpenGLUnsafe(string MethodName)
+        {
+            if (DisplayThread != null && DisplayThread == Thread.CurrentThread)
+                throw new InvalidOperationException("The method \"" + MethodName + "\" must be called OUTSIDE an OpenGL safe thread!");
         }
 
         private static void _prepare()
@@ -177,9 +195,11 @@ namespace Sharp2D.Core.Graphics
 
             Settings.Camera.BeforeRender();
 
+            if (renders == null) return;
+
             lock (job_lock)
             {
-                foreach (IRenderJob job in jobs)
+                foreach (IRenderJob job in renders.RenderJobs)
                 {
                     job.PerformJob();
                 }
@@ -192,7 +212,7 @@ namespace Sharp2D.Core.Graphics
 
             lock (logic_lock)
             {
-                foreach (ILogical logic in logics.GetLogicalList()) 
+                foreach (ILogical logic in logics.LogicalList) 
                 {
                     logic.Update();
                 }

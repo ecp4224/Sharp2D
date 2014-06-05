@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sharp2D.Core.Graphics
+namespace Sharp2D.Game.Sprite
 {
-    public interface IRenderJob : IDisposable
+    class LogicalSprite
     {
-        void PerformJob();
     }
 }

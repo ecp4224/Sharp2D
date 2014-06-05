@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sharp2D.Core.Logic;
 
-namespace Sharp2D.Core.Graphics
+namespace Sharp2D.Game
 {
-    public interface IRenderJob : IDisposable
+    public abstract class SpriteWorld : World
     {
-        void PerformJob();
+
     }
 }

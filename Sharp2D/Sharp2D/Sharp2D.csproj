@@ -47,16 +47,21 @@
     <Compile Include="Core\Graphics\Camera.cs" />
     <Compile Include="Core\Graphics\GenericCamera.cs" />
     <Compile Include="Core\Graphics\IRenderJob.cs" />
+    <Compile Include="Core\Graphics\IRenderJobContainer.cs" />
     <Compile Include="Core\Graphics\Screen.cs" />
+    <Compile Include="Core\Graphics\Texture.cs" />
     <Compile Include="Core\Logic\ILogical.cs" />
     <Compile Include="Core\Logic\ILogicContainer.cs" />
+    <Compile Include="Core\Logic\World.cs" />
+    <Compile Include="Core\Utils\Vector.cs" />
+    <Compile Include="Game\SpriteWorld.cs" />
+    <Compile Include="Game\Sprite\Sprite.cs" />
+    <Compile Include="Game\Sprite\OpenGL1SpriteRenderJob.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Settings\ScreenSettings.cs" />
     <Compile Include="Core\Utils\Rectangle.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Game\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
