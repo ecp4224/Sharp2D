@@ -23,16 +23,16 @@ namespace TestGame
             world.Load();
             world.Display();
             Screen.Camera.Z = 2f;
-            world.AddLogical(new MoveCamera() { start = Screen.TickCount });
+            world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
         }
     }
 
     class MoveCamera : Sharp2D.Core.Logic.ILogical
     {
-        public long start;
+        public long Start;
         public void Update()
         {
-            float value = MathUtils.Ease(0f, 30f * 16f, 3000, Screen.TickCount - start);
+            float value = MathUtils.Ease(0f, 30f * 16f, 3000, Screen.TickCount - Start);
             Screen.Camera.X = value;
             Console.CursorTop = 2;
             Console.WriteLine("       ");

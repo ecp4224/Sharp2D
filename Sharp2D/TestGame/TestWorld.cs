@@ -11,7 +11,7 @@ namespace TestGame
     {
         public override string Name
         {
-            get { return "worlds/testworld.json"; }
+            get { return "worlds/TestWorld.json"; }
         }
 
         protected override void OnLoad()

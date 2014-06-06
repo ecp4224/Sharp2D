@@ -77,8 +77,8 @@ namespace Sharp2D.Game.Worlds.Tiled
             TileWidth = (int)obj["tilewidth"];
             Version = (int)obj["version"];
             Properties = obj["properties"].ToObject<Dictionary<string, string>>();
-            TileSets = obj["tilesets"].Select(t => t.ToObject<TileSet>()).ToArray<TileSet>();
-            Layers = obj["layers"].Select(l => l.ToObject<Layer>()).ToArray<Layer>();
+            TileSets = obj["tilesets"].Select(t => t.ToObject<TileSet>()).ToArray();
+            Layers = obj["layers"].Select(l => l.ToObject<Layer>()).ToArray();
 
             for (int i = 0; i < Layers.Length; i++)
             {
