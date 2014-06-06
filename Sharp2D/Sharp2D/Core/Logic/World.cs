@@ -9,11 +9,11 @@ namespace Sharp2D.Core.Logic
 {
     public abstract class World : ILogicContainer, IRenderJobContainer
     {
-        private List<ILogical> logics;
+        protected List<ILogical> logics;
         private List<ILogical> lCache;
         private List<ILogical> lToRemove;
 
-        private List<IRenderJob> jobs;
+        protected List<IRenderJob> jobs;
         private List<IRenderJob> jCache;
         private List<IRenderJob> jToRemove;
         private bool lFetch;
@@ -48,7 +48,7 @@ namespace Sharp2D.Core.Logic
 
         public bool IsDisposing { get; private set; }
 
-        public abstract string Name { get; set; }
+        public abstract string Name { get; }
 
         protected abstract void OnLoad();
 
@@ -62,7 +62,6 @@ namespace Sharp2D.Core.Logic
         {
             Screen.ValidateOpenGLUnsafe("Display()");
 
-            OnDisplay();
             Screen.LogicContainer = this;
             Screen.RenderJobContainer = this;
             Displaying = true;
@@ -190,10 +189,20 @@ namespace Sharp2D.Core.Logic
 
         }
 
+        public bool HasJob(IRenderJob job)
+        {
+            return jobs.Contains(job) || jCache.Contains(job);
+        }
+
 
         public void PreFetch()
         {
             lFetch = true;
+            if (!used)
+            {
+                used = true;
+                OnDisplay();
+            }
         }
 
         public void PostFetch()
@@ -240,5 +249,8 @@ namespace Sharp2D.Core.Logic
             }
             jToRemove.Clear();
         }
+
+
+        private bool used = false;
     }
 }

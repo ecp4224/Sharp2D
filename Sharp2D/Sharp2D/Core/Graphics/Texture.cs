@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 using System.Reflection;
 using OpenTK.Graphics.OpenGL;
 using System.IO;
@@ -30,6 +31,14 @@ namespace Sharp2D.Core.Graphics
         public int MinFilter { get; set; }
 
         public int MagFilter { get; set; }
+
+        public int ImageWidth { get; private set; }
+
+        public int ImageHeight { get; private set; }
+
+        public int TextureWidth { get; private set; }
+
+        public int TextureHeight { get; private set; }
 
         public bool Loaded
         {
@@ -65,6 +74,26 @@ namespace Sharp2D.Core.Graphics
         public void LoadTextureFromFile()
         {
             Bitmap = new Bitmap(Name, false);
+
+            ImageWidth = Bitmap.Width;
+            ImageHeight = Bitmap.Height;
+
+            TextureWidth = ((ImageWidth & (ImageWidth - 1)) == 0 ? ImageWidth : 2);
+            TextureHeight = ((ImageHeight & (ImageHeight - 1)) == 0 ? ImageHeight : 2);
+            
+            while (TextureWidth < ImageWidth) TextureWidth *= 2;
+
+            while (TextureHeight < ImageHeight) TextureHeight *= 2;
+
+            if (TextureWidth != ImageWidth || TextureHeight != ImageHeight)
+            {
+                Bitmap bmp = new Bitmap(TextureWidth, TextureHeight);
+                System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp);
+                g.CompositingMode = CompositingMode.SourceOver;
+                g.DrawImage(Bitmap, new Point(0, 0));
+                g.Dispose();
+                Bitmap = bmp;
+            }
         }
 
         public void Create()

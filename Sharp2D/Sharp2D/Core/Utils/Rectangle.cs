@@ -8,10 +8,10 @@ namespace Sharp2D.Core.Utils
 {
     public class Rectangle
     {
-        public float X { get; private set; }
-        public float Y { get; private set; }
-        public float Width { get; private set; }
-        public float Height { get; private set; }
+        public float X;
+        public float Y;
+        public float Width;
+        public float Height;
 
         public Rectangle() : this(0, 0, 0, 0)
         {

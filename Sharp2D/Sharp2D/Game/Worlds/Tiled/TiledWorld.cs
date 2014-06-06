@@ -1,0 +1,155 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sharp2D.Game.Tiled;
+using Sharp2D.Game.Sprites;
+using Sharp2D.Game.Sprites.Tiled;
+
+namespace Sharp2D.Game.Worlds.Tiled
+{
+    public abstract class TiledWorld : SpriteWorld
+    {
+        internal readonly Dictionary<int, Core.Utils.Rectangle> texcoords_cache = new Dictionary<int, Core.Utils.Rectangle>();
+        [JsonProperty(PropertyName = "height")]
+        public int Height { get; private set; }
+
+        [JsonProperty(PropertyName = "tileheight")]
+        public int TileHeight { get; private set; }
+
+        [JsonProperty(PropertyName = "tilewidth")]
+        public int TileWidth { get; private set; }
+
+        [JsonProperty(PropertyName = "version")]
+        public int Version { get; private set; }
+
+        [JsonProperty(PropertyName = "width")]
+        public int Width { get; private set; }
+
+        [JsonProperty(PropertyName = "properties")]
+        public Dictionary<string, string> Properties;
+
+        [JsonProperty(PropertyName = "tilesets")]
+        public TileSet[] TileSets { get; private set; }
+
+        [JsonProperty(PropertyName="layers")]
+        public Layer[] Layers { get; private set; }
+
+        public int PixelWidth
+        {
+            get
+            {
+                return Width * TileWidth;
+            }
+        }
+
+        public int PixelHeight
+        {
+            get
+            {
+                return Height * TileHeight;
+            }
+        }
+
+        public TileSet FindTileset(long id)
+        {
+            foreach (TileSet tileSet in TileSets)
+            {
+                if (id >= tileSet.FirstGID)
+                {
+                    if (tileSet.Contains(id))
+                        return tileSet;
+                }
+            }
+            return null;
+        }
+
+        protected override void OnLoad()
+        {
+            string text = System.IO.File.ReadAllText(Name);
+            JObject obj = JObject.Parse(text);
+            Height = (int)obj["height"];
+            Width = (int)obj["width"];
+            TileHeight = (int)obj["tileheight"];
+            TileWidth = (int)obj["tilewidth"];
+            Version = (int)obj["version"];
+            Properties = obj["properties"].ToObject<Dictionary<string, string>>();
+            TileSets = obj["tilesets"].Select(t => t.ToObject<TileSet>()).ToArray<TileSet>();
+            Layers = obj["layers"].Select(l => l.ToObject<Layer>()).ToArray<Layer>();
+
+            for (int i = 0; i < Layers.Length; i++)
+            {
+                Layers[i].LayerNumber = i + 1;
+            }
+
+            foreach (TileSet tileset in TileSets)
+            {
+                tileset.LoadTexture();
+            }
+
+            foreach (Layer layer in Layers)
+            {
+                layer.RenderJob = new OpenGL1SpriteRenderJob(); //Create a new render job for this layer
+                if (layer.IsTileLayer)
+                {
+                    for (int i = 0; i < layer.Data.Length; i++)
+                    {
+                        long id = layer.Data[i];
+                        if (id == 0)
+                            continue;
+
+                        bool flipH = (id & Layer.FLIPPED_HORIZONTALLY_FLAG) > 0;
+                        bool flipV = (id & Layer.FLIPPED_VERTICALLY_FLAG)   > 0;
+                        bool flipD = (id & Layer.FLIPPED_DIAGONALLY_FLAG)   > 0;
+
+                        id &= ~(Layer.FLIPPED_DIAGONALLY_FLAG | Layer.FLIPPED_HORIZONTALLY_FLAG | Layer.FLIPPED_VERTICALLY_FLAG);
+
+                        TileSet set = FindTileset(id);
+
+                        TileSprite sprite = new TileSprite((int)id, set, layer, i, this);
+
+                        layer.RenderJob.AddSprite(sprite); //Add the new tile to the job
+                    }
+                }
+            }
+        }
+
+        protected override void OnDisplay()
+        {
+            foreach (TileSet tileset in TileSets)
+            {
+                if (!tileset.TileTexture.Created)
+                    tileset.TileTexture.Create();
+            }
+
+            foreach (Layer layer in Layers)
+            {
+                AddRenderJob(layer.RenderJob);
+            }
+        }
+
+        protected override void OnUnload()
+        {
+            //TODO Unload something..
+        }
+
+        protected override void OnDispose()
+        {
+            Properties.Clear();
+            foreach (Layer l in Layers)
+            {
+                l.Dispose();
+            }
+
+            foreach (TileSet tileset in TileSets)
+            {
+                tileset.Dispose();
+            }
+
+            texcoords_cache.Clear();
+        }
+    }
+}

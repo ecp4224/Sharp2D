@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\OpenTK.1.1.1589.5941\lib\NET40\OpenTK.dll</HintPath>
@@ -45,7 +49,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Graphics\Camera.cs" />
-    <Compile Include="Core\Graphics\GenericCamera.cs" />
+    <Compile Include="Core\Utils\MathUtils.cs" />
+    <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />
+    <Compile Include="Game\Tiled\Layer.cs" />
+    <Compile Include="Game\Tiled\TileSet.cs" />
+    <Compile Include="Game\Worlds\GenericCamera.cs" />
     <Compile Include="Core\Graphics\IRenderJob.cs" />
     <Compile Include="Core\Graphics\IRenderJobContainer.cs" />
     <Compile Include="Core\Graphics\Screen.cs" />
@@ -53,10 +61,12 @@
     <Compile Include="Core\Logic\ILogical.cs" />
     <Compile Include="Core\Logic\ILogicContainer.cs" />
     <Compile Include="Core\Logic\World.cs" />
-    <Compile Include="Core\Utils\Vector.cs" />
-    <Compile Include="Game\SpriteWorld.cs" />
-    <Compile Include="Game\Sprite\Sprite.cs" />
-    <Compile Include="Game\Sprite\OpenGL1SpriteRenderJob.cs" />
+    <Compile Include="Game\Worlds\SpriteWorld.cs" />
+    <Compile Include="Game\Sprites\LogicalSprite.cs" />
+    <Compile Include="Game\Sprites\Sprite.cs" />
+    <Compile Include="Game\Sprites\OpenGL1SpriteRenderJob.cs" />
+    <Compile Include="Game\Sprites\SpriteRenderJob.cs" />
+    <Compile Include="Game\Worlds\Tiled\TiledWorld.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Settings\ScreenSettings.cs" />
     <Compile Include="Core\Utils\Rectangle.cs" />
