@@ -50,7 +50,6 @@
   <ItemGroup>
     <Compile Include="Core\Graphics\Camera.cs" />
     <Compile Include="Core\Utils\MathUtils.cs" />
-    <Compile Include="Core\Utils\Vector.cs" />
     <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />
     <Compile Include="Game\Tiled\Layer.cs" />
     <Compile Include="Game\Tiled\TileSet.cs" />
