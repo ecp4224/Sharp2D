@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Graphics\Camera.cs" />
+    <Compile Include="Core\Logic\World.cs" />
     <Compile Include="Core\Utils\MathUtils.cs" />
     <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />
     <Compile Include="Game\Tiled\Layer.cs" />
@@ -60,7 +61,6 @@
     <Compile Include="Core\Graphics\Texture.cs" />
     <Compile Include="Core\Logic\ILogical.cs" />
     <Compile Include="Core\Logic\ILogicContainer.cs" />
-    <Compile Include="Core\Logic\World.cs" />
     <Compile Include="Game\Worlds\SpriteWorld.cs" />
     <Compile Include="Game\Sprites\LogicalSprite.cs" />
     <Compile Include="Game\Sprites\Sprite.cs" />
