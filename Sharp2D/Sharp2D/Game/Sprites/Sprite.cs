@@ -16,10 +16,9 @@ namespace Sharp2D.Game.Sprites
             Dispose();
         }
 
-        private Vector2 _vector;
         public bool Loaded { get; private set; }
         public Texture Texture { get; set; }
-        public Vector2 Position { get { return _vector; } set { _vector = value; } }
+        public Vector2 Position { get { return new Vector2(X, Y); } }
         public Rectangle TexCoords;
         public float Width { get; set; }
         public float Height { get; set; }
@@ -31,29 +30,9 @@ namespace Sharp2D.Game.Sprites
 
             }
         }
-        public float X
-        {
-            get
-            {
-                return Position.X;
-            }
-            set
-            {
-                _vector.X = value;
-            }
-        }
+        public virtual float X { get; set; }
 
-        public float Y
-        {
-            get
-            {
-                return Position.Y;
-            }
-            set
-            {
-                _vector.Y = value;
-            }
-        }
+        public virtual float Y { get; set; }
 
         public void Load()
         {
