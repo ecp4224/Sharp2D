@@ -10,6 +10,28 @@ namespace Sharp2D.Game.Sprites
 {
     public abstract class SpriteRenderJob : IRenderJob
     {
+        private static Type DefaultJob;
+
+        public static SpriteRenderJob CreateDefaultJob()
+        {
+            if (DefaultJob == null)
+            {
+                DefaultJob = typeof(OpenGL1SpriteRenderJob);
+            }
+
+            return (SpriteRenderJob)Activator.CreateInstance(DefaultJob);
+        }
+
+        public static void SetDefaultJob<T>()
+        {
+            DefaultJob = typeof(T);
+        }
+
+        public static void SetDefaultJob(Type t)
+        {
+            DefaultJob = t;
+        }
+
         protected readonly ConcurrentDictionary<Texture, List<Sprite>> groups = new ConcurrentDictionary<Texture, List<Sprite>>();
         protected readonly object group_lock = new object();
 

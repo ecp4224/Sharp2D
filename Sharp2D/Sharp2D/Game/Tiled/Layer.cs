@@ -54,6 +54,14 @@ namespace Sharp2D.Game.Tiled
         [JsonIgnore]
         public Sprites.SpriteRenderJob RenderJob { get; internal set; }
 
+        public bool IsPlayerLayer
+        {
+            get
+            {
+                return Properties.ContainsKey("playerlayer") && Properties["playerlayer"].ToLower() == "true";
+            }
+        }
+
         public bool IsImageLayer
         {
             get

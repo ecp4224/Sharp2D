@@ -92,7 +92,7 @@ namespace Sharp2D.Game.Worlds.Tiled
 
             foreach (Layer layer in Layers)
             {
-                layer.RenderJob = new OpenGL1SpriteRenderJob(); //Create a new render job for this layer
+                layer.RenderJob = SpriteRenderJob.CreateDefaultJob(); //Create a new render job for this layer
                 if (layer.IsTileLayer)
                 {
                     for (int i = 0; i < layer.Data.Length; i++)
@@ -125,10 +125,28 @@ namespace Sharp2D.Game.Worlds.Tiled
                     tileset.TileTexture.Create();
             }
 
+            bool _found = false;
+            SpriteRenderJob @default = SpriteRenderJob.CreateDefaultJob();
+
             foreach (Layer layer in Layers)
             {
+                if (this.DefaultJob == null)
+                {
+                    if (layer.IsPlayerLayer && !_found)
+                    {
+                        _found = true;
+                    }
+                    else if (_found && !layer.IsPlayerLayer)
+                    {
+                        _found = false;
+                        this.DefaultJob = @default; //Setting DefaultJob adds the job, so add it before adding the next layer
+                    }
+                }
                 AddRenderJob(layer.RenderJob);
             }
+
+            if (DefaultJob == null)
+                DefaultJob = @default;
         }
 
         protected override void OnUnload()

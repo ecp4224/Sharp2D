@@ -33,12 +33,17 @@ namespace Sharp2D.Game.Worlds
             }
 
             job.AddSprite(s);
+
+            if (s is ILogical)
+                AddLogical((ILogical)s);
         }
 
         public void AddSprite(Sprite s)
         {
             if (DefaultJob != null)
                 DefaultJob.AddSprite(s);
+            if (s is ILogical)
+                AddLogical((ILogical)s);
         }
 
         public void RemoveSprite(Sprite s)
