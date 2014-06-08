@@ -9,6 +9,11 @@ namespace Sharp2D.Core.Logic
 {
     public abstract class World : ILogicContainer, IRenderJobContainer
     {
+        ~World()
+        {
+            Dispose();
+        }
+
         protected List<ILogical> logics;
         private List<ILogical> lCache;
         private List<ILogical> lToRemove;

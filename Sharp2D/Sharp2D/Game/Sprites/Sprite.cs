@@ -11,6 +11,11 @@ namespace Sharp2D.Game.Sprites
 {
     public abstract class Sprite : IDisposable
     {
+        ~Sprite()
+        {
+            Dispose();
+        }
+
         private Vector2 _vector;
         public bool Loaded { get; private set; }
         public Texture Texture { get; set; }
