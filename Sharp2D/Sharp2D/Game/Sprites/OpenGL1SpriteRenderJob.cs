@@ -39,13 +39,14 @@ namespace Sharp2D.Game.Sprites
 
                         GL.Color3(70f / 255f, 130f / 255f, 250f / 255f);
                         GL.Begin(PrimitiveType.Quads);
-                        //GL.TexCoord2(s.TexCoords.X, s.TexCoords.Y);
+
+                        GL.TexCoord2(s.TexCoords.TopLeft.X, s.TexCoords.TopLeft.Y);
                         GL.Vertex3(x - bx, y - by, z);
-                        //GL.TexCoord2(s.TexCoords.Width, s.TexCoords.Y);
+                        GL.TexCoord2(s.TexCoords.TopRight.X, s.TexCoords.TopRight.Y);
                         GL.Vertex3(x + bx, y - by, z);
-                        //GL.TexCoord2(s.TexCoords.Width, s.TexCoords.Height);
+                        GL.TexCoord2(s.TexCoords.BottomRight.X, s.TexCoords.BottomRight.Y);
                         GL.Vertex3(x + bx, y + by, z);
-                        //GL.TexCoord2(s.TexCoords.X, s.TexCoords.Height);
+                        GL.TexCoord2(s.TexCoords.BottomLeft.X, s.TexCoords.BottomLeft.Y);
                         GL.Vertex3(x - bx, y + by, z);
                         GL.End();
 

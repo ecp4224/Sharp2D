@@ -62,12 +62,7 @@ namespace Sharp2D.Game.Sprites.Tiled
             width = x + TileSet.TileWidth;
             height = y + TileSet.TileHeight;
 
-            x /= TileSet.TileTexture.TextureWidth;
-            width /= TileSet.TileTexture.TextureWidth;
-            y /= TileSet.TileTexture.TextureHeight;
-            height /= TileSet.TileTexture.TextureHeight;
-
-            TexCoords = new Core.Utils.Rectangle(x, y, width, height);
+            TexCoords = new Core.Utils.TexCoords(x, y, width, height, TileSet.TileTexture);
 
             World.texcoords_cache.Add(ID, TexCoords);
         }

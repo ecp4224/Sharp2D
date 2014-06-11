@@ -50,9 +50,13 @@
   <ItemGroup>
     <Compile Include="Core\Graphics\Camera.cs" />
     <Compile Include="Core\Logic\World.cs" />
+    <Compile Include="Core\Settings\Settings.cs" />
+    <Compile Include="Core\Utils\Logger.cs" />
     <Compile Include="Core\Utils\MathUtils.cs" />
     <Compile Include="Core\Physics\Hitbox.cs" />
     <Compile Include="Core\Physics\ICollidable.cs" />
+    <Compile Include="Core\Utils\TexCoords.cs" />
+    <Compile Include="Game\Graphics\Texture.cs" />
     <Compile Include="Game\Sprites\Animations\AnimatedSprite.cs" />
     <Compile Include="Game\Sprites\Animations\Animation.cs" />
     <Compile Include="Game\Sprites\PhysicsSprite.cs" />
@@ -74,11 +78,9 @@
     <Compile Include="Game\Worlds\Tiled\TiledWorld.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Settings\ScreenSettings.cs" />
-    <Compile Include="Core\Utils\Rectangle.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Core\Utils\swag.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

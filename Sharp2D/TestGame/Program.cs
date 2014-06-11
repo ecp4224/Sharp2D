@@ -14,11 +14,7 @@ namespace TestGame
         public static TestSprite spriteSause;
         public static void Main(string[] args)
         {
-            ScreenSettings settings = new ScreenSettings();
-            settings.GameSize = new Sharp2D.Core.Utils.Rectangle(1280f, 720f);
-            settings.WindowSize = settings.GameSize;
-
-            Screen.DisplayScreenAsync(settings);
+            Screen.DisplayScreenAsync();
 
             TestWorld world = new TestWorld();
 
@@ -29,15 +25,17 @@ namespace TestGame
             Screen.Camera.Z = 2f;
             world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
 
+            Texture tex = Texture.NewTexture("sprites/Hans/Hans.png");
+            tex.LoadTextureFromFile();
             TestSprite idontevenknowanymore = new TestSprite();
             idontevenknowanymore.ChangeHitbox("PonyHitbox");
-            idontevenknowanymore.TexCoords = new Rectangle(0, 0, 1, 1);
+            idontevenknowanymore.TexCoords = new TexCoords(0, 0, tex);
             idontevenknowanymore.X = 256;
             idontevenknowanymore.Y = 512;
             world.AddSprite(idontevenknowanymore);
 
             spriteSause = new TestSprite(); //messy messy mess
-            spriteSause.TexCoords = new Rectangle(0, 0, 1, 1);
+            //spriteSause.TexCoords = new TexCoords(0, 0, null);
             spriteSause.X = 256;
             spriteSause.Y = 128;
             spriteSause.MoveFlag = true;
@@ -45,7 +43,7 @@ namespace TestGame
             
             TestSprite enemy = new TestSprite();
             enemy.ChangeHitbox("TriangleHitbox");
-            enemy.TexCoords = new Rectangle(0, 0, 1, 1);
+            //enemy.TexCoords = new TexCoords(0, 0, null);
             enemy.X = 512;
             enemy.Y = 128;
             world.AddSprite(enemy);
@@ -53,7 +51,7 @@ namespace TestGame
 
             TestSprite eddie = new TestSprite();
             eddie.ChangeHitbox("UhidkHitbox");
-            eddie.TexCoords = new Rectangle(0, 0, 1, 1);
+            //eddie.TexCoords = new TexCoords(0, 0, null);
             eddie.X = 512;
             eddie.Y = 512;
             world.AddSprite(eddie);

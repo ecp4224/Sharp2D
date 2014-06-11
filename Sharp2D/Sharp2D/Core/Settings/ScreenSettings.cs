@@ -8,14 +8,14 @@ using Sharp2D.Core.Graphics;
 
 namespace Sharp2D.Core.Settings
 {
-    public class ScreenSettings
-    {
+    public class ScreenSettings : Setting
+    { 
         public string WindowTitle { get; set; }
 
         public int LogicTickRate { get; set; }
         public int MaxSkippedFrames { get; set; }
-        public Rectangle GameSize { get; set; }
-        public Rectangle WindowSize { get; set; }
+        public System.Drawing.Rectangle GameSize { get; set; }
+        public System.Drawing.Rectangle WindowSize { get; set; }
         public bool Fullscreen { get; set; }
         public bool VSync { get; set; }
         public int MaxFPS { get; set; }
@@ -49,5 +49,9 @@ namespace Sharp2D.Core.Settings
         }
 
         public ScreenSettings() : this(Screen.DEFAULT_SETTINGS) { }
+
+        public override void OnLoad() { }
+
+        public override void OnSave() { }
     }
 }

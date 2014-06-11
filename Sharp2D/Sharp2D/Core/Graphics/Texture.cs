@@ -64,6 +64,7 @@ namespace Sharp2D.Core.Graphics
 
         public void LoadTextureFromResource()
         {
+            Screen.ValidateOpenGLUnsafe("Texture.LoadTextureFromResource", true);
             Assembly asm = Assembly.GetEntryAssembly();
 
             Stream stream = asm.GetManifestResourceStream(Name);
@@ -73,6 +74,7 @@ namespace Sharp2D.Core.Graphics
 
         public void LoadTextureFromFile()
         {
+            Screen.ValidateOpenGLUnsafe("Texture.LoadTextureFromFile", true);
             Bitmap = new Bitmap(Name, false);
 
             ImageWidth = Bitmap.Width;
@@ -98,6 +100,8 @@ namespace Sharp2D.Core.Graphics
 
         public void Create()
         {
+            Screen.ValidateOpenGLSafe("Texture.Create");
+
             ID = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, ID);
 
@@ -113,6 +117,8 @@ namespace Sharp2D.Core.Graphics
 
         public void Bind()
         {
+            Screen.ValidateOpenGLSafe("Texture.Bind");
+
             GL.BindTexture(TextureTarget.Texture2D, ID);
         }
     }

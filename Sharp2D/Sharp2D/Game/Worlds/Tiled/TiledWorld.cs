@@ -13,7 +13,7 @@ namespace Sharp2D.Game.Worlds.Tiled
 {
     public abstract class TiledWorld : SpriteWorld
     {
-        internal readonly Dictionary<int, Core.Utils.Rectangle> texcoords_cache = new Dictionary<int, Core.Utils.Rectangle>();
+        internal readonly Dictionary<int, Core.Utils.TexCoords> texcoords_cache = new Dictionary<int, Core.Utils.TexCoords>();
         [JsonProperty(PropertyName = "height")]
         public int Height { get; private set; }
 

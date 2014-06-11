@@ -119,7 +119,7 @@ namespace Sharp2D.Game.Graphics
 
         public void Create()
         {
-            Sharp2D.Core.Graphics.Screen.ValidateThreadState("Texture.Create");
+            Sharp2D.Core.Graphics.Screen.ValidateOpenGLSafe("Texture.Create");
 
             ID = GL.GenTexture();
 
