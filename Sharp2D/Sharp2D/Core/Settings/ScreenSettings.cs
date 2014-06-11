@@ -8,7 +8,7 @@ using Sharp2D.Core.Graphics;
 
 namespace Sharp2D.Core.Settings
 {
-    public class ScreenSettings : Settings
+    public class ScreenSettings : Setting
     { 
         public string WindowTitle { get; set; }
 
@@ -49,5 +49,9 @@ namespace Sharp2D.Core.Settings
         }
 
         public ScreenSettings() : this(Screen.DEFAULT_SETTINGS) { }
+
+        public override void OnLoad() { }
+
+        public override void OnSave() { }
     }
 }
