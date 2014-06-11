@@ -8,8 +8,8 @@ using Sharp2D.Core.Graphics;
 
 namespace Sharp2D.Core.Settings
 {
-    public class ScreenSettings
-    {
+    public class ScreenSettings : Settings
+    { 
         public string WindowTitle { get; set; }
 
         public int LogicTickRate { get; set; }
