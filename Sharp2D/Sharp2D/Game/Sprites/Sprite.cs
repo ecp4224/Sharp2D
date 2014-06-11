@@ -19,7 +19,21 @@ namespace Sharp2D.Game.Sprites
         public bool Loaded { get; private set; }
         public Texture Texture { get; set; }
         public Vector2 Position { get { return new Vector2(X, Y); } }
-        public Rectangle TexCoords;
+        public TexCoords TexCoords;
+        private float _rot;
+        public float Rotation
+        {
+            get { return _rot; }
+            set
+            {
+                while (value > 360f)
+                    value -= 360f;
+                while (value < 0f)
+                    value += 360f;
+
+                _rot = value;
+            }
+        }
         public float Width { get; set; }
         public float Height { get; set; }
         public bool IsOffScreen

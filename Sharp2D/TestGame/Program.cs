@@ -13,11 +13,7 @@ namespace TestGame
     {
         static void Main(string[] args)
         {
-            ScreenSettings settings = new ScreenSettings();
-            settings.GameSize = new Sharp2D.Core.Utils.Rectangle(1280f, 720f);
-            settings.WindowSize = settings.GameSize;
-
-            Screen.DisplayScreenAsync(settings);
+            Screen.DisplayScreenAsync();
 
             TestWorld world = new TestWorld();
             world.Load();

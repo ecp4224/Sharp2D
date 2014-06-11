@@ -21,7 +21,7 @@ namespace Sharp2D.Core.Graphics
                 ScreenSettings settings = new ScreenSettings(null);
                 settings.LogicTickRate = 40; //25 ticks/second
                 settings.MaxSkippedFrames = 5; //Skip a max of 5 draw frames
-                settings.GameSize = new Rectangle(1280, 720); //720p
+                settings.GameSize = new System.Drawing.Rectangle(0, 0, 1280, 720); //720p
                 settings.WindowSize = settings.GameSize;
                 settings.Fullscreen = false;
                 settings.VSync = false;

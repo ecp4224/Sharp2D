@@ -51,6 +51,7 @@
     <Compile Include="Core\Graphics\Camera.cs" />
     <Compile Include="Core\Logic\World.cs" />
     <Compile Include="Core\Utils\MathUtils.cs" />
+    <Compile Include="Core\Utils\TexCoords.cs" />
     <Compile Include="Game\Sprites\Animations\AnimatedSprite.cs" />
     <Compile Include="Game\Sprites\Animations\Animation.cs" />
     <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />
@@ -71,7 +72,6 @@
     <Compile Include="Game\Worlds\Tiled\TiledWorld.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Settings\ScreenSettings.cs" />
-    <Compile Include="Core\Utils\Rectangle.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

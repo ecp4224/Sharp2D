@@ -14,8 +14,8 @@ namespace Sharp2D.Core.Settings
 
         public int LogicTickRate { get; set; }
         public int MaxSkippedFrames { get; set; }
-        public Rectangle GameSize { get; set; }
-        public Rectangle WindowSize { get; set; }
+        public System.Drawing.Rectangle GameSize { get; set; }
+        public System.Drawing.Rectangle WindowSize { get; set; }
         public bool Fullscreen { get; set; }
         public bool VSync { get; set; }
         public int MaxFPS { get; set; }
