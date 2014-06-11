@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using OpenTK;
+using Newtonsoft.Json.Linq;
 
 namespace Sharp2D.Core.Physics
 {
@@ -74,20 +75,8 @@ namespace Sharp2D.Core.Physics
                 }
             }
 
-            var container = JsonConvert.DeserializeObject<HitboxContainer>(json);
-            var hitboxes = new List<Hitbox>();
-
-            foreach (var holder in container.Hitboxes)
-            {
-                var vertices = new List<Vector2>();
-                for (var i = 0; i < holder.Vertices.Count; i += 2)
-                {
-                    vertices.Add(new Vector2(holder.Vertices[i], holder.Vertices[i + 1]));
-                }
-                hitboxes.Add(new Hitbox(holder.Name, vertices));
-            }
-
-            return hitboxes;
+            JObject obj = JObject.Parse(json);
+            return obj["hitboxes"].Select(t => t.ToObject<Hitbox>()).ToList();
         }
 
         private static void Project(Vector2 axis, Hitbox hitbox, ref float min, ref float max)
