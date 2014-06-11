@@ -23,19 +23,15 @@ namespace TestGame
             world.Display();
 
             Screen.Camera.Z = 2f;
-            world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
+            //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
 
-            Texture tex = Texture.NewTexture("sprites/Hans/Hans.png");
-            tex.LoadTextureFromFile();
             TestSprite idontevenknowanymore = new TestSprite();
             idontevenknowanymore.ChangeHitbox("PonyHitbox");
-            idontevenknowanymore.TexCoords = new TexCoords(0, 0, tex);
             idontevenknowanymore.X = 256;
-            idontevenknowanymore.Y = 512;
+            idontevenknowanymore.Y = 128;
             world.AddSprite(idontevenknowanymore);
 
-            spriteSause = new TestSprite(); //messy messy mess
-            //spriteSause.TexCoords = new TexCoords(0, 0, null);
+            spriteSause = new TestSprite(); 
             spriteSause.X = 256;
             spriteSause.Y = 128;
             spriteSause.MoveFlag = true;
@@ -43,7 +39,6 @@ namespace TestGame
             
             TestSprite enemy = new TestSprite();
             enemy.ChangeHitbox("TriangleHitbox");
-            //enemy.TexCoords = new TexCoords(0, 0, null);
             enemy.X = 512;
             enemy.Y = 128;
             world.AddSprite(enemy);
@@ -51,11 +46,12 @@ namespace TestGame
 
             TestSprite eddie = new TestSprite();
             eddie.ChangeHitbox("UhidkHitbox");
-            //eddie.TexCoords = new TexCoords(0, 0, null);
             eddie.X = 512;
             eddie.Y = 512;
             world.AddSprite(eddie);
 
+
+            Logger.Debug(eddie.CurrentWorld.Name);
         }
     }
 

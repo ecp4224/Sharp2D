@@ -38,7 +38,7 @@ namespace Sharp2D.Game.Sprites.Animations
             }
         }
 
-        public override void OnLoad()
+        protected override void OnLoad()
         {
             string json = null;
             if (File.Exists("animations/" + Name + ".conf"))
@@ -74,9 +74,9 @@ namespace Sharp2D.Game.Sprites.Animations
             }
         }
 
-        public override void OnDispose()
+        protected override void OnDispose()
         {
-            if (Animations != null) //todo temp workaround
+            if (Animations != null)
                 Animations.Dispose();
         }
     }

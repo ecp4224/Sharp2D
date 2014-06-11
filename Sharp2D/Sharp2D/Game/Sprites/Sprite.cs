@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Utils;
 using OpenTK;
+using Sharp2D.Core.Logic;
 
 namespace Sharp2D.Game.Sprites
 {
@@ -20,6 +21,24 @@ namespace Sharp2D.Game.Sprites
         public bool Loaded { get; private set; }
         public Texture Texture { get; set; }
         public Vector2 Position { get { return new Vector2(X, Y); } }
+        internal readonly List<World> _worlds = new List<World>();
+        public IList<World> ContainingWorlds
+        {
+            get
+            {
+                return _worlds.AsReadOnly();
+            }
+        }
+        /// <summary>
+        /// Get the world the sprite is currently in. This world is the current World being displayed on the screen. To get all the Worlds this sprite is in, use ContainingWorlds
+        /// </summary>
+        public World CurrentWorld
+        {
+            get
+            {
+                return ContainingWorlds.Where(w => w.Displaying).First();
+            }
+        }
         public TexCoords TexCoords;
         private float _rot;
         public float Rotation
@@ -52,6 +71,10 @@ namespace Sharp2D.Game.Sprites
         public void Load()
         {
             OnLoad();
+            if (TexCoords == null && Texture != null)
+            {
+                TexCoords = new Sharp2D.Core.Utils.TexCoords(Width, Height, Texture);
+            }
             Loaded = true;
         }
 
@@ -68,13 +91,20 @@ namespace Sharp2D.Game.Sprites
             OnDispose();
         }
 
-        public abstract void OnLoad();
+        public void Display()
+        {
+            OnDisplay();
+            if (Texture != null && Texture.ID == -1)
+                Texture.Create();
+        }
 
-        public abstract void OnUnload();
+        protected abstract void OnLoad();
 
-        public abstract void OnDispose();
+        protected abstract void OnUnload();
 
-        public abstract void OnDisplay();
+        protected abstract void OnDispose();
+
+        protected abstract void OnDisplay();
 
     }
 }

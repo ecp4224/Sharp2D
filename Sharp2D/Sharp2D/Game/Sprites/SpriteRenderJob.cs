@@ -32,6 +32,31 @@ namespace Sharp2D.Game.Sprites
             DefaultJob = t;
         }
 
+        private bool valid = false;
+        private List<Sprite> _cache = new List<Sprite>();
+        public List<Sprite> Sprites
+        {
+            get
+            {
+                lock (group_lock)
+                {
+                    if (!valid)
+                    {
+                        _cache = new List<Sprite>();
+                        foreach (Texture tex in groups.Keys)
+                        {
+                            foreach (Sprite sprite in groups[tex])
+                            {
+                                _cache.Add(sprite);
+                            }
+                        }
+                        valid = true;
+                    }
+                }
+                return _cache;
+            }
+        }
+
         protected readonly ConcurrentDictionary<Texture, List<Sprite>> groups = new ConcurrentDictionary<Texture, List<Sprite>>();
         protected readonly object group_lock = new object();
 
@@ -43,7 +68,7 @@ namespace Sharp2D.Game.Sprites
             {
                 foreach (Sprite s in groups[t])
                 {
-                    s.OnUnload();
+                    s.Unload();
                     s.Dispose();
                 }
             }
@@ -52,11 +77,12 @@ namespace Sharp2D.Game.Sprites
 
         public virtual void AddSprite(Sprite sprite)
         {
+            sprite.Load();
             lock (group_lock)
             {
                 groups.GetOrAdd(sprite.Texture, new List<Sprite>()).Add(sprite);
+                valid = false;
             }
-            sprite.OnLoad();
         }
 
         public virtual void RemoveSprite(Sprite sprite)
@@ -68,8 +94,9 @@ namespace Sharp2D.Game.Sprites
                 if (temp.Contains(sprite))
                 {
                     temp.Remove(sprite);
-                    sprite.OnUnload();
+                    sprite.Unload();
                 }
+                valid = false;
             }
         }
 

@@ -68,22 +68,22 @@ namespace Sharp2D.Game.Sprites.Tiled
         }
 
 
-        public override void OnLoad()
+        protected override void OnLoad()
         {
             //TODO Do some loading of something
         }
 
-        public override void OnUnload()
+        protected override void OnUnload()
         {
             //TODO Do some unloading of something
         }
 
-        public override void OnDispose()
+        protected override void OnDispose()
         {
             //TODO Dispose something..
         }
 
-        public override void OnDisplay()
+        protected override void OnDisplay()
         {
             //TODO Display related stuff (badpokerface)
         }

@@ -89,12 +89,18 @@ namespace Sharp2D.Game.Tiled
                     throw new System.IO.FileNotFoundException("Could not find texture for tileset", ImagePath);
                 }
             }
+
+            if (Properties == null)
+                Properties = new Dictionary<string, string>();
+            if (TileProperties == null)
+                TileProperties = new Dictionary<string, Dictionary<string, string>>();
         }
 
         public void Dispose()
         {
-            Properties.Clear();
-            if (TileProperties != null) //todo temp workaround, see whats causing this
+            if (Properties != null)
+                Properties.Clear();
+            if (TileProperties != null)
                 TileProperties.Clear();
             TileTexture = null;
         }

@@ -27,7 +27,7 @@ namespace Sharp2D.Game.Sprites
 
                         if (s.FirstRun)
                         {
-                            s.OnDisplay();
+                            s.Display();
                             s.FirstRun = false;
                         }
 
@@ -37,7 +37,6 @@ namespace Sharp2D.Game.Sprites
                         float x = s.X;
                         float y = s.Y;
 
-                        GL.Color3(70f / 255f, 130f / 255f, 250f / 255f);
                         GL.Begin(PrimitiveType.Quads);
 
                         GL.TexCoord2(s.TexCoords.TopLeft.X, s.TexCoords.TopLeft.Y);
@@ -50,7 +49,7 @@ namespace Sharp2D.Game.Sprites
                         GL.Vertex3(x - bx, y + by, z);
                         GL.End();
 
-                        if (s is PhysicsSprite)
+                        /*if (s is PhysicsSprite)
                         {
                             var h = (s as PhysicsSprite).Hitbox.GetRelativeHitbox(s as PhysicsSprite);
 
@@ -76,7 +75,7 @@ namespace Sharp2D.Game.Sprites
 
                             GL.LineWidth(1f);
                             GL.Color3(1, 1, 1);
-                        }
+                        }*/
                     }
                 }
             }

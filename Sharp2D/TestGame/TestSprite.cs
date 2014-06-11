@@ -16,15 +16,17 @@ namespace TestGame
         public TestSprite()
         {
             Texture = Texture.NewTexture("sprites/Hans/Hans.png");
-            //Texture.LoadTextureFromFile();
+            Texture.LoadTextureFromFile();
+            Width = Texture.TextureWidth;
+            Height = Texture.TextureHeight;
         }
 
 
-        public override void OnUnload()
+        protected override void OnUnload()
         {
         }
 
-        public override void OnDisplay()
+        protected override void OnDisplay()
         {
         }
 
