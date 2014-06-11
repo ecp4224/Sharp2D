@@ -51,8 +51,11 @@
     <Compile Include="Core\Graphics\Camera.cs" />
     <Compile Include="Core\Logic\World.cs" />
     <Compile Include="Core\Utils\MathUtils.cs" />
+    <Compile Include="Core\Physics\Hitbox.cs" />
+    <Compile Include="Core\Physics\ICollidable.cs" />
     <Compile Include="Game\Sprites\Animations\AnimatedSprite.cs" />
     <Compile Include="Game\Sprites\Animations\Animation.cs" />
+    <Compile Include="Game\Sprites\PhysicsSprite.cs" />
     <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />
     <Compile Include="Game\Tiled\Layer.cs" />
     <Compile Include="Game\Tiled\TileSet.cs" />
@@ -75,6 +78,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="Core\Utils\swag.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

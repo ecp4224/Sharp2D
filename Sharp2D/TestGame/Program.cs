@@ -11,7 +11,8 @@ namespace TestGame
 {
     class Program
     {
-        static void Main(string[] args)
+        public static TestSprite spriteSause;
+        public static void Main(string[] args)
         {
             ScreenSettings settings = new ScreenSettings();
             settings.GameSize = new Sharp2D.Core.Utils.Rectangle(1280f, 720f);
@@ -20,10 +21,43 @@ namespace TestGame
             Screen.DisplayScreenAsync(settings);
 
             TestWorld world = new TestWorld();
+
             world.Load();
+
             world.Display();
+
             Screen.Camera.Z = 2f;
             world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
+
+            TestSprite idontevenknowanymore = new TestSprite();
+            idontevenknowanymore.ChangeHitbox("PonyHitbox");
+            idontevenknowanymore.TexCoords = new Rectangle(0, 0, 1, 1);
+            idontevenknowanymore.X = 256;
+            idontevenknowanymore.Y = 512;
+            world.AddSprite(idontevenknowanymore);
+
+            spriteSause = new TestSprite(); //messy messy mess
+            spriteSause.TexCoords = new Rectangle(0, 0, 1, 1);
+            spriteSause.X = 256;
+            spriteSause.Y = 128;
+            spriteSause.MoveFlag = true;
+
+            
+            TestSprite enemy = new TestSprite();
+            enemy.ChangeHitbox("TriangleHitbox");
+            enemy.TexCoords = new Rectangle(0, 0, 1, 1);
+            enemy.X = 512;
+            enemy.Y = 128;
+            world.AddSprite(enemy);
+            world.AddSprite(spriteSause);
+
+            TestSprite eddie = new TestSprite();
+            eddie.ChangeHitbox("UhidkHitbox");
+            eddie.TexCoords = new Rectangle(0, 0, 1, 1);
+            eddie.X = 512;
+            eddie.Y = 512;
+            world.AddSprite(eddie);
+
         }
     }
 
@@ -32,11 +66,11 @@ namespace TestGame
         public long Start;
         public void Update()
         {
-            float value = MathUtils.Ease(0f, 30f * 16f, 3000, Screen.TickCount - Start);
-            Screen.Camera.X = value;
-            Console.CursorTop = 2;
-            Console.WriteLine("       ");
-            Console.WriteLine(Screen.Camera.X);
+            if (Program.spriteSause != null)
+            {
+                Screen.Camera.X = Program.spriteSause.X - 300;
+                Screen.Camera.Y = Program.spriteSause.Y - 200;
+            }
         }
 
         public void Dispose()

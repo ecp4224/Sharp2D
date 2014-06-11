@@ -94,7 +94,8 @@ namespace Sharp2D.Game.Tiled
         public void Dispose()
         {
             Properties.Clear();
-            TileProperties.Clear();
+            if (TileProperties != null) //todo temp workaround, see whats causing this
+                TileProperties.Clear();
             TileTexture = null;
         }
     }

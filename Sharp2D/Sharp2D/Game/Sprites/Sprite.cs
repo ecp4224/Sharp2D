@@ -16,6 +16,7 @@ namespace Sharp2D.Game.Sprites
             Dispose();
         }
 
+        internal bool FirstRun = true;
         public bool Loaded { get; private set; }
         public Texture Texture { get; set; }
         public Vector2 Position { get { return new Vector2(X, Y); } }
@@ -58,6 +59,8 @@ namespace Sharp2D.Game.Sprites
         public abstract void OnUnload();
 
         public abstract void OnDispose();
+
+        public abstract void OnDisplay();
 
     }
 }

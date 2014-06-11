@@ -87,5 +87,10 @@ namespace Sharp2D.Game.Sprites.Tiled
         {
             //TODO Dispose something..
         }
+
+        public override void OnDisplay()
+        {
+            //TODO Display related stuff (badpokerface)
+        }
     }
 }

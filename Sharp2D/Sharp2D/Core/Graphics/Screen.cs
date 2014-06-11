@@ -200,18 +200,18 @@ namespace Sharp2D.Core.Graphics
         static void window_UpdateFrame(object sender, FrameEventArgs e)
         {
             _logicTick();
-            Console.CursorTop = 1;
+            /*Console.CursorTop = 1;
             Console.WriteLine("                                            ");
-            Console.WriteLine("UPS: " + window.UpdateFrequency);
+            Console.WriteLine("UPS: " + window.UpdateFrequency);*/
         }
 
         static void window_RenderFrame(object sender, FrameEventArgs e)
         {
             _draw();
             window.SwapBuffers();
-            Console.CursorTop = 0;
+            /*Console.CursorTop = 0;
             Console.WriteLine("                                            ");
-            Console.WriteLine("FPS: " + window.RenderFrequency);
+            Console.WriteLine("FPS: " + window.RenderFrequency);*/
         }
 
         private static void _openTKStart()
@@ -267,7 +267,7 @@ namespace Sharp2D.Core.Graphics
                 {
                     fpsCount = 0;
                     FPS = (1000f / fpsTime);
-                    Console.WriteLine("FPS: " + FPS);
+                    //Console.WriteLine("FPS: " + FPS);
                     fpsTime = 0;
                 }
 
