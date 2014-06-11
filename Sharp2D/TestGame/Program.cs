@@ -30,9 +30,6 @@ namespace TestGame
         {
             float value = MathUtils.Ease(0f, 30f * 16f, 3000, Screen.TickCount - Start);
             Screen.Camera.X = value;
-            Console.CursorTop = 2;
-            Console.WriteLine("       ");
-            Console.WriteLine(Screen.Camera.X);
         }
 
         public void Dispose()
