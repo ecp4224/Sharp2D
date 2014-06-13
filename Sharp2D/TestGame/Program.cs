@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sharp2D.Core.Settings;
 using Sharp2D.Core.Graphics;
+using Sharp2D.Core.Graphics.Shaders;
 using Sharp2D.Core.Utils;
 
 namespace TestGame
@@ -49,7 +50,6 @@ namespace TestGame
             eddie.X = 512;
             eddie.Y = 512;
             world.AddSprite(eddie);
-
 
             Logger.Debug(eddie.CurrentWorld.Name);
         }

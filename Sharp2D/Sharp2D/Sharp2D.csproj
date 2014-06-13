@@ -49,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Graphics\Camera.cs" />
+    <Compile Include="Core\Graphics\Shaders\Shader.cs" />
+    <Compile Include="Core\Graphics\Shaders\Source.cs" />
+    <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />
     <Compile Include="Core\Logic\World.cs" />
     <Compile Include="Core\Settings\Settings.cs" />
     <Compile Include="Core\Utils\Logger.cs" />
@@ -56,6 +59,8 @@
     <Compile Include="Core\Physics\Hitbox.cs" />
     <Compile Include="Core\Physics\ICollidable.cs" />
     <Compile Include="Core\Utils\TexCoords.cs" />
+    <Compile Include="Game\Drawables\IDrawable.cs" />
+    <Compile Include="Game\Drawables\DrawableRenderJob.cs" />
     <Compile Include="Game\Sprites\Animations\AnimatedSprite.cs" />
     <Compile Include="Game\Sprites\Animations\Animation.cs" />
     <Compile Include="Game\Sprites\PhysicsSprite.cs" />

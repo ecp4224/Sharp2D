@@ -19,7 +19,44 @@ namespace Sharp2D.Game.Sprites
 
         internal bool FirstRun = true;
         public bool Loaded { get; private set; }
-        public Texture Texture { get; set; }
+        private Texture _texture;
+        public List<SpriteRenderJob> ContainingJobs
+        {
+            get
+            {
+                World current = CurrentWorld;
+                if (current is Game.Worlds.SpriteWorld)
+                {
+                    List<SpriteRenderJob> toReturn = new List<SpriteRenderJob>();
+                    List<SpriteRenderJob> jobs = ((Game.Worlds.SpriteWorld)current).SpriteRenderJobs;
+                    foreach (SpriteRenderJob job in jobs)
+                    {
+                        if (job.HasSprite(this))
+                            toReturn.Add(job);
+                    }
+
+                    return toReturn;
+                }
+                return new List<SpriteRenderJob>();
+            }
+        }
+        public Texture Texture
+        {
+            get
+            {
+                return _texture;
+            }
+            set
+            {
+                List<SpriteRenderJob> temp = ContainingJobs;
+
+                foreach (SpriteRenderJob job in temp) job.RemoveSprite(this);
+
+                _texture = value;
+
+                foreach (SpriteRenderJob job in temp) job.AddSprite(this);
+            }
+        }
         public Vector2 Position { get { return new Vector2(X, Y); } }
         internal readonly List<World> _worlds = new List<World>();
         public IList<World> ContainingWorlds
@@ -75,6 +112,8 @@ namespace Sharp2D.Game.Sprites
             {
                 TexCoords = new Sharp2D.Core.Utils.TexCoords(Width, Height, Texture);
             }
+            else if (Texture == null)
+                throw new InvalidOperationException("This sprite has no texture! A sprite MUST have a texture!");
             Loaded = true;
         }
 

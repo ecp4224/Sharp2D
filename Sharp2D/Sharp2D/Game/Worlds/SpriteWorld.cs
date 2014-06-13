@@ -38,7 +38,8 @@ namespace Sharp2D.Game.Worlds
             get
             {
                 List<Sprite> sprites = new List<Sprite>();
-                foreach (SpriteRenderJob job in SpriteRenderJobs)
+                List<SpriteRenderJob> jobs = SpriteRenderJobs;
+                foreach (SpriteRenderJob job in jobs)
                 {
                     sprites.AddRange(job.Sprites);
                 }
@@ -74,7 +75,8 @@ namespace Sharp2D.Game.Worlds
 
         public void RemoveSprite(Sprite s)
         {
-            foreach (SpriteRenderJob job in SpriteRenderJobs)
+            List<SpriteRenderJob> jobs = SpriteRenderJobs;
+            foreach (SpriteRenderJob job in jobs)
             {
                 if (job.HasSprite(s))
                     job.RemoveSprite(s);
