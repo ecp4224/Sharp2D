@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sharp2D.Game.Drawables
 {
-    interface IDrawable
+    public interface IDrawable
     {
         void Draw();
     }
