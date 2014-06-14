@@ -10,8 +10,6 @@ namespace TestGame
         public static TestSprite spriteSause;
         public static void Main(string[] args)
         {
-            Input.Initialize();
-
             Screen.DisplayScreenAsync();
 
             TestWorld world = new TestWorld();

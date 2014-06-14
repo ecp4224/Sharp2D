@@ -14,9 +14,7 @@ namespace Sharp2D.Core.Settings
         public static Keyboard Keyboard = new Keyboard();
         public static Mouse Mouse = new Mouse();
 
-        internal static bool Initialized = false;
-
-        public static void Initialize()
+        static Input()
         {
             var lines = File.ReadAllLines(FilePath);
 
@@ -44,8 +42,6 @@ namespace Sharp2D.Core.Settings
                 else if (parsed < 142) { Mouse.Buttons.Add(key, (MouseButton) (parsed - 130)); } //Mouse codes
                 else { Logger.Warn("Value \"" + parsed + "\" is not a valid keycode."); } //Invalid codes
             }
-
-            Initialized = true;
         }
     }
 
@@ -61,12 +57,6 @@ namespace Sharp2D.Core.Settings
         {
             get
             {
-                if (!Input.Initialized)
-                {
-                    Logger.Warn("Input is not initialized.");
-                    return false;
-                }
-
                 if (Keys.ContainsKey(keyName))
                 {
                     return OpenTK.Input.Keyboard.GetState()[Keys[keyName]];
@@ -90,12 +80,6 @@ namespace Sharp2D.Core.Settings
         {
             get
             {
-                if (!Input.Initialized)
-                {
-                    Logger.Warn("Input is not initialized.");
-                    return false;
-                }
-
                 if (Buttons.ContainsKey(buttonName))
                 {
                     return OpenTK.Input.Mouse.GetState()[Buttons[buttonName]];
