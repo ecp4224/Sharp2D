@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Sharp2D.Core.Graphics;
+using Sharp2D.Core.Logic;
 using Sharp2D.Core.Settings;
-using Sharp2D.Core.Graphics;
-using Sharp2D.Core.Graphics.Shaders;
 using Sharp2D.Core.Utils;
 
 namespace TestGame
@@ -15,6 +10,8 @@ namespace TestGame
         public static TestSprite spriteSause;
         public static void Main(string[] args)
         {
+            Input.Initialize();
+
             Screen.DisplayScreenAsync();
 
             TestWorld world = new TestWorld();
@@ -52,10 +49,13 @@ namespace TestGame
             world.AddSprite(eddie);
 
             Logger.Debug(eddie.CurrentWorld.Name);
+
+            world.AddLogical(new MoveCamera());
+            world.AddLogical(new CheckKeys());
         }
     }
 
-    class MoveCamera : Sharp2D.Core.Logic.ILogical
+    class MoveCamera : ILogical
     {
         public long Start;
         public void Update()
@@ -70,6 +70,27 @@ namespace TestGame
         public void Dispose()
         {
 
+        }
+    }
+
+    class CheckKeys : ILogical
+    {
+        public void Update()
+        {
+            if (Input.Keyboard["Jump"])
+            {
+                Logger.Log("I LIKE TURTLES!");
+            }
+
+            if (Input.Mouse["Shoot"])
+            {
+                Logger.Log("SCOOTALOO IS THE BEST PONY!");
+            }
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

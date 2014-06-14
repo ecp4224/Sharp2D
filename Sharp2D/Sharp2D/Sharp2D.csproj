@@ -53,6 +53,7 @@
     <Compile Include="Core\Graphics\Shaders\Source.cs" />
     <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />
     <Compile Include="Core\Logic\World.cs" />
+    <Compile Include="Core\Settings\Input.cs" />
     <Compile Include="Core\Settings\Settings.cs" />
     <Compile Include="Core\Utils\Logger.cs" />
     <Compile Include="Core\Utils\MathUtils.cs" />

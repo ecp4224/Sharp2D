@@ -54,8 +54,7 @@ namespace Sharp2D.Game.Sprites
                         {
                             var h = (s as PhysicsSprite).Hitbox.GetRelativeHitbox(s as PhysicsSprite);
 
-                            GL.LineWidth(2f);
-                            GL.Color3(200f / 255f, 30f / 255f, 30f / 255f);
+                            
                             GL.Begin(PrimitiveType.LineLoop);
                             foreach (var v in h.Vertices)
                             {
@@ -63,19 +62,6 @@ namespace Sharp2D.Game.Sprites
                             }
                             GL.End();
 
-                            GL.Color3(230f / 255f, 90f / 255f, 250f / 255f);
-                            GL.Begin(PrimitiveType.LineLoop);
-                            var i = 1f;
-                            foreach (var v in h.ConstructEdgesRelative(s as PhysicsSprite))
-                            {
-                                i++;
-                                GL.LineWidth(i);
-                                GL.Vertex3(v.X, v.Y, 0);
-                            }
-                            GL.End();
-
-                            GL.LineWidth(1f);
-                            GL.Color3(1, 1, 1);
                         }*/
                     }
                 }

@@ -73,7 +73,7 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return ContainingWorlds.Where(w => w.Displaying).First();
+                return ContainingWorlds.Where(w => w.Displaying).FirstOrDefault();
             }
         }
         public TexCoords TexCoords;
