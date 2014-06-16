@@ -17,6 +17,8 @@ namespace TestGame
         {
             Screen.DisplayScreenAsync();
 
+            System.Threading.Thread.Sleep(1000);
+
             TestWorld world = new TestWorld();
 
             world.Load();
@@ -50,8 +52,6 @@ namespace TestGame
             eddie.X = 512;
             eddie.Y = 512;
             world.AddSprite(eddie);
-
-            Logger.Debug(eddie.CurrentWorld.Name);
         }
     }
 

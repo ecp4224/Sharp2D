@@ -11,10 +11,9 @@ namespace Sharp2D.Game.Worlds
 {
     public class GenericCamera : Camera
     {
-        internal override void BeforeRender()
+        public override void BeforeRender()
         {
-            GL.Scale(Z, Z, 0f);
-            GL.Translate(-X, -Y, 0f);
+            
         }
     }
 }

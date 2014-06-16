@@ -10,6 +10,11 @@ namespace Sharp2D.Core.Graphics.Shaders
 {
     public class Shader
     {
+        public delegate void ShaderEvent(Shader shader);
+        public event ShaderEvent OnShaderBound;
+        public event ShaderEvent OnShaderCompiled;
+        public event ShaderEvent OnShaderLinked;
+
         private List<Source> _sources = new List<Source>();
         public IList<Source> Sources
         {
@@ -20,6 +25,9 @@ namespace Sharp2D.Core.Graphics.Shaders
         }
         
         public bool IsActive { get; private set; }
+        public bool IsLinked { get; private set; }
+        public bool IsLoaded { get; private set; }
+        public bool IsCompiled { get; private set; }
 
         private UniformHolder _holder;
         public UniformHolder Uniforms
@@ -67,11 +75,15 @@ namespace Sharp2D.Core.Graphics.Shaders
         public void LoadAll()
         {
             _sources.ForEach(s => s.LoadSource());
+            IsLoaded = true;
         }
 
         public void CompileAll()
         {
             _sources.ForEach(s => s.Create());
+            IsCompiled = true;
+            if (OnShaderCompiled != null)
+                OnShaderCompiled(this);
         }
 
         public void LinkAll()
@@ -109,6 +121,11 @@ namespace Sharp2D.Core.Graphics.Shaders
 
                 _holder.locations.Add(name.ToString(), GL.GetUniformLocation(ProgramID, name.ToString()));
             }
+
+            IsCompiled = true;
+
+            if (OnShaderLinked != null)
+                OnShaderLinked(this);
         }
 
         private static Shader _currentShader;
@@ -119,6 +136,8 @@ namespace Sharp2D.Core.Graphics.Shaders
 
             GL.UseProgram(ProgramID);
             IsActive = true;
+            if (OnShaderBound != null)
+                OnShaderBound(this);
 
             if (_currentShader != null)
                 _currentShader.IsActive = false;

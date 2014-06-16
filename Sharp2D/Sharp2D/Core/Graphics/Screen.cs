@@ -42,6 +42,10 @@ namespace Sharp2D.Core.Graphics
             {
                 return Settings.Camera;
             }
+            set
+            {
+                Settings.Camera = value;
+            }
         }
 
         public static Thread DisplayThread { get; private set; }
@@ -215,14 +219,14 @@ namespace Sharp2D.Core.Graphics
         static void window_UpdateFrame(object sender, FrameEventArgs e)
         {
             _logicTick();
-            Logger.WriteAt(0, 1, "UPS: " + window.UpdateFrequency);
+            //Logger.WriteAt(0, 1, "UPS: " + window.UpdateFrequency);
         }
 
         static void window_RenderFrame(object sender, FrameEventArgs e)
         {
             _draw();
             window.SwapBuffers();
-            Logger.WriteAt(0, 0, "FPS: " + window.RenderFrequency);
+            ////Logger.WriteAt(0, 0, "FPS: " + window.RenderFrequency);
         }
 
         private static void _openTKStart()

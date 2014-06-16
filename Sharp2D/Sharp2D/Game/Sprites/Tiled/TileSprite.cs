@@ -87,5 +87,10 @@ namespace Sharp2D.Game.Sprites.Tiled
         {
             //TODO Display related stuff (badpokerface)
         }
+
+        protected override void BeforeDraw()
+        {
+            //TODO Do something before it's drawn
+        }
     }
 }

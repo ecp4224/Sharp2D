@@ -5,9 +5,46 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sharp2D.Core.Graphics;
+using Sharp2D.Core.Graphics.Shaders;
 
 namespace Sharp2D.Game.Sprites
 {
+    public class ShaderGroup
+    {
+        public Shader key;
+        public List<TextureGroup> group = new List<TextureGroup>();
+
+        public TextureGroup GetTextureGroupOrDefault(Texture tex)
+        {
+            foreach (TextureGroup t in group)
+            {
+                if (t.key == tex || t.key.ID == tex.ID)
+                    return t;
+            }
+
+            TextureGroup new_group = new TextureGroup();
+            new_group.key = tex;
+            group.Add(new_group);
+
+            return new_group;
+        }
+
+        public TextureGroup GetTextureGroup(Texture tex)
+        {
+            foreach (TextureGroup t in group)
+            {
+                if (t.key == tex || t.key.ID == tex.ID)
+                    return t;
+            }
+            return null;
+        }
+    }
+    public class TextureGroup
+    {
+        public Texture key;
+        public List<Sprite> group = new List<Sprite>();
+    }
+    
     public abstract class SpriteRenderJob : IRenderJob
     {
         private static Type DefaultJob;
@@ -43,11 +80,11 @@ namespace Sharp2D.Game.Sprites
                     if (!valid)
                     {
                         _cache = new List<Sprite>();
-                        foreach (Texture tex in groups.Keys)
+                        foreach (ShaderGroup s in group)
                         {
-                            foreach (Sprite sprite in groups[tex])
+                            foreach (TextureGroup t in s.group)
                             {
-                                _cache.Add(sprite);
+                                _cache.AddRange(t.group);
                             }
                         }
                         valid = true;
@@ -57,22 +94,49 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        protected readonly ConcurrentDictionary<Texture, List<Sprite>> groups = new ConcurrentDictionary<Texture, List<Sprite>>();
+
+        protected readonly List<ShaderGroup> group = new List<ShaderGroup>();
         protected readonly object group_lock = new object();
 
         public abstract void PerformJob();
 
         public virtual void Dispose()
         {
-            foreach (Texture t in groups.Keys)
+            foreach (ShaderGroup s in group)
             {
-                foreach (Sprite s in groups[t])
+                foreach (TextureGroup t in s.group) 
                 {
-                    s.Unload();
-                    s.Dispose();
+                    foreach (Sprite sprite in t.group)
+                    {
+                        sprite.Unload();
+                        sprite.Dispose();
+                    }
                 }
             }
-            groups.Clear();
+            group.Clear();
+        }
+
+        public ShaderGroup GetShaderGroupOrDefault(Shader shader)
+        {
+            foreach (ShaderGroup s in group)
+            {
+                if (s.key == shader)
+                    return s;
+            }
+            ShaderGroup ss = new ShaderGroup();
+            ss.key = shader;
+            group.Add(ss);
+            return ss;
+        }
+
+        public ShaderGroup GetShaderGroup(Shader shader)
+        {
+            foreach (ShaderGroup s in group)
+            {
+                if (s.key == shader)
+                    return s;
+            }
+            return null;
         }
 
         public virtual void AddSprite(Sprite sprite)
@@ -80,20 +144,22 @@ namespace Sharp2D.Game.Sprites
             sprite.Load();
             lock (group_lock)
             {
-                groups.GetOrAdd(sprite.Texture, new List<Sprite>()).Add(sprite);
+                ShaderGroup s = GetShaderGroupOrDefault(sprite.Shader);
+                TextureGroup t = s.GetTextureGroupOrDefault(sprite.Texture);
+                t.group.Add(sprite);
                 valid = false;
             }
         }
 
         public virtual void RemoveSprite(Sprite sprite)
         {
-            List<Sprite> temp;
-            groups.TryGetValue(sprite.Texture, out temp);
+            ShaderGroup s = GetShaderGroupOrDefault(sprite.Shader);
+            TextureGroup t = s.GetTextureGroupOrDefault(sprite.Texture);
             lock (group_lock)
             {
-                if (temp.Contains(sprite))
+                if (t.group.Contains(sprite))
                 {
-                    temp.Remove(sprite);
+                    t.group.Remove(sprite);
                     sprite.Unload();
                 }
                 valid = false;
@@ -102,10 +168,16 @@ namespace Sharp2D.Game.Sprites
 
         public virtual bool HasSprite(Sprite sprite)
         {
-            lock (group_lock)
+            ShaderGroup group = GetShaderGroup(sprite.Shader);
+            if (group != null)
             {
-                return groups.ContainsKey(sprite.Texture) && groups[sprite.Texture].Contains(sprite);
+                TextureGroup tgroup = group.GetTextureGroup(sprite.Texture);
+                if (tgroup != null)
+                {
+                    return tgroup.group.Contains(sprite);
+                }
             }
+            return false;
         }
     }
 }

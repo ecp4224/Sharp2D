@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using Sharp2D.Core.Graphics;
 
 namespace Sharp2D.Core.Utils
@@ -12,6 +13,17 @@ namespace Sharp2D.Core.Utils
         public Vector2 TopLeft { get; set; }
 
         public Vector2 TopRight { get; set; }
+
+        public float SquardSize
+        {
+            get
+            {
+                return (float)Math.Sqrt(
+                    ((BottomLeft.X - TopRight.X) * (BottomLeft.X - TopRight.X)) + 
+                    ((BottomLeft.Y - TopRight.Y) * (BottomLeft.Y - TopRight.Y))
+                    );
+            }
+        }
 
         public TexCoords(Vector2 BottomLeft, Vector2 BottomRight, Vector2 TopLeft, Vector2 TopRight)
         {

@@ -82,6 +82,36 @@ namespace Sharp2D.Core.Settings
             }
         }
 
+        private OpenTK.Vector2 aspect;
+        private System.Drawing.Rectangle savedW;
+        public OpenTK.Vector2 WindowAspectRatio
+        {
+            get
+            {
+                if (savedW == null || savedW != WindowSize)
+                {
+                    float width = WindowSize.Width;
+                    float height = WindowSize.Height;
+
+                    float remainder = 0;
+                    float newWidth = width;
+                    float newHeight = height;
+
+                    while (height != 0)
+                    {
+                        remainder = width % height;
+                        width = height;
+                        height = remainder;
+                    }
+
+                    newWidth = newWidth / width;
+                    newHeight = newHeight / width;
+                    aspect = new OpenTK.Vector2(newWidth, newHeight);
+                }
+                return aspect;
+            }
+        }
+
         /// <summary>
         /// <para>The Camera object to use.</para>
         /// Default: Sharp2D.Game.Worlds.GenericCamera

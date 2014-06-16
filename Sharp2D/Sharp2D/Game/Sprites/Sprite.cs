@@ -7,6 +7,7 @@ using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Utils;
 using OpenTK;
 using Sharp2D.Core.Logic;
+using Sharp2D.Core.Graphics.Shaders;
 
 namespace Sharp2D.Game.Sprites
 {
@@ -20,6 +21,7 @@ namespace Sharp2D.Game.Sprites
         internal bool FirstRun = true;
         public bool Loaded { get; private set; }
         private Texture _texture;
+        private Shader _shader;
         public List<SpriteRenderJob> ContainingJobs
         {
             get
@@ -38,6 +40,23 @@ namespace Sharp2D.Game.Sprites
                     return toReturn;
                 }
                 return new List<SpriteRenderJob>();
+            }
+        }
+        public Shader Shader
+        {
+            get
+            {
+                return _shader;
+            }
+            set
+            {
+                List<SpriteRenderJob> temp = ContainingJobs;
+
+                foreach (SpriteRenderJob job in temp) job.RemoveSprite(this);
+
+                _shader = value;
+
+                foreach (SpriteRenderJob job in temp) job.AddSprite(this);
             }
         }
         public Texture Texture
@@ -73,6 +92,8 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
+                if (ContainingWorlds.Count == 0)
+                    return null;
                 return ContainingWorlds.Where(w => w.Displaying).First();
             }
         }
@@ -98,7 +119,6 @@ namespace Sharp2D.Game.Sprites
             get
             {
                 return (X + Width) - Screen.Camera.X < -32 || Math.Abs(Screen.Camera.X - (X - Width)) > 32 + (Screen.Settings.GameSize.Width / Screen.Camera.Z) || (Y + Height) - Screen.Camera.Y < -32 || Math.Abs(Screen.Camera.Y - (Y - Height)) > 32 + (Screen.Settings.GameSize.Height / Screen.Camera.Z);
-
             }
         }
         public virtual float X { get; set; }
@@ -136,6 +156,13 @@ namespace Sharp2D.Game.Sprites
             if (Texture != null && Texture.ID == -1)
                 Texture.Create();
         }
+
+        public void PrepareDraw()
+        {
+            BeforeDraw();
+        }
+
+        protected abstract void BeforeDraw();
 
         protected abstract void OnLoad();
 

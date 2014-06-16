@@ -30,6 +30,10 @@ namespace TestGame
         {
         }
 
+        protected override void BeforeDraw()
+        {
+        }
+
         public override void Update()
         {
             base.Update();
