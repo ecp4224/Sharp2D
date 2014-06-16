@@ -50,7 +50,6 @@ namespace Sharp2D.Game.Sprites
                             float y = s.Y;
 
                             GL.Begin(PrimitiveType.Quads);
-
                             GL.TexCoord2(s.TexCoords.TopLeft.X, s.TexCoords.TopLeft.Y);
                             GL.Vertex3(x - bx, y - by, z);
                             GL.TexCoord2(s.TexCoords.TopRight.X, s.TexCoords.TopRight.Y);
@@ -87,7 +86,15 @@ namespace Sharp2D.Game.Sprites
 
                                 GL.LineWidth(1f);
                                 GL.Color3(1, 1, 1);
-                            }*/
+                            }
+                            
+                            GL.Begin(PrimitiveType.LineLoop);
+                            foreach (var v in h.Vertices)
+                            {
+                                GL.Vertex3(v.X, v.Y, 0);
+                            }
+                            GL.End();*/
+
                         }
                     }
                 }

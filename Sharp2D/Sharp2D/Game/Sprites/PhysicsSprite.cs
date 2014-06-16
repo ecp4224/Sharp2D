@@ -28,7 +28,7 @@ namespace Sharp2D.Game.Sprites
                     var result = Hitbox.CheckCollision(this, c, new Vector2(value - _x, 0));
 
                     if (!result.WillIntersect) { continue; }
-                    Console.WriteLine("X collision detected");
+
                     xSum += result.TranslationVector.X;
                     _y += result.TranslationVector.Y;
                 }
@@ -54,7 +54,6 @@ namespace Sharp2D.Game.Sprites
                     var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - _y));
 
                     if (!result.WillIntersect) { continue; }
-                    Console.WriteLine("Y collision detected");
 
                     _x += result.TranslationVector.X;
                     ySum += result.TranslationVector.Y;
