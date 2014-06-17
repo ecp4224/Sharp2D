@@ -30,6 +30,11 @@ namespace Sharp2D.Game.Sprites
             0, 1, 2, 0, 2, 3
         };
 
+        public OpenGL3SpriteRenderJob()
+        {
+            Screen.Camera = new OpenGL3Camera();
+        }
+
         public override void PerformJob()
         {
             if (!gen)
@@ -49,9 +54,9 @@ namespace Sharp2D.Game.Sprites
 
                         if (s.key.ProgramID == shader.ProgramID) //If this shader is our shader
                         {
-                            shader.Uniforms["camPosAndScale"] = new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z);
+                            shader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), shader.Uniforms["camPosAndScale"]);
                             Vector2 aspect = Screen.Settings.WindowAspectRatio;
-                            shader.Uniforms["screenRatioFix"] = aspect.X / aspect.Y;
+                            shader.Uniforms.SetUniform(aspect.X / aspect.Y, shader.Uniforms["screenRatioFix"]);
                         }
                     }
                     else
@@ -62,9 +67,9 @@ namespace Sharp2D.Game.Sprites
 
                         if (s.key.ProgramID == shader.ProgramID) //If this shader is our shader
                         {
-                            shader.Uniforms["camPosAndScale"] = new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z);
+                            shader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), shader.Uniforms["camPosAndScale"]);
                             Vector2 aspect = Screen.Settings.WindowAspectRatio;
-                            shader.Uniforms["screenRatioFix"] = aspect.X / aspect.Y;
+                            shader.Uniforms.SetUniform(aspect.X / aspect.Y, shader.Uniforms["screenRatioFix"]);
                         }
                     }
 
@@ -75,16 +80,20 @@ namespace Sharp2D.Game.Sprites
 
                         foreach (Sprite sprite in t.group)
                         {
+                            if (sprite.IsOffScreen)
+                                continue;
+
                             sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
 
                             if (s.key != null && s.key.ProgramID == shader.ProgramID) //If this sprite is using our ID
                             {
-                                shader.Uniforms["spritePos"] = new Vector3(sprite.X, sprite.Y, sprite.Width); //TODO Do height as well
+                                shader.Uniforms.SetUniform(new Vector4(sprite.X, sprite.Y, sprite.Width, sprite.Height), shader.Uniforms["spritePos"]);
                                 float tsize = sprite.TexCoords.SquardSize;
-                                shader.Uniforms["texCoordPosAndScale"] = new Vector3(sprite.TexCoords.TopRight.X, sprite.TexCoords.TopRight.Y, sprite.TexCoords.SquardSize);
+                                shader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.TopRight.X, sprite.TexCoords.TopRight.Y, (sprite.TexCoords.BottomRight.X - sprite.TexCoords.BottomLeft.X), (sprite.TexCoords.TopLeft.Y - sprite.TexCoords.BottomLeft.Y)), shader.Uniforms["texCoordPosAndScale"]);
                             }
 
-                            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            GL.DrawArrays(BeginMode.Quads, 0, 4);
+                            //GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                         }
                     }
                 }

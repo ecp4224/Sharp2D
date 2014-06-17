@@ -119,6 +119,9 @@ namespace Sharp2D.Core.Graphics
         {
             Screen.ValidateOpenGLSafe("Texture.Bind");
 
+            if (!Created)
+                Create();
+
             GL.BindTexture(TextureTarget.Texture2D, ID);
         }
     }

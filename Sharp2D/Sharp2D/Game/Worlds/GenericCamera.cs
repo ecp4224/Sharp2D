@@ -15,5 +15,10 @@ namespace Sharp2D.Game.Worlds
         {
             
         }
+
+        public override bool IsOutsideCamera(float X, float Y, float Width, float Height)
+        {
+            return false;
+        }
     }
 }

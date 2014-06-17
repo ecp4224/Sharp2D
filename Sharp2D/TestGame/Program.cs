@@ -10,7 +10,12 @@ namespace TestGame
         public static TestSprite spriteSause;
         public static void Main(string[] args)
         {
-            Screen.DisplayScreenAsync();
+            Sharp2D.Game.Sprites.SpriteRenderJob.SetDefaultJob<Sharp2D.Game.Sprites.OpenGL3SpriteRenderJob>();
+
+            ScreenSettings settings = new ScreenSettings();
+            settings.UseOpenTKLoop = false;
+
+            Screen.DisplayScreenAsync(settings);
 
             System.Threading.Thread.Sleep(1000);
 
@@ -48,11 +53,14 @@ namespace TestGame
             eddie.Y = 512;
             world.AddSprite(eddie);
 
+            Screen.Camera.Z = 100f;
+            Screen.Camera.Y = -150f;
+
             if (eddie.CurrentWorld != null)
                 Logger.Debug(eddie.CurrentWorld.Name);
-
+            
             world.AddLogical(new MoveCamera());
-            world.AddLogical(new CheckKeys());
+            //world.AddLogical(new CheckKeys());
         }
     }
 
@@ -61,11 +69,8 @@ namespace TestGame
         public long Start;
         public void Update()
         {
-            if (Program.spriteSause != null)
-            {
-                Screen.Camera.X = Program.spriteSause.X - 300;
-                Screen.Camera.Y = Program.spriteSause.Y - 200;
-            }
+            Screen.Camera.X -= 2;
+            Logger.WriteAt(0, 0, "FPS: " + Screen.FPS);
         }
 
         public void Dispose()

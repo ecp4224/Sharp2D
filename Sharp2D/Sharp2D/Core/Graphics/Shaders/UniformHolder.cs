@@ -21,7 +21,7 @@ namespace Sharp2D.Core.Graphics.Shaders
             this.program_id = program_id;
         }
 
-        public dynamic this[string var]
+        public int this[string var]
         {
             get
             {
@@ -38,27 +38,7 @@ namespace Sharp2D.Core.Graphics.Shaders
                     locations.Add(var, id);
                 }
 
-                if (values.ContainsKey(id))
-                    return values[id];
-                return null;
-            }
-
-            set
-            {
-                int id;
-                if (locations.ContainsKey(var))
-                {
-                    id = locations[var];
-                }
-                else
-                {
-                    id = GL.GetUniformLocation(program_id, var);
-                    if (id == -1)
-                        throw new System.IO.FileNotFoundException("The variable was not found!", var);
-                    locations.Add(var, id);
-                }
-
-                _setUniform(value, id);
+                return id;
             }
         }
 

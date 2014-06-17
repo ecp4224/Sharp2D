@@ -130,6 +130,7 @@ namespace Sharp2D.Core.Settings
             Fullscreen = orginal.Fullscreen;
             VSync = orginal.VSync;
             Camera = orginal.Camera;
+            MaxFPS = orginal.MaxFPS;
         }
 
         public ScreenSettings() : this(Screen.DEFAULT_SETTINGS) { }

@@ -20,5 +20,10 @@ namespace Sharp2D.Game.Sprites
             GL.Scale(Z, Z, 0f);
             GL.Translate(-X, -Y, 0f);
         }
+
+        public override bool IsOutsideCamera(float X, float Y, float Width, float Height)
+        {
+            return (X + Width) - Screen.Camera.X < -32 || Math.Abs(Screen.Camera.X - (X - Width)) > 32 + (Screen.Settings.GameSize.Width / Screen.Camera.Z) || (Y + Height) - Screen.Camera.Y < -32 || Math.Abs(Screen.Camera.Y - (Y - Height)) > 32 + (Screen.Settings.GameSize.Height / Screen.Camera.Z);
+        }
     }
 }

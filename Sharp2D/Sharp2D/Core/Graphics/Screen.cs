@@ -54,7 +54,7 @@ namespace Sharp2D.Core.Graphics
 
         public static ScreenSettings Settings { get; private set; }
 
-        public static float FPS { get; private set; }
+        public static double FPS { get; private set; }
 
         public static int TickCount
         {
@@ -219,14 +219,13 @@ namespace Sharp2D.Core.Graphics
         static void window_UpdateFrame(object sender, FrameEventArgs e)
         {
             _logicTick();
-            //Logger.WriteAt(0, 1, "UPS: " + window.UpdateFrequency);
         }
 
         static void window_RenderFrame(object sender, FrameEventArgs e)
         {
             _draw();
             window.SwapBuffers();
-            ////Logger.WriteAt(0, 0, "FPS: " + window.RenderFrequency);
+            FPS = window.RenderFrequency;
         }
 
         private static void _openTKStart()
