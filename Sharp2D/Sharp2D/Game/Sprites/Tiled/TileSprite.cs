@@ -62,30 +62,35 @@ namespace Sharp2D.Game.Sprites.Tiled
             width = x + TileSet.TileWidth;
             height = y + TileSet.TileHeight;
 
-            x /= TileSet.TileTexture.TextureWidth;
-            width /= TileSet.TileTexture.TextureWidth;
-            y /= TileSet.TileTexture.TextureHeight;
-            height /= TileSet.TileTexture.TextureHeight;
-
-            TexCoords = new Core.Utils.Rectangle(x, y, width, height);
+            TexCoords = new Core.Utils.TexCoords(x, y, width, height, TileSet.TileTexture);
 
             World.texcoords_cache.Add(ID, TexCoords);
         }
 
 
-        public override void OnLoad()
+        protected override void OnLoad()
         {
             //TODO Do some loading of something
         }
 
-        public override void OnUnload()
+        protected override void OnUnload()
         {
             //TODO Do some unloading of something
         }
 
-        public override void OnDispose()
+        protected override void OnDispose()
         {
             //TODO Dispose something..
+        }
+
+        protected override void OnDisplay()
+        {
+            //TODO Display related stuff (badpokerface)
+        }
+
+        protected override void BeforeDraw()
+        {
+            //TODO Do something before it's drawn
         }
     }
 }

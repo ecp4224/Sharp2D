@@ -146,7 +146,21 @@ namespace Sharp2D.Core.Logic
             if (IsDisposing)
                 throw new InvalidOperationException("This world object is currently disposing, can not add job..");
 
-            jobs.Add(job);
+            if (!lFetch)
+                jobs.Add(job);
+            else
+                jCache.Add(job);
+        }
+
+        public void AddRenderJobAt(IRenderJob job, int index)
+        {
+            if (!Loaded)
+                throw new InvalidOperationException("This world object has not been loaded! Please call the \"Load()\" method before adding jobs!");
+            if (IsDisposing)
+                throw new InvalidOperationException("This world object is currently disposing, can not add job..");
+
+
+            jobs.Insert(index, job);
         }
 
         public void RemoveRenderJob(IRenderJob job)
@@ -156,7 +170,15 @@ namespace Sharp2D.Core.Logic
             if (IsDisposing)
                 throw new InvalidOperationException("This world object is currently disposing, can not remove job..");
 
-            jobs.Remove(job);
+            if (!lFetch)
+                jobs.Remove(job);
+            else
+            {
+                if (jCache.Contains(job))
+                    jCache.Remove(job);
+                else
+                    jToRemove.Add(job);
+            }
         }
 
         public void AddLogical(ILogical logical)

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Sharp2D.Core.Utils
+﻿namespace Sharp2D.Core.Utils
 {
-    public class MathUtils
+    public static class MathUtils
     {
         //Code taken from: https://code.google.com/p/replicaisland/source/browse/trunk/src/com/replica/replicaisland/Lerp.java?r=5
         //Because I'm a no good dirty scrub

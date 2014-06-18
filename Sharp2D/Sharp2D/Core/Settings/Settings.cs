@@ -7,26 +7,39 @@ using System.Threading.Tasks;
 
 namespace Sharp2D.Core.Settings
 {
-    public abstract class Settings
+    public abstract class Setting
     {
 
-        public abstract void OnLoad();
-        public abstract void OnSave();
-        
-        public static T Load<T>(string Path) where T : Settings{
-            if (!System.IO.File.Exists(Path))
-            {
-                return (T)Activator.CreateInstance(typeof(T));
-            }
-            
+        protected abstract void OnLoad();
+        protected abstract void OnSave();
+
+        public void Save(string Path)
+        {
+            Setting.Save(this, Path);
+        }
+
+        public static T Load<T>(string Path) where T : Setting
+        {
             T settings = JsonConvert.DeserializeObject<T>(Path);
             settings.OnLoad();
             return settings;
         }
 
-        public static void Save(Settings Settings, string Path){
+        public static T LoadOrSaveDefault<T>(string Path) where T : Setting
+        {
+            if (!System.IO.File.Exists(Path))
+            {
+                T @default = (T)Activator.CreateInstance(typeof(T));
+                @default.Save(Path);
+                return @default;
+            }
+            return Load<T>(Path);
+        }
+
+        public static void Save(Setting Settings, string Path)
+        {
             Settings.OnSave();
-            System.IO.File.WriteAllText(Path, JsonConvert.SerializeObject(Settings, Formatting.Indented));   
+            System.IO.File.WriteAllText(Path, JsonConvert.SerializeObject(Settings, Formatting.Indented));
         }
     }
 }

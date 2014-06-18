@@ -64,7 +64,7 @@ namespace Sharp2D.Game.Sprites.Animations
         public bool Reverse { get; set; }
 
         [JsonIgnore]
-        public Rectangle CurrentTexCoords
+        public TexCoords CurrentTexCoords
         {
             get
             {
@@ -73,7 +73,7 @@ namespace Sharp2D.Game.Sprites.Animations
                 float width = x + Owner.Width;
                 float height = y + Owner.Height;
 
-                return new Rectangle(x, y, width, height);
+                return new TexCoords(x, y, width, height, Owner.Texture);
             }
         }
     }

@@ -21,7 +21,7 @@ namespace Sharp2D.Core.Graphics
                 ScreenSettings settings = new ScreenSettings(null);
                 settings.LogicTickRate = 40; //25 ticks/second
                 settings.MaxSkippedFrames = 5; //Skip a max of 5 draw frames
-                settings.GameSize = new Rectangle(1280, 720); //720p
+                settings.GameSize = new System.Drawing.Rectangle(0, 0, 1280, 720); //720p
                 settings.WindowSize = settings.GameSize;
                 settings.Fullscreen = false;
                 settings.VSync = false;
@@ -42,6 +42,10 @@ namespace Sharp2D.Core.Graphics
             {
                 return Settings.Camera;
             }
+            set
+            {
+                Settings.Camera = value;
+            }
         }
 
         public static Thread DisplayThread { get; private set; }
@@ -50,7 +54,7 @@ namespace Sharp2D.Core.Graphics
 
         public static ScreenSettings Settings { get; private set; }
 
-        public static float FPS { get; private set; }
+        public static double FPS { get; private set; }
 
         public static int TickCount
         {
@@ -139,6 +143,11 @@ namespace Sharp2D.Core.Graphics
         {
             if (DisplayThread == null)
                 DisplayThread = Thread.CurrentThread;
+            
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+
             Settings = settings;
 
             IsRunning = true;
@@ -159,16 +168,26 @@ namespace Sharp2D.Core.Graphics
             }
         }
 
-        public static void ValidateOpenGLSafe(string MethodName)
+        public static void ValidateOpenGLSafe(string MethodName, bool warn = false)
         {
             if (DisplayThread != null && DisplayThread != Thread.CurrentThread)
-                throw new InvalidOperationException("The method \"" + MethodName + "\" must be called inside an OpenGL safe thread!");
+            {
+                if (warn)
+                    Logger.Warn("The method \"" + MethodName + "\" SHOULD be invoked in an OpenGL safe thread.");
+                else
+                    throw new InvalidOperationException("The method \"" + MethodName + "\" must be invoked in an OpenGL safe thread!");
+            }
         }
 
-        public static void ValidateOpenGLUnsafe(string MethodName)
+        public static void ValidateOpenGLUnsafe(string MethodName, bool warn = false)
         {
             if (DisplayThread != null && DisplayThread == Thread.CurrentThread)
-                throw new InvalidOperationException("The method \"" + MethodName + "\" must be called OUTSIDE an OpenGL safe thread!");
+            {
+                if (warn)
+                    Logger.Warn("The method \"" + MethodName + "\" SHOULD be invoked OUTSIDE an OpenGL safe thread.");
+                else
+                    throw new InvalidOperationException("The method \"" + MethodName + "\" must be invoked OUTSIDE an OpenGL safe thread!");
+            }
         }
 
         private static void _prepare()
@@ -200,18 +219,13 @@ namespace Sharp2D.Core.Graphics
         static void window_UpdateFrame(object sender, FrameEventArgs e)
         {
             _logicTick();
-            Console.CursorTop = 1;
-            Console.WriteLine("                                            ");
-            Console.WriteLine("UPS: " + window.UpdateFrequency);
         }
 
         static void window_RenderFrame(object sender, FrameEventArgs e)
         {
             _draw();
             window.SwapBuffers();
-            Console.CursorTop = 0;
-            Console.WriteLine("                                            ");
-            Console.WriteLine("FPS: " + window.RenderFrequency);
+            FPS = window.RenderFrequency;
         }
 
         private static void _openTKStart()
@@ -292,7 +306,14 @@ namespace Sharp2D.Core.Graphics
                 renders.PreFetch();
                 foreach (IRenderJob job in renders.RenderJobs)
                 {
-                    job.PerformJob();
+                    try
+                    {
+                        job.PerformJob();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.CaughtException(e);
+                    }
                 }
                 renders.PostFetch();
             }
@@ -307,7 +328,14 @@ namespace Sharp2D.Core.Graphics
                 logics.PreFetch();
                 foreach (ILogical logic in logics.LogicalList) 
                 {
-                    logic.Update();
+                    try
+                    {
+                        logic.Update();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.CaughtException(e);
+                    }
                 }
                 logics.PostFetch();
             }

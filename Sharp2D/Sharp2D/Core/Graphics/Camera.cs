@@ -12,6 +12,8 @@ namespace Sharp2D.Core.Graphics
         public float Y { get; set; }
         public float Z { get; set; }
 
-        internal abstract void BeforeRender();
+        public abstract void BeforeRender();
+
+        public abstract bool IsOutsideCamera(float X, float Y, float Width, float Height);
     }
 }

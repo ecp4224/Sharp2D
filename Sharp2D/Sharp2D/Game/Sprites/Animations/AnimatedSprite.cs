@@ -38,7 +38,7 @@ namespace Sharp2D.Game.Sprites.Animations
             }
         }
 
-        public override void OnLoad()
+        protected override void OnLoad()
         {
             string json = null;
             if (File.Exists("animations/" + Name + ".conf"))
@@ -68,13 +68,16 @@ namespace Sharp2D.Game.Sprites.Animations
                 Width = Animations.width;
                 Height = Animations.height;
 
+                Animations[0].Owner = this;
+
                 Animations[0].Playing = true;
             }
         }
 
-        public override void OnDispose()
+        protected override void OnDispose()
         {
-            Animations.Dispose();
+            if (Animations != null)
+                Animations.Dispose();
         }
     }
 
@@ -113,7 +116,8 @@ namespace Sharp2D.Game.Sprites.Animations
 
         internal void Dispose()
         {
-            _animations.Clear();
+            if (_animations != null) //todo temp workaround
+                _animations.Clear();
             _animations = null;
         }
     }

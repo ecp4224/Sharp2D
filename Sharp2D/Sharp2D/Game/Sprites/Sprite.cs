@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Utils;
 using OpenTK;
+using Sharp2D.Core.Logic;
+using Sharp2D.Core.Graphics.Shaders;
 
 namespace Sharp2D.Game.Sprites
 {
@@ -16,18 +18,107 @@ namespace Sharp2D.Game.Sprites
             Dispose();
         }
 
+        internal bool FirstRun = true;
         public bool Loaded { get; private set; }
-        public Texture Texture { get; set; }
+        private Texture _texture;
+        private Shader _shader;
+        public List<SpriteRenderJob> ContainingJobs
+        {
+            get
+            {
+                World current = CurrentWorld;
+                if (current is Game.Worlds.SpriteWorld)
+                {
+                    List<SpriteRenderJob> toReturn = new List<SpriteRenderJob>();
+                    List<SpriteRenderJob> jobs = ((Game.Worlds.SpriteWorld)current).SpriteRenderJobs;
+                    foreach (SpriteRenderJob job in jobs)
+                    {
+                        if (job.HasSprite(this))
+                            toReturn.Add(job);
+                    }
+
+                    return toReturn;
+                }
+                return new List<SpriteRenderJob>();
+            }
+        }
+        public Shader Shader
+        {
+            get
+            {
+                return _shader;
+            }
+            set
+            {
+                List<SpriteRenderJob> temp = ContainingJobs;
+
+                foreach (SpriteRenderJob job in temp) job.RemoveSprite(this);
+
+                _shader = value;
+
+                foreach (SpriteRenderJob job in temp) job.AddSprite(this);
+            }
+        }
+        public Texture Texture
+        {
+            get
+            {
+                return _texture;
+            }
+            set
+            {
+                List<SpriteRenderJob> temp = ContainingJobs;
+
+                foreach (SpriteRenderJob job in temp) job.RemoveSprite(this);
+
+                _texture = value;
+
+                foreach (SpriteRenderJob job in temp) job.AddSprite(this);
+            }
+        }
         public Vector2 Position { get { return new Vector2(X, Y); } }
-        public Rectangle TexCoords;
+        internal readonly List<World> _worlds = new List<World>();
+        public IList<World> ContainingWorlds
+        {
+            get
+            {
+                return _worlds.AsReadOnly();
+            }
+        }
+        /// <summary>
+        /// Get the world the sprite is currently in. This world is the current World being displayed on the screen. To get all the Worlds this sprite is in, use ContainingWorlds
+        /// </summary>
+        public World CurrentWorld
+        {
+            get
+            {
+                if (ContainingWorlds.Count == 0)
+                    return null;
+                return ContainingWorlds.Where(w => w.Displaying).First();
+            }
+        }
+        public TexCoords TexCoords;
+        private float _rot;
+        public float Rotation
+        {
+            get { return _rot; }
+            set
+            {
+                while (value > 360f)
+                    value -= 360f;
+                while (value < 0f)
+                    value += 360f;
+
+                _rot = value;
+            }
+        }
         public float Width { get; set; }
         public float Height { get; set; }
         public bool IsOffScreen
         {
             get
             {
-                return (X + Width) - Screen.Camera.X < -32 || Math.Abs(Screen.Camera.X - (X - Width)) > 32 + (Screen.Settings.GameSize.Width / Screen.Camera.Z) || (Y + Height) - Screen.Camera.Y < -32 || Math.Abs(Screen.Camera.Y - (Y - Height)) > 32 + (Screen.Settings.GameSize.Height / Screen.Camera.Z);
-
+                return Screen.Camera.IsOutsideCamera(X, Y, Width, Height);
             }
         }
         public virtual float X { get; set; }
@@ -37,6 +128,12 @@ namespace Sharp2D.Game.Sprites
         public void Load()
         {
             OnLoad();
+            if (TexCoords == null && Texture != null)
+            {
+                TexCoords = new Sharp2D.Core.Utils.TexCoords(Width, Height, Texture);
+            }
+            else if (Texture == null)
+                throw new InvalidOperationException("This sprite has no texture! A sprite MUST have a texture!");
             Loaded = true;
         }
 
@@ -53,11 +150,27 @@ namespace Sharp2D.Game.Sprites
             OnDispose();
         }
 
-        public abstract void OnLoad();
+        public void Display()
+        {
+            OnDisplay();
+            if (Texture != null && Texture.ID == -1)
+                Texture.Create();
+        }
 
-        public abstract void OnUnload();
+        public void PrepareDraw()
+        {
+            BeforeDraw();
+        }
 
-        public abstract void OnDispose();
+        protected abstract void BeforeDraw();
+
+        protected abstract void OnLoad();
+
+        protected abstract void OnUnload();
+
+        protected abstract void OnDispose();
+
+        protected abstract void OnDisplay();
 
     }
 }

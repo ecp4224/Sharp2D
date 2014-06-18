@@ -25,6 +25,29 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
+        public List<SpriteRenderJob> SpriteRenderJobs
+        {
+            get
+            {
+                return base.jobs.OfType<SpriteRenderJob>().ToList<SpriteRenderJob>();
+            }
+        }
+
+        public List<Sprite> Sprites
+        {
+            get
+            {
+                List<Sprite> sprites = new List<Sprite>();
+                List<SpriteRenderJob> jobs = SpriteRenderJobs;
+                foreach (SpriteRenderJob job in jobs)
+                {
+                    sprites.AddRange(job.Sprites);
+                }
+
+                return sprites;
+            }
+        }
+
         public void AddSprite(Sprite s, SpriteRenderJob job)
         {
             if (!HasJob(job))
@@ -33,6 +56,7 @@ namespace Sharp2D.Game.Worlds
             }
 
             job.AddSprite(s);
+            s._worlds.Add(this);
 
             if (s is ILogical)
                 AddLogical((ILogical)s);
@@ -41,23 +65,23 @@ namespace Sharp2D.Game.Worlds
         public void AddSprite(Sprite s)
         {
             if (DefaultJob != null)
+            {
                 DefaultJob.AddSprite(s);
+                s._worlds.Add(this);
+            }
             if (s is ILogical)
                 AddLogical((ILogical)s);
         }
 
         public void RemoveSprite(Sprite s)
         {
-            foreach (SpriteRenderJob job in GetSpriteJobs())
+            List<SpriteRenderJob> jobs = SpriteRenderJobs;
+            foreach (SpriteRenderJob job in jobs)
             {
                 if (job.HasSprite(s))
                     job.RemoveSprite(s);
             }
-        }
-
-        public List<SpriteRenderJob> GetSpriteJobs()
-        {
-            return base.jobs.OfType<SpriteRenderJob>().ToList<SpriteRenderJob>();
+            s._worlds.Remove(this);
         }
     }
 }
