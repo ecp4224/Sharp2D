@@ -28,9 +28,9 @@ namespace Sharp2D.Core.Utils
         public TexCoords(Vector2 BottomLeft, Vector2 BottomRight, Vector2 TopLeft, Vector2 TopRight)
         {
             this.BottomLeft = BottomLeft;
-            this.BottomRight = BottomRight;
+            this.BottomRight = TopRight;
             this.TopLeft = TopLeft;
-            this.TopRight = TopRight;
+            this.TopRight = BottomRight;
         }
 
         public TexCoords(Vector2 TopLeft, Vector2 BottomRight)

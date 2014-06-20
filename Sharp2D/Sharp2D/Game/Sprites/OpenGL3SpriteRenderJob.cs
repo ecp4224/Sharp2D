@@ -89,7 +89,7 @@ namespace Sharp2D.Game.Sprites
                             {
                                 shader.Uniforms.SetUniform(new Vector4(sprite.X, sprite.Y, sprite.Width, sprite.Height), shader.Uniforms["spritePos"]);
                                 float tsize = sprite.TexCoords.SquardSize;
-                                shader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.TopRight.X, sprite.TexCoords.TopRight.Y, (sprite.TexCoords.BottomRight.X - sprite.TexCoords.BottomLeft.X), (sprite.TexCoords.TopLeft.Y - sprite.TexCoords.BottomLeft.Y)), shader.Uniforms["texCoordPosAndScale"]);
+                                shader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), shader.Uniforms["texCoordPosAndScale"]);
                             }
 
                             GL.DrawArrays(BeginMode.Quads, 0, 4);

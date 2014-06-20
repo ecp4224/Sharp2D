@@ -59,6 +59,7 @@ namespace Sharp2D.Game.Sprites.Tiled
 
             x = TileSet.TileWidth * step;
             y = TileSet.TileHeight * row;
+            y = TileSet.TileTexture.TextureHeight + y;
             width = x + TileSet.TileWidth;
             height = y + TileSet.TileHeight;
 

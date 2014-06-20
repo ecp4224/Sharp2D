@@ -91,8 +91,7 @@ namespace Sharp2D.Core.Graphics
             {
                 Bitmap bmp = new Bitmap(TextureWidth, TextureHeight);
                 System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp);
-                g.CompositingMode = CompositingMode.SourceOver;
-                g.DrawImage(Bitmap, new Point(0, 0));
+                g.DrawImage(Bitmap, new RectangleF(0f, 0f, ImageWidth, ImageHeight), new RectangleF(0f, 0f, ImageWidth, ImageHeight), GraphicsUnit.Pixel);
                 g.Dispose();
                 Bitmap = bmp;
             }
