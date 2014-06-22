@@ -20,6 +20,7 @@ namespace Sharp2D.Game.Sprites
 
         internal bool FirstRun = true;
         public bool Loaded { get; private set; }
+        public bool Visible { get; set; }
         private Texture _texture;
         private Shader _shader;
         public List<SpriteRenderJob> ContainingJobs
@@ -112,8 +113,8 @@ namespace Sharp2D.Game.Sprites
                 _rot = value;
             }
         }
-        public float Width { get; set; }
-        public float Height { get; set; }
+        public virtual float Width { get; set; }
+        public virtual float Height { get; set; }
         public bool IsOffScreen
         {
             get
@@ -127,6 +128,8 @@ namespace Sharp2D.Game.Sprites
 
         public void Load()
         {
+            Visible = true;
+
             OnLoad();
             if (TexCoords == null && Texture != null)
             {
@@ -160,6 +163,16 @@ namespace Sharp2D.Game.Sprites
         public void PrepareDraw()
         {
             BeforeDraw();
+        }
+
+        public virtual void OnAddedToWorld(World w)
+        {
+
+        }
+
+        public virtual void OnRemovedFromWorld(World w)
+        {
+
         }
 
         protected abstract void BeforeDraw();

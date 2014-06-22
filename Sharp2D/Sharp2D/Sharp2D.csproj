@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -63,11 +64,14 @@
     <Compile Include="Core\Utils\MathUtils.cs" />
     <Compile Include="Core\Physics\Hitbox.cs" />
     <Compile Include="Core\Physics\ICollidable.cs" />
+    <Compile Include="Core\Utils\Origin.cs" />
     <Compile Include="Core\Utils\TexCoords.cs" />
     <Compile Include="Game\Drawables\IDrawable.cs" />
     <Compile Include="Game\Drawables\DrawableRenderJob.cs" />
     <Compile Include="Game\Sprites\Animations\AnimatedSprite.cs" />
     <Compile Include="Game\Sprites\Animations\Animation.cs" />
+    <Compile Include="Game\Sprites\Animations\NullAnimatedSprite.cs" />
+    <Compile Include="Game\Sprites\NullSprite.cs" />
     <Compile Include="Game\Sprites\OpenGL1Camera.cs" />
     <Compile Include="Game\Sprites\OpenGL3Camera.cs" />
     <Compile Include="Game\Sprites\OpenGL3SpriteRenderJob.cs" />

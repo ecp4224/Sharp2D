@@ -57,6 +57,7 @@ namespace Sharp2D.Game.Worlds
 
             job.AddSprite(s);
             s._worlds.Add(this);
+            s.OnAddedToWorld(this);
 
             if (s is ILogical)
                 AddLogical((ILogical)s);
@@ -68,6 +69,7 @@ namespace Sharp2D.Game.Worlds
             {
                 DefaultJob.AddSprite(s);
                 s._worlds.Add(this);
+                s.OnAddedToWorld(this);
             }
             if (s is ILogical)
                 AddLogical((ILogical)s);
@@ -82,6 +84,7 @@ namespace Sharp2D.Game.Worlds
                     job.RemoveSprite(s);
             }
             s._worlds.Remove(this);
+            s.OnRemovedFromWorld(this);
         }
     }
 }

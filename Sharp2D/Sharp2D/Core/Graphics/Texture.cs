@@ -114,14 +114,19 @@ namespace Sharp2D.Core.Graphics
             Bitmap.UnlockBits(bmp);
         }
 
+        private static int currentBind;
         public void Bind()
         {
             Screen.ValidateOpenGLSafe("Texture.Bind");
+
+            if (currentBind == ID)
+                return;
 
             if (!Created)
                 Create();
 
             GL.BindTexture(TextureTarget.Texture2D, ID);
+            currentBind = ID;
         }
     }
 }

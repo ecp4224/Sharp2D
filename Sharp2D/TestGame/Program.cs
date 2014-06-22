@@ -34,7 +34,7 @@ namespace TestGame
             idontevenknowanymore.Y = 128;
             world.AddSprite(idontevenknowanymore);
 
-            spriteSause = new TestSprite(); 
+            /*spriteSause = new TestSprite(); 
             spriteSause.X = 256;
             spriteSause.Y = 128;
             spriteSause.MoveFlag = true;
@@ -51,15 +51,19 @@ namespace TestGame
             eddie.ChangeHitbox("UhidkHitbox");
             eddie.X = 512;
             eddie.Y = 512;
-            world.AddSprite(eddie);
+            world.AddSprite(eddie);*/
 
             Screen.Camera.Z = 100f;
             Screen.Camera.Y = -150f;
 
-            if (eddie.CurrentWorld != null)
-                Logger.Debug(eddie.CurrentWorld.Name);
-            
+            //if (eddie.CurrentWorld != null)
+            //    Logger.Debug(eddie.CurrentWorld.Name);
+
             world.AddLogical(new MoveCamera());
+
+            System.Threading.Thread.Sleep(3000);
+            idontevenknowanymore.Animations["happyFace"].Play()
+                .Animations["hat"].Play();
             //world.AddLogical(new CheckKeys());
         }
     }

@@ -80,7 +80,7 @@ namespace Sharp2D.Game.Sprites
 
                         foreach (Sprite sprite in t.group)
                         {
-                            if (sprite.IsOffScreen)
+                            if (sprite.IsOffScreen || !sprite.Visible)
                                 continue;
 
                             sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader

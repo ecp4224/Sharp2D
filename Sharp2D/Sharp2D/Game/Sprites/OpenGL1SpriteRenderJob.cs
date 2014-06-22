@@ -34,7 +34,7 @@ namespace Sharp2D.Game.Sprites
 
                         foreach (Sprite s in tgroup.group)
                         {
-                            if (s.IsOffScreen)
+                            if (s.IsOffScreen || !s.Visible)
                                 continue;
 
                             if (s.FirstRun)
