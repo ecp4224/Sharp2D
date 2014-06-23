@@ -92,8 +92,8 @@ namespace Sharp2D.Game.Sprites
                                 shader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), shader.Uniforms["texCoordPosAndScale"]);
                             }
 
-                            GL.DrawArrays(BeginMode.Quads, 0, 4);
-                            //GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            //GL.DrawArrays(BeginMode.Quads, 0, 4);
+                            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                         }
                     }
                 }

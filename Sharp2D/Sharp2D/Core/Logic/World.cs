@@ -11,6 +11,7 @@ namespace Sharp2D.Core.Logic
     {
         ~World()
         {
+            Sharp2D.Core.Utils.Logger.Debug("Finalized called for World " + Name);
             Dispose();
         }
 

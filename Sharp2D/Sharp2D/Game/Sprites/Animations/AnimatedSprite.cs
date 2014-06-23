@@ -18,6 +18,8 @@ namespace Sharp2D.Game.Sprites.Animations
     public abstract class AnimatedSprite : Sprite, ILogical
     {
         public Animation CurrentlyPlayingAnimation { get; internal set; }
+        public Animation ChildAnimationPlaying { get; internal set; }
+
         private long LastTick;
 
         public AnimationHolder Animations { get; private set; }
@@ -133,7 +135,7 @@ namespace Sharp2D.Game.Sprites.Animations
             }
         }
 
-        public override void OnAddedToWorld(World w)
+        /*public override void OnAddedToWorld(World w)
         {
             base.OnAddedToWorld(w);
 
@@ -165,7 +167,7 @@ namespace Sharp2D.Game.Sprites.Animations
                     sw.RemoveSprite(ani);
                 }
             }
-        }
+        }*/
 
         protected override void OnDispose()
         {
@@ -202,13 +204,16 @@ namespace Sharp2D.Game.Sprites.Animations
                         sprite.Animations = child_animation.Animations; //Set the animations for the hat sprite to the children animations of the "hat" animation.
                         sprite.Parent = this; //Set the parent of the hat sprite to this
                         sprite.Visible = false; //Make sure this sprite isn't visible by default
-                        foreach (World w in ContainingWorlds) //For every world this sprite is in
+                        
+                        child_animation.ParentAnimation = ani; //Set the parent of this child animation to this
+
+                        /*foreach (World w in ContainingWorlds) //For every world this sprite is in
                         {
                             if (w is Worlds.SpriteWorld) //If it's a sprite world
                             {
                                 ((Worlds.SpriteWorld)w).AddSprite(sprite); //Add the "hat" sprite to the world
                             }
-                        }
+                        }*/
 
                         float xadd = 0f, yadd = 0f;
                         Origin origin = child_animation.OriginType;

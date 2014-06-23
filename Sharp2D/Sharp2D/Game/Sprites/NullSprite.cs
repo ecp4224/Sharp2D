@@ -13,6 +13,11 @@ namespace Sharp2D.Game.Sprites
     /// </summary>
     public class NullSprite : Sprite
     {
+        ~NullSprite()
+        {
+            Sharp2D.Core.Utils.Logger.Debug("Finalized called for NullSprite");
+        }
+
         protected override void BeforeDraw()
         {
             throw new InvalidOperationException("This sprite can not be drawn, it's null!");
@@ -25,12 +30,10 @@ namespace Sharp2D.Game.Sprites
 
         protected override void OnUnload()
         {
-            throw new InvalidOperationException("This sprite can't be unloaded, it never was loaded!");
         }
 
         protected override void OnDispose()
         {
-            throw new InvalidOperationException("This sprite can't be disposed, it's null");
         }
 
         protected override void OnDisplay()

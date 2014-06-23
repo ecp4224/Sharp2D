@@ -16,6 +16,7 @@ namespace Sharp2D.Game.Sprites.Animations
         [JsonIgnore]
         private AnimationHolder holder;
 
+        [JsonIgnore]
         public AnimationHolder Animations
         {
             get
@@ -39,6 +40,24 @@ namespace Sharp2D.Game.Sprites.Animations
             }
         }
 
+        [JsonIgnore]
+        public Animation this[string name]
+        {
+            get
+            {
+                return Animations[name];
+            }
+        }
+
+        [JsonIgnore]
+        public Animation this[int row]
+        {
+            get
+            {
+                return Animations[row];
+            }
+        }
+
         [JsonProperty(PropertyName="origin_type")]
         private string origin_type;
 
@@ -59,6 +78,9 @@ namespace Sharp2D.Game.Sprites.Animations
 
         [JsonIgnore]
         public float YOffset { get { return yoffset; } }
+
+        [JsonIgnore]
+        public Animation ParentAnimation { get; internal set; }
 
         [JsonIgnore]
         private Origin type;
@@ -188,6 +210,24 @@ namespace Sharp2D.Game.Sprites.Animations
                     Owner.Width = Width;
                     Owner.Height = Height;
                     Owner.Visible = true;
+                    if (ParentAnimation != null)
+                    {
+                        if (ParentAnimation.Owner.ChildAnimationPlaying != null)
+                        {
+                            if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
+                            {
+                                Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
+                                w.RemoveSprite(ParentAnimation.Owner.ChildAnimationPlaying.Owner);
+                            }
+                        }
+                        ParentAnimation.Owner.ChildAnimationPlaying = this;
+                        if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
+                        {
+                            Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
+                            if (!w.Sprites.Contains(Owner))
+                                w.AddSprite(Owner);
+                        }
+                    }
                 }
                 _play = value;
             }
@@ -218,6 +258,8 @@ namespace Sharp2D.Game.Sprites.Animations
 
         public Animation Play()
         {
+            if (ParentAnimation != null)
+                ParentAnimation.Play();
             Playing = true;
             return this;
         }

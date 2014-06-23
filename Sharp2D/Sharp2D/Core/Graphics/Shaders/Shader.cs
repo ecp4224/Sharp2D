@@ -112,7 +112,7 @@ namespace Sharp2D.Core.Graphics.Shaders
 
 
 
-            for (int i = 0; i < ucount; i++)
+            /*for (int i = 0; i < ucount; i++)
             {
                 int length, size;
                 ActiveUniformType type;
@@ -120,7 +120,7 @@ namespace Sharp2D.Core.Graphics.Shaders
                 GL.GetActiveUniform(ProgramID, i, 256, out length, out size, out type, name);
 
                 _holder.locations.Add(name.ToString(), GL.GetUniformLocation(ProgramID, name.ToString()));
-            }
+            }*/
 
             IsCompiled = true;
 

@@ -1,4 +1,5 @@
-﻿using Sharp2D.Core.Graphics;
+﻿using System;
+using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Logic;
 using Sharp2D.Core.Settings;
 using Sharp2D.Core.Utils;
@@ -10,61 +11,67 @@ namespace TestGame
         public static TestSprite spriteSause;
         public static void Main(string[] args)
         {
-            Sharp2D.Game.Sprites.SpriteRenderJob.SetDefaultJob<Sharp2D.Game.Sprites.OpenGL3SpriteRenderJob>();
+            try
+            {
+                Sharp2D.Game.Sprites.SpriteRenderJob.SetDefaultJob<Sharp2D.Game.Sprites.OpenGL3SpriteRenderJob>();
 
-            ScreenSettings settings = new ScreenSettings();
-            settings.UseOpenTKLoop = false;
+                ScreenSettings settings = new ScreenSettings();
+                settings.UseOpenTKLoop = false;
 
-            Screen.DisplayScreenAsync(settings);
+                Screen.DisplayScreenAsync(settings);
 
-            System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(1000);
 
-            TestWorld world = new TestWorld();
+                TestWorld world = new TestWorld();
 
-            world.Load();
+                world.Load();
 
-            world.Display();
+                world.Display();
 
-            Screen.Camera.Z = 2f;
-            //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
+                Screen.Camera.Z = 2f;
+                world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
 
-            TestSprite idontevenknowanymore = new TestSprite();
-            idontevenknowanymore.ChangeHitbox("PonyHitbox");
-            idontevenknowanymore.X = 256;
-            idontevenknowanymore.Y = 128;
-            world.AddSprite(idontevenknowanymore);
+                TestSprite idontevenknowanymore = new TestSprite();
+                idontevenknowanymore.ChangeHitbox("PonyHitbox");
+                idontevenknowanymore.X = 256;
+                idontevenknowanymore.Y = 128;
+                world.AddSprite(idontevenknowanymore);
 
-            /*spriteSause = new TestSprite(); 
-            spriteSause.X = 256;
-            spriteSause.Y = 128;
-            spriteSause.MoveFlag = true;
+                /*spriteSause = new TestSprite(); 
+                spriteSause.X = 256;
+                spriteSause.Y = 128;
+                spriteSause.MoveFlag = true;
 
             
-            TestSprite enemy = new TestSprite();
-            enemy.ChangeHitbox("TriangleHitbox");
-            enemy.X = 512;
-            enemy.Y = 128;
-            world.AddSprite(enemy);
-            world.AddSprite(spriteSause);
+                TestSprite enemy = new TestSprite();
+                enemy.ChangeHitbox("TriangleHitbox");
+                enemy.X = 512;
+                enemy.Y = 128;
+                world.AddSprite(enemy);
+                world.AddSprite(spriteSause);
 
-            TestSprite eddie = new TestSprite();
-            eddie.ChangeHitbox("UhidkHitbox");
-            eddie.X = 512;
-            eddie.Y = 512;
-            world.AddSprite(eddie);*/
+                TestSprite eddie = new TestSprite();
+                eddie.ChangeHitbox("UhidkHitbox");
+                eddie.X = 512;
+                eddie.Y = 512;
+                world.AddSprite(eddie);*/
 
-            Screen.Camera.Z = 100f;
-            Screen.Camera.Y = -150f;
+                Screen.Camera.Z = 100f;
+                Screen.Camera.Y = -150f;
 
-            //if (eddie.CurrentWorld != null)
-            //    Logger.Debug(eddie.CurrentWorld.Name);
+                //if (eddie.CurrentWorld != null)
+                //    Logger.Debug(eddie.CurrentWorld.Name);
 
-            world.AddLogical(new MoveCamera());
+                world.AddLogical(new MoveCamera());
 
-            System.Threading.Thread.Sleep(3000);
-            idontevenknowanymore.Animations["happyFace"].Play()
-                .Animations["hat"].Play();
-            //world.AddLogical(new CheckKeys());
+                System.Threading.Thread.Sleep(3000);
+                idontevenknowanymore.Animations["happyFace"]["hat"].Play();
+                //world.AddLogical(new CheckKeys());
+            }
+            catch (Exception e)
+            {
+                Logger.Debug(e.ToString());
+            }
         }
     }
 

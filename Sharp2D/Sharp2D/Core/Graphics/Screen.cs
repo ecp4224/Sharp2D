@@ -129,7 +129,7 @@ namespace Sharp2D.Core.Graphics
         public static void DisplayScreenAsync(ScreenSettings settings)
         {
             DisplayThread = new Thread(new ThreadStart(delegate { DisplayScreen(settings); }));
-            DisplayThread.Priority = ThreadPriority.Highest;
+            //DisplayThread.Priority = ThreadPriority.Highest;
             DisplayThread.Name = "Display Thread";
             DisplayThread.Start();
         }

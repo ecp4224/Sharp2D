@@ -15,6 +15,7 @@ namespace Sharp2D.Game.Sprites
     {
         ~Sprite()
         {
+            Sharp2D.Core.Utils.Logger.Debug("Finalized called for Sprite " + this.ToString());
             Dispose();
         }
 
