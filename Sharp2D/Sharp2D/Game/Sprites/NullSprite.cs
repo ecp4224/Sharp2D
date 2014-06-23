@@ -15,7 +15,6 @@ namespace Sharp2D.Game.Sprites
     {
         ~NullSprite()
         {
-            Sharp2D.Core.Utils.Logger.Debug("Finalized called for NullSprite");
         }
 
         protected override void BeforeDraw()

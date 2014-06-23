@@ -15,7 +15,6 @@ namespace Sharp2D.Game.Sprites.Animations
     {
         ~NullAnimatedSprite()
         {
-            Sharp2D.Core.Utils.Logger.Debug("Finalized called for NullAnimatedSprite");
         }
 
         public override string Name
