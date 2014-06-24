@@ -34,6 +34,8 @@ namespace Sharp2D.Game.Sprites.Tiled
             X *= TileSet.TileWidth;
             Y *= TileSet.TileHeight;
 
+            //Y = -(parentLayer.Height - Y);
+
             _setTexCoords();
 
             Texture = TileSet.TileTexture;

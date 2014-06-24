@@ -15,7 +15,7 @@ namespace Sharp2D.Game.Sprites
         private const int POS_LOCATION = 0;
         private const int TEXCOORD_LOCATION = 1;
 
-        private Shader shader;
+        private static Shader shader;
 
         private int vao_id;
         private int vbo_id;
@@ -87,7 +87,7 @@ namespace Sharp2D.Game.Sprites
 
                             if (s.key != null && s.key.ProgramID == shader.ProgramID) //If this sprite is using our ID
                             {
-                                shader.Uniforms.SetUniform(new Vector4(sprite.X, sprite.Y, sprite.Width, sprite.Height), shader.Uniforms["spritePos"]);
+                                shader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), shader.Uniforms["spritePos"]);
                                 float tsize = sprite.TexCoords.SquardSize;
                                 shader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), shader.Uniforms["texCoordPosAndScale"]);
                             }
@@ -138,13 +138,16 @@ namespace Sharp2D.Game.Sprites
                 }
             }
 
-            shader = new Shader("shaders/sprite.vert", "shaders/sprite.frag"); //TODO Change files
+            if (shader == null)
+            {
+                shader = new Shader("shaders/sprite.vert", "shaders/sprite.frag"); //TODO Change files
 
-            shader.LoadAll();
-            shader.CompileAll();
-            GL.BindAttribLocation(shader.ProgramID, POS_LOCATION, "posattrib");
-            GL.BindAttribLocation(shader.ProgramID, TEXCOORD_LOCATION, "tcattrib");
-            shader.LinkAll();
+                shader.LoadAll();
+                shader.CompileAll();
+                GL.BindAttribLocation(shader.ProgramID, POS_LOCATION, "posattrib");
+                GL.BindAttribLocation(shader.ProgramID, TEXCOORD_LOCATION, "tcattrib");
+                shader.LinkAll();
+            }
 
             List<Sprite> sprites = Sprites;
             foreach (Sprite sprite in sprites)

@@ -92,7 +92,7 @@ namespace Sharp2D.Game.Sprites.Animations
 
         protected override void OnLoad()
         {
-            if (Parent == null) //Only load json if we have no parent
+            if (Parent == null && Animations == null) //Only load json if we have no parent and if we haven't already loaded the json
                 LoadJSON();
         }
 
@@ -124,50 +124,14 @@ namespace Sharp2D.Game.Sprites.Animations
             {
 
                 Animations = JsonConvert.DeserializeObject<AnimationHolder>(json);
+                Width = Animations[0].Width;
+                Height = Animations[0].Height;
 
                 children = SetupChildren(Animations);
 
                 Animations[0].Playing = true;
-                if (Animations[0].Animations.Animations.Count > 0)
-                {
-                    Animations[0].Animations[0].Playing = true;
-                }
             }
         }
-
-        /*public override void OnAddedToWorld(World w)
-        {
-            base.OnAddedToWorld(w);
-
-            if (w is SpriteWorld)
-            {
-                SpriteWorld sw = (SpriteWorld)w;
-                foreach (AnimatedSprite ani in children)
-                {
-                    if (ani is NullAnimatedSprite)
-                        continue;
-
-                    sw.AddSprite(ani);
-                }
-            }
-        }
-
-        public override void OnRemovedFromWorld(World w)
-        {
-            base.OnRemovedFromWorld(w);
-
-            if (w is SpriteWorld)
-            {
-                SpriteWorld sw = (SpriteWorld)w;
-                foreach (AnimatedSprite ani in children)
-                {
-                    if (ani is NullAnimatedSprite)
-                        continue;
-
-                    sw.RemoveSprite(ani);
-                }
-            }
-        }*/
 
         protected override void OnDispose()
         {
@@ -178,85 +142,145 @@ namespace Sharp2D.Game.Sprites.Animations
         private List<AnimatedSprite> SetupChildren(AnimationHolder animations)
         {
             List<AnimatedSprite> temp = new List<AnimatedSprite>();
-            Assembly assembly = Assembly.GetEntryAssembly();
             foreach (string key in animations.Animations.Keys) //To follow this, let's assume this is the "walking left" animation
             {
                 Animation ani = animations.Animations[key];
 
-                ani.Owner = this;
-
-                if (ani.Animations == null)
-                    continue;
-
-                foreach (string ckey in ani.Animations.Animations.Keys) //To follow this, let's assume this is the "hat" animation for "walking left" animation
-                {
-                    //ckey = "hat"
-                    Animation child_animation = ani.Animations[ckey]; //Same as ani.Animations.Animations[ckey];
-                    //Get the animation object for "hat"
-
-                    if (!child_animation.IsEmpty)
-                    {
-
-                        Type st = assembly.GetType(child_animation.SpriteFullName); //Get the type for the FullSpriteName
-                        AnimatedSprite sprite = (AnimatedSprite)Activator.CreateInstance(st); //Create a new instance of the child sprite
-
-                        child_animation.Owner = sprite; //Set the owner of the "hat" animation to the newly created sprite
-                        sprite.Animations = child_animation.Animations; //Set the animations for the hat sprite to the children animations of the "hat" animation.
-                        sprite.Parent = this; //Set the parent of the hat sprite to this
-                        sprite.Visible = false; //Make sure this sprite isn't visible by default
-                        
-                        child_animation.ParentAnimation = ani; //Set the parent of this child animation to this
-
-                        /*foreach (World w in ContainingWorlds) //For every world this sprite is in
-                        {
-                            if (w is Worlds.SpriteWorld) //If it's a sprite world
-                            {
-                                ((Worlds.SpriteWorld)w).AddSprite(sprite); //Add the "hat" sprite to the world
-                            }
-                        }*/
-
-                        float xadd = 0f, yadd = 0f;
-                        Origin origin = child_animation.OriginType;
-                        if ((origin & Origin.Left) != 0)
-                        {
-                            xadd = -(child_animation.Width / 2f);
-                        }
-                        if ((origin & Origin.Right) != 0)
-                        {
-                            xadd = child_animation.Width / 2f;
-                        }
-                        if ((origin & Origin.Top) != 0)
-                        {
-                            yadd = child_animation.Height / 2f;
-                        }
-                        if ((origin & Origin.Bottom) != 0)
-                        {
-                            yadd = -(child_animation.Height / 2f);
-                        }
-
-                        //Move the "hat" sprite to the default center of the sprite
-                        sprite.X = X + xadd;
-                        sprite.Y = Y + yadd;
-
-                        //Offset the "hat" sprite
-                        sprite.X += child_animation.XOffset;
-                        sprite.Y += child_animation.YOffset;
-
-                        temp.Add(sprite); //Add the "hat" sprite as a children of this sprite
-
-                        sprite.SetupChildren(sprite.Animations); //Setup the children of "hat" animation, and put all of it's children in a list
-
-                        //Nevermind, don't do that
-                        //temp.AddRange(temp2); //Add all of children of the "hat" sprite as our children as well.
-                    }
-                    else
-                    {
-                        temp.Add(new NullAnimatedSprite()); //This is an empty animation, fill it with a null sprite
-                    }
-                }
+                temp.AddRange(Setup(ref ani));
             }
 
             return temp; //Return the new sprites created
+        }
+
+        private List<AnimatedSprite> Setup(ref Animation ani, List<Animation> inheritStack = null)
+        {
+            List<AnimatedSprite> temp = new List<AnimatedSprite>();
+
+            if (ani.setup_ran)
+                return temp;
+
+            if (inheritStack == null)
+                inheritStack = new List<Animation>();
+
+            Assembly assembly = Assembly.GetEntryAssembly();
+
+            ani.Owner = this;
+
+            if (ani.Animations == null)
+                return temp;
+
+            if (ani.InheritedAnimations != null)
+            {
+                if (inheritStack.Count > 0 && inheritStack.Contains(ani.InheritedAnimationOwner))
+                    throw new InvalidOperationException("Loop inheritance detected!");
+                if (!ani.InheritedAnimationOwner.setup_ran) //If the inherited animation hasn't been setup yet
+                {
+                    Animation inherit_owner = ani.InheritedAnimationOwner;
+                    inheritStack.Add(ani); //Add ourself to the stack
+                    Setup(ref inherit_owner, inheritStack); //Setup the inherited animation
+                    inheritStack.Remove(ani); //Remove ourself from the stack
+                }
+                AnimationHolder t = ani.Animations;
+                AnimationHolder.Combind(ani.InheritedAnimations, ref t);
+            }
+
+            foreach (string ckey in ani.Animations.Animations.Keys) //To follow this, let's assume this is the "hat" animation for "walking left" animation
+            {
+                //ckey = "hat"
+                Animation child_animation = ani.Animations[ckey]; //Same as ani.Animations.Animations[ckey];
+                //Get the animation object for "hat"
+
+                child_animation.ParentAnimation = ani; //Set the parent of this child animation to this
+
+                if (ani.InheritedAnimations == null) //Only inherit values if this animation didn't inherit animations from another animation
+                {
+                    Animation.Combind(ani, ref child_animation, false); //Inherit values from parent animation to this animation (exclude animations)
+                }
+
+                if (!child_animation.IsEmpty)
+                {
+
+                    Type st = assembly.GetType(child_animation.SpriteFullName); //Get the type for the FullSpriteName
+                    AnimatedSprite sprite = (AnimatedSprite)Activator.CreateInstance(st); //Create a new instance of the child sprite
+
+                    child_animation.Owner = sprite; //Set the owner of the "hat" animation to the newly created sprite
+                    sprite.Animations = child_animation.Animations; //Set the animations for the hat sprite to the children animations of the "hat" animation.
+                    sprite.Parent = this; //Set the parent of the hat sprite to this
+                    sprite.Visible = false; //Make sure this sprite isn't visible by default
+                    temp.Add(sprite); //Add the "hat" sprite as a children of this sprite
+
+                    sprite.SetupChildren(sprite.Animations); //Setup the children of "hat" animation, and put all of it's children in a list
+
+                    //Nevermind, don't do that
+                    //temp.AddRange(temp2); //Add all of children of the "hat" sprite as our children as well.
+                }
+                else
+                {
+                    temp.Add(new NullAnimatedSprite()); //This is an empty animation, fill it with a null sprite
+                }
+            }
+
+            ani.setup_ran = true;
+
+            return temp;
+        }
+
+        public void AlignChildAnimation()
+        {
+            if (ChildAnimationPlaying == null)
+                return;
+            AnimatedSprite sprite = ChildAnimationPlaying.Owner;
+
+            //Default is center parent origin, center child origin
+            float defaultx = X + (Width / 2f) - (ChildAnimationPlaying.Width / 2f);
+            float defaulty = Y - (Height / 2f) + (ChildAnimationPlaying.Height / 2f);
+
+            Origin porigin = ChildAnimationPlaying.ParentOriginType;
+            if ((porigin & Origin.Left) != 0)
+            {
+                defaultx -= (Width / 2f);
+            }
+            if ((porigin & Origin.Right) != 0)
+            {
+                defaultx += Width / 2f;
+            }
+            if ((porigin & Origin.Top) != 0)
+            {
+                defaulty -= Height / 2f;
+            }
+            if ((porigin & Origin.Bottom) != 0)
+            {
+                defaulty += (Height / 2f);
+            }
+
+            float xadd = 0f, yadd = 0f;
+            Origin origin = ChildAnimationPlaying.OriginType;
+            if ((origin & Origin.Left) != 0)
+            {
+                xadd = -(ChildAnimationPlaying.Width / 2f);
+            }
+            if ((origin & Origin.Right) != 0)
+            {
+                xadd = ChildAnimationPlaying.Width / 2f;
+            }
+            if ((origin & Origin.Top) != 0)
+            {
+                yadd = ChildAnimationPlaying.Height / 2f;
+            }
+            if ((origin & Origin.Bottom) != 0)
+            {
+                yadd = -(ChildAnimationPlaying.Height / 2f);
+            }
+
+            //Move the "hat" sprite to the default origin of the sprite
+            sprite.X = defaultx - xadd;
+            sprite.Y = defaulty + yadd;
+
+            //Offset the "hat" sprite
+            sprite.X += ChildAnimationPlaying.XOffset;
+            sprite.Y += ChildAnimationPlaying.YOffset;
+
+            sprite.AlignChildAnimation();
         }
     }
 
@@ -291,6 +315,35 @@ namespace Sharp2D.Game.Sprites.Animations
             {
                 return _animations[name];
             }
+        }
+
+        public static void Combind(AnimationHolder inherited, ref AnimationHolder @override)
+        {
+            var temp = new Dictionary<string,Animation>();
+            foreach (string key in inherited._animations.Keys)
+            {
+                temp.Add(key, (Animation)inherited._animations[key].Clone());
+            }
+
+            foreach (string key in @override._animations.Keys)
+            {
+                if (temp.ContainsKey(key))
+                {
+                    Animation inherited_animation = temp[key];
+                    Animation override_animation = @override._animations[key];
+
+                    Animation.Combind(inherited_animation, ref override_animation);
+
+                    temp.Remove(key);
+                    temp.Add(key, override_animation);
+                }
+                else
+                {
+                    temp.Add(key, @override._animations[key]);
+                }
+            }
+
+            @override._animations = temp;
         }
 
         internal Dictionary<string, Animation> Animations

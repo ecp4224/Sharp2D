@@ -15,6 +15,7 @@ namespace Sharp2D.Game.Sprites
 
         public override bool IsOutsideCamera(float X, float Y, float Width, float Height)
         {
+            Y = -Y;
             float temp = Screen.Camera.Z / 100f;
             float temp2 = 7f / temp;
             float temp3 = 64f * temp;

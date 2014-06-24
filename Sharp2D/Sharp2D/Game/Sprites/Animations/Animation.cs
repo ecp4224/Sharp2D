@@ -8,7 +8,7 @@ using Sharp2D.Core.Utils;
 
 namespace Sharp2D.Game.Sprites.Animations
 {
-    public class Animation
+    public class Animation : ICloneable
     {
         [JsonProperty(PropertyName = "animations")]
         private Dictionary<string, Animation> animations;
@@ -32,10 +32,10 @@ namespace Sharp2D.Game.Sprites.Animations
                     holder.Animations = animations;
                 }
 
-                if (inherit_from != null && !string.IsNullOrWhiteSpace(inherit_from))
+                /*if (inherit_from != null && !string.IsNullOrWhiteSpace(inherit_from))
                 {
                     return Owner.Animations[inherit_from].Animations;
-                }
+                }*/
                 return holder;
             }
         }
@@ -61,11 +61,14 @@ namespace Sharp2D.Game.Sprites.Animations
         [JsonProperty(PropertyName="origin_type")]
         private string origin_type;
 
+        [JsonProperty(PropertyName="parent_origin_type")]
+        private string parent_origin_type;
+
         [JsonProperty(PropertyName="x_offset")]
-        private float xoffset;
+        private float xoffset = -1;
 
         [JsonProperty(PropertyName="y_offset")]
-        private float yoffset;
+        private float yoffset = -1;
 
         [JsonProperty(PropertyName="sprite")]
         private string sprite;
@@ -86,7 +89,13 @@ namespace Sharp2D.Game.Sprites.Animations
         private Origin type;
 
         [JsonIgnore]
+        private Origin parent_type;
+
+        [JsonIgnore]
         private bool type_set = false;
+        
+        [JsonIgnore]
+        private bool parent_type_set = false;
 
         [JsonIgnore]
         public Origin OriginType
@@ -97,22 +106,7 @@ namespace Sharp2D.Game.Sprites.Animations
                 {
                     if (origin_type != null)
                     {
-                        Type ot = typeof(Origin);
-
-                        if (origin_type.Contains("|"))
-                        {
-                            Origin f, s;
-                            string[] array = origin_type.Split('|');
-
-                            Enum.TryParse<Origin>(array[0], true, out f);
-                            Enum.TryParse<Origin>(array[1], true, out s);
-
-                            type = f | s;
-                        }
-                        else
-                        {
-                            Enum.TryParse<Origin>(origin_type, true, out type);
-                        }
+                        type = ParseStringToOrigin(origin_type);
                     }
                     else
                     {
@@ -126,11 +120,65 @@ namespace Sharp2D.Game.Sprites.Animations
             }
         }
 
+        [JsonIgnore]
+        internal bool setup_ran = false;
+
+        [JsonIgnore]
+        public Origin ParentOriginType
+        {
+            get
+            {
+                if (!parent_type_set)
+                {
+                    if (parent_origin_type != null)
+                    {
+                        parent_type = ParseStringToOrigin(parent_origin_type);
+                    }
+                    else
+                    {
+                        parent_type = Origin.Center;
+                    }
+
+                    parent_type_set = true;
+                }
+
+                return parent_type;
+            }
+        }
+
         [JsonProperty(PropertyName="inherit_animations")]
         private string inherit_from;
 
-        [JsonProperty(PropertyName="row")]
-        public int Row { get; private set; }
+        [JsonIgnore]
+        public AnimationHolder InheritedAnimations
+        {
+            get
+            {
+                if (inherit_from != null && !string.IsNullOrWhiteSpace(inherit_from))
+                {
+                    return Owner.Animations[inherit_from].Animations;
+                }
+                return null;
+            }
+        }
+
+        [JsonIgnore]
+        public Animation InheritedAnimationOwner
+        {
+            get
+            {
+                if (inherit_from != null && !string.IsNullOrWhiteSpace(inherit_from))
+                {
+                    return Owner.Animations[inherit_from];
+                }
+                return null;
+            }
+        }
+
+        [JsonProperty(PropertyName = "row")]
+        private int row = -1;
+
+        public int Row { get { return row; } }
 
         [JsonProperty(PropertyName="framecount")]
         public int Frames { get; private set; }
@@ -173,7 +221,7 @@ namespace Sharp2D.Game.Sprites.Animations
         public AnimatedSprite Owner { get; internal set; }
 
         [JsonIgnore]
-        private int _step;
+        private int _step = -1;
         
         [JsonIgnore]
         public int CurrentStep
@@ -204,7 +252,19 @@ namespace Sharp2D.Game.Sprites.Animations
             }
             set
             {
-                if (value && Owner.CurrentlyPlayingAnimation != this)
+                if (Owner == null) //This is a empty animation
+                {
+                    if (ParentAnimation.Owner.ChildAnimationPlaying != null)
+                    {
+                        if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
+                        {
+                            Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
+                            w.RemoveSprite(ParentAnimation.Owner.ChildAnimationPlaying.Owner);
+                        }
+                    }
+                    ParentAnimation.Owner.ChildAnimationPlaying = null;
+                }
+                else if (value && Owner.CurrentlyPlayingAnimation != this)
                 {
                     Owner.CurrentlyPlayingAnimation = this;
                     Owner.Width = Width;
@@ -227,6 +287,7 @@ namespace Sharp2D.Game.Sprites.Animations
                             if (!w.Sprites.Contains(Owner))
                                 w.AddSprite(Owner);
                         }
+                        ParentAnimation.Owner.AlignChildAnimation();
                     }
                 }
                 _play = value;
@@ -268,6 +329,168 @@ namespace Sharp2D.Game.Sprites.Animations
         {
             Playing = false;
             return this;
+        }
+
+        private static Origin ParseStringToOrigin(string origin_type)
+        {
+            Origin type;
+            Type ot = typeof(Origin);
+
+            if (origin_type.Contains("|"))
+            {
+                Origin f, s;
+                string[] array = origin_type.Split('|');
+
+                Enum.TryParse<Origin>(array[0], true, out f);
+                Enum.TryParse<Origin>(array[1], true, out s);
+
+                type = f | s;
+            }
+            else
+            {
+                Enum.TryParse<Origin>(origin_type, true, out type);
+            }
+
+            return type;
+        }
+
+        public Animation Clone()
+        {
+            Animation toReturn = new Animation();
+
+            toReturn.animations = new Dictionary<string, Animation>();
+            if (animations != null)
+            {
+                foreach (string key in animations.Keys)
+                {
+                    toReturn.animations.Add(key, (Animation)animations[key].Clone());
+                }
+            }
+
+            toReturn.origin_type = origin_type;
+            toReturn.parent_origin_type = parent_origin_type;
+            toReturn.sprite = sprite;
+            toReturn.width = width;
+            toReturn.height = height;
+            toReturn.inherit_from = inherit_from;
+            toReturn.row = row;
+            toReturn.Speed = Speed;
+            toReturn.Reverse = Reverse;
+            toReturn.xoffset = xoffset;
+            toReturn.yoffset = yoffset;
+            toReturn._step = _step;
+            toReturn._play = _play;
+            toReturn.IsEmpty = IsEmpty;
+            toReturn.Frames = Frames;
+
+            return toReturn;
+        }
+
+        public static void Combind(Animation inherit, ref Animation @override, bool includeAnimations = true)
+        {
+            //kill me alem ;_;
+
+            if (@override.IsEmpty) //The overrider is an empty animation, don't inherit anything 
+                return;
+
+            if (includeAnimations)
+            {
+                if (inherit.animations != null)
+                {
+                    if (@override.animations == null)
+                    {
+                        //If the overrider doesn't have any animations, then give all of inherit's animations
+                        //to the overrider
+                        @override.animations = new Dictionary<string, Animation>();
+                        foreach (string key in inherit.animations.Keys)
+                        {
+                            @override.animations.Add(key, inherit.animations[key].Clone()); //Be sure to clone the animation
+                        }
+                    }
+                    else
+                    {
+                        //For every animation the override doesn't have, clone it and give it to the overrider
+                        //For every animation the override does have, call Combind again with the 2 conflicting animations, then give the result to the overrider
+                        foreach (string key in inherit.animations.Keys)
+                        {
+                            if (@override.animations.ContainsKey(key))
+                            {
+                                Animation inherit_animation = inherit.animations[key];
+                                Animation override_animation = @override.animations[key];
+
+                                Combind(inherit_animation, ref @override_animation);
+
+                                @override.animations.Remove(key); //Replace the old animation
+                                @override.animations.Add(key, override_animation); //With the new animation
+                            }
+                            else
+                            {
+                                @override.animations.Add(key, inherit.animations[key].Clone());
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*
+            Check against default for strings, if is default, then use inherited value
+            Check for -1 against any variable that can be 0 (ex: xoffset, yoffset, width, height, row), if is -1, then use inherited value
+            Check for default for Speed and Frames, these values should never be 0, if is default, then use inherited value
+             */
+
+            if (@override.origin_type.IsDefaultForType<string>())
+            {
+                @override.origin_type = inherit.origin_type;
+            }
+            if (@override.parent_origin_type.IsDefaultForType<string>())
+            {
+                @override.parent_origin_type = inherit.parent_origin_type;
+            }
+            if (@override.sprite.IsDefaultForType<string>())
+            {
+                @override.sprite = inherit.sprite;
+            }
+            if (@override.width == -1)
+            {
+                @override.width = inherit.width;
+            }
+            if (@override.height == -1)
+            {
+                @override.height = inherit.height;
+            }
+            if (@override.inherit_from.IsDefaultForType<string>())
+            {
+                @override.inherit_from = inherit.inherit_from;
+            }
+            if (@override.row == -1)
+            {
+                @override.row = inherit.row;
+            }
+            if (@override.Speed.IsDefaultForType<long>())
+            {
+                @override.Speed = inherit.Speed;
+            }
+            if (@override.xoffset == -1)
+            {
+                @override.xoffset = inherit.xoffset;
+            }
+            if (@override.yoffset == -1)
+            {
+                @override.yoffset = inherit.yoffset;
+            }
+            if (@override._step == -1)
+            {
+                @override._step = inherit._step;
+            }
+            if (@override.Frames.IsDefaultForType<int>())
+            {
+                @override.Frames = inherit.Frames;
+            }
+        }
+
+        object ICloneable.Clone()
+        {
+            return this.Clone();
         }
     }
 }

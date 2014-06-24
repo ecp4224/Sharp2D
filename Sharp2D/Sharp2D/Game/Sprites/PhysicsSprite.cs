@@ -9,12 +9,11 @@ namespace Sharp2D.Game.Sprites
 {
     public abstract class PhysicsSprite : AnimatedSprite, ICollidable
     {
-        private float _x;
         public override float X
         {
             get
             {
-                return _x;
+                return base.X;
             }
 
             set
@@ -25,23 +24,22 @@ namespace Sharp2D.Game.Sprites
                 {
                     if (c == this) { continue; }
 
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(value - _x, 0));
+                    var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X, 0));
 
                     if (!result.WillIntersect) { continue; }
 
                     xSum += result.TranslationVector.X;
-                    _y += result.TranslationVector.Y;
+                    base.Y += result.TranslationVector.Y;
                 }
-                _x = value + xSum;
+                base.X = value + xSum;
             }
         }
 
-        private float _y;
         public override float Y
         {
             get
             {
-                return _y;
+                return base.Y;
             }
 
             set
@@ -51,15 +49,15 @@ namespace Sharp2D.Game.Sprites
                 foreach (var c in collidables)
                 {
                     if (c == this) { continue; }
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - _y));
+                    var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y));
 
                     if (!result.WillIntersect) { continue; }
 
-                    _x += result.TranslationVector.X;
+                    base.X += result.TranslationVector.X;
                     ySum += result.TranslationVector.Y;
                 }
                 
-                _y = value + ySum;
+                base.Y = value + ySum;
             }
         }
 

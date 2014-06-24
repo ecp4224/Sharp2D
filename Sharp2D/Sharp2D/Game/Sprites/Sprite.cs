@@ -126,6 +126,8 @@ namespace Sharp2D.Game.Sprites
 
         public virtual float Y { get; set; }
 
+        public virtual float Layer { get; set; }
+
         public void Load()
         {
             Visible = true;

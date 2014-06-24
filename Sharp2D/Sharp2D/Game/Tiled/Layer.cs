@@ -58,7 +58,7 @@ namespace Sharp2D.Game.Tiled
         {
             get
             {
-                return Properties.ContainsKey("playerlayer") && Properties["playerlayer"].ToLower() == "true";
+                return Properties != null && Properties.ContainsKey("playerlayer") && Properties["playerlayer"].ToLower() == "true";
             }
         }
 
@@ -88,7 +88,8 @@ namespace Sharp2D.Game.Tiled
 
         public void Dispose()
         {
-            Properties.Clear();
+            if (Properties != null) Properties.Clear();
+            Properties = null;
             Data = null;
             RenderJob = null;
         }

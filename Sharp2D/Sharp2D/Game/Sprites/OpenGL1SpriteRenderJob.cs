@@ -53,11 +53,11 @@ namespace Sharp2D.Game.Sprites
                             GL.TexCoord2(s.TexCoords.TopLeft.X, s.TexCoords.TopLeft.Y);
                             GL.Vertex3(x - bx, y - by, z);
                             GL.TexCoord2(s.TexCoords.TopRight.X, s.TexCoords.TopRight.Y);
-                            GL.Vertex3(x + bx, y - by, z);
+                            GL.Vertex3(x - bx, y + by, z);
                             GL.TexCoord2(s.TexCoords.BottomRight.X, s.TexCoords.BottomRight.Y);
                             GL.Vertex3(x + bx, y + by, z);
                             GL.TexCoord2(s.TexCoords.BottomLeft.X, s.TexCoords.BottomLeft.Y);
-                            GL.Vertex3(x - bx, y + by, z);
+                            GL.Vertex3(x + bx, y - by, z);
                             GL.End();
 
                             /*if (s is PhysicsSprite)

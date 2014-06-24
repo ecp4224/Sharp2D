@@ -33,8 +33,8 @@ namespace TestGame
 
                 TestSprite idontevenknowanymore = new TestSprite();
                 idontevenknowanymore.ChangeHitbox("PonyHitbox");
-                idontevenknowanymore.X = 256;
-                idontevenknowanymore.Y = 128;
+                idontevenknowanymore.X = 456;
+                idontevenknowanymore.Y = 600;
                 world.AddSprite(idontevenknowanymore);
 
                 /*spriteSause = new TestSprite(); 
@@ -56,8 +56,8 @@ namespace TestGame
                 eddie.Y = 512;
                 world.AddSprite(eddie);*/
 
-                Screen.Camera.Z = 100f;
-                Screen.Camera.Y = -150f;
+                Screen.Camera.Z = 200f;
+                Screen.Camera.Y = 630f;
 
                 //if (eddie.CurrentWorld != null)
                 //    Logger.Debug(eddie.CurrentWorld.Name);
@@ -65,7 +65,7 @@ namespace TestGame
                 world.AddLogical(new MoveCamera());
 
                 System.Threading.Thread.Sleep(3000);
-                idontevenknowanymore.Animations["happyFace"]["hat"].Play();
+                idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
                 //world.AddLogical(new CheckKeys());
             }
             catch (Exception e)

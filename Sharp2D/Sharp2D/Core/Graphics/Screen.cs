@@ -198,14 +198,14 @@ namespace Sharp2D.Core.Graphics
             window.VSync = Settings.VSync ? VSyncMode.On : VSyncMode.Off;
             window.WindowBorder = WindowBorder.Fixed;
 
-            GL.ClearColor(0f, 1f, 0f, 1f);
+            GL.ClearColor(0f, 0f, 0f, 1f);
             GL.ClearDepth(1.0);
             GL.Viewport(0, 0, (int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
             GL.MatrixMode(MatrixMode.Projection);
             
             GL.LoadIdentity();
             
-            GL.Ortho(0f, Settings.GameSize.Width, Settings.GameSize.Height, 0f, 0.1f, -1f);
+            GL.Ortho(0f, Settings.GameSize.Width, Settings.GameSize.Height, 0f, 0.1f, -1000f);
             GL.MatrixMode(MatrixMode.Modelview);
 
             GL.Enable(EnableCap.Texture2D);
@@ -249,7 +249,7 @@ namespace Sharp2D.Core.Graphics
             float fpsTime = 0;
             int loop = 0;
             int ntick = TickCount;
-            while (IsRunning)
+            while (IsRunning && !window.IsExiting)
             {
                 cur = now;
                 now = TickCount;
@@ -292,7 +292,7 @@ namespace Sharp2D.Core.Graphics
         private static void _draw()
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor(0f, 1f, 0f, 1f);
+            GL.ClearColor(0f, 0f, 0f, 1f);
             
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();

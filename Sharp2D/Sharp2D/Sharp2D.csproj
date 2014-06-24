@@ -33,6 +33,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FastMember">
+      <HintPath>..\packages\FastMember.1.0.0.11\lib\net40\FastMember.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -65,6 +68,7 @@
     <Compile Include="Core\Physics\Hitbox.cs" />
     <Compile Include="Core\Physics\ICollidable.cs" />
     <Compile Include="Core\Utils\Origin.cs" />
+    <Compile Include="Core\Utils\Extensions.cs" />
     <Compile Include="Core\Utils\TexCoords.cs" />
     <Compile Include="Game\Drawables\IDrawable.cs" />
     <Compile Include="Game\Drawables\DrawableRenderJob.cs" />
