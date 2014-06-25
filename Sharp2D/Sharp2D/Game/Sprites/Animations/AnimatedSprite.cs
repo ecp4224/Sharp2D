@@ -28,6 +28,22 @@ namespace Sharp2D.Game.Sprites.Animations
 
         public abstract string Name { get; }
 
+        public virtual string JsonFilePath
+        {
+            get
+            {
+                return "animations/" + Name + ".conf";
+            }
+        }
+
+        public virtual string JsonResourcePath
+        {
+            get
+            {
+                return Name + ".conf";
+            }
+        }
+
         public override float X
         {
             get
@@ -78,7 +94,10 @@ namespace Sharp2D.Game.Sprites.Animations
         {
             if (CurrentlyPlayingAnimation != null)
             {
-                if (LastTick + CurrentlyPlayingAnimation.Speed >= Screen.TickCount)
+                if (LastTick == 0)
+                    LastTick = Screen.TickCount;
+
+                if (LastTick + CurrentlyPlayingAnimation.Speed <= Screen.TickCount)
                 {
                     LastTick = Screen.TickCount;
                     if (!CurrentlyPlayingAnimation.Reverse)
@@ -90,6 +109,16 @@ namespace Sharp2D.Game.Sprites.Animations
             }
         }
 
+        public void ClearAnimations()
+        {
+            Animations = null;
+            foreach (AnimatedSprite ani in children)
+            {
+                ani.ClearAnimations();
+            }
+            children.Clear();
+        }
+
         protected override void OnLoad()
         {
             if (Parent == null && Animations == null) //Only load json if we have no parent and if we haven't already loaded the json
@@ -99,15 +128,15 @@ namespace Sharp2D.Game.Sprites.Animations
         private void LoadJSON()
         {
             string json = null;
-            if (File.Exists("animations/" + Name + ".conf"))
+            if (File.Exists(JsonFilePath))
             {
-                json = File.ReadAllText("animations/" + Name + ".conf");
+                json = File.ReadAllText(JsonFilePath);
             }
             else
             {
                 Assembly asm = Assembly.GetEntryAssembly();
 
-                Stream stream = asm.GetManifestResourceStream(Name + ".conf");
+                Stream stream = asm.GetManifestResourceStream(JsonResourcePath);
                 if (stream == null)
                     return;
                 StreamReader reader = new StreamReader(stream);
@@ -199,9 +228,17 @@ namespace Sharp2D.Game.Sprites.Animations
 
                 if (!child_animation.IsEmpty)
                 {
-
+                    AnimatedSprite sprite;
                     Type st = assembly.GetType(child_animation.SpriteFullName); //Get the type for the FullSpriteName
-                    AnimatedSprite sprite = (AnimatedSprite)Activator.CreateInstance(st); //Create a new instance of the child sprite
+                    if (st == null)
+                    {
+                        //Assume it's a file path if no type was found
+                        sprite = new BasicAnimatedSprite(child_animation.SpriteFullName);
+                    }
+                    else
+                    {
+                        sprite = (AnimatedSprite)Activator.CreateInstance(st); //Create a new instance of the child sprite
+                    }
 
                     child_animation.Owner = sprite; //Set the owner of the "hat" animation to the newly created sprite
                     sprite.Animations = child_animation.Animations; //Set the animations for the hat sprite to the children animations of the "hat" animation.
@@ -284,6 +321,34 @@ namespace Sharp2D.Game.Sprites.Animations
         }
     }
 
+    public class BasicAnimatedSprite : AnimatedSprite
+    {
+        public BasicAnimatedSprite(string path)
+        {
+            Texture = Texture.NewTexture(path);
+            Texture.LoadTextureFromFile();
+            Width = Texture.TextureWidth;
+            Height = Texture.TextureHeight;
+        }
+
+        public override string Name
+        {
+            get { return "basic_sprite"; }
+        }
+
+        protected override void BeforeDraw()
+        {
+        }
+
+        protected override void OnUnload()
+        {
+        }
+
+        protected override void OnDisplay()
+        {
+        }
+    }
+
     public class AnimationHolder
     {
         [JsonProperty(PropertyName="width")]
@@ -295,6 +360,13 @@ namespace Sharp2D.Game.Sprites.Animations
         [JsonProperty(PropertyName = "animations")]
         private Dictionary<string, Animation> _animations = new Dictionary<string, Animation>();
 
+        public int Rows
+        {
+            get
+            {
+                return _animations.Keys.Count;
+            }
+        }
 
         public Animation this[int index]
         {

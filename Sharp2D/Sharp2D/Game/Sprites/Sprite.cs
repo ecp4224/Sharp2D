@@ -128,6 +128,11 @@ namespace Sharp2D.Game.Sprites
 
         public virtual float Layer { get; set; }
 
+        protected void RequestOnDisplay()
+        {
+            FirstRun = true;
+        }
+
         public void Load()
         {
             Visible = true;

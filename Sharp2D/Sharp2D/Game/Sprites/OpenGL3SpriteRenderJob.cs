@@ -83,6 +83,12 @@ namespace Sharp2D.Game.Sprites
                             if (sprite.IsOffScreen || !sprite.Visible)
                                 continue;
 
+                            if (sprite.FirstRun)
+                            {
+                                sprite.Display();
+                                sprite.FirstRun = false;
+                            }
+
                             sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
 
                             if (s.key != null && s.key.ProgramID == shader.ProgramID) //If this sprite is using our ID

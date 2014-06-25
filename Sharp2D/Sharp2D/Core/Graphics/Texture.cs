@@ -75,7 +75,11 @@ namespace Sharp2D.Core.Graphics
         public void LoadTextureFromFile()
         {
             Screen.ValidateOpenGLUnsafe("Texture.LoadTextureFromFile", true);
-            Bitmap = new Bitmap(Name, false);
+            
+            using (var fs = new System.IO.FileStream(Name, System.IO.FileMode.Open))
+            {
+                Bitmap = new Bitmap(fs);
+            }
 
             ImageWidth = Bitmap.Width;
             ImageHeight = Bitmap.Height;
@@ -99,6 +103,8 @@ namespace Sharp2D.Core.Graphics
 
         public void Create()
         {
+            if (Created)
+                return;
             Screen.ValidateOpenGLSafe("Texture.Create");
 
             ID = GL.GenTexture();
@@ -114,6 +120,27 @@ namespace Sharp2D.Core.Graphics
             Bitmap.UnlockBits(bmp);
         }
 
+        public void CreateOrUpdate()
+        {
+            Screen.ValidateOpenGLSafe("Texture.CreateOrupdate");
+
+            if (!Created)
+                Create();
+            else
+            {
+                GL.BindTexture(TextureTarget.Texture2D, ID);
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
+
+                BitmapData bmp = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp.Width, bmp.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp.Scan0);
+
+                Bitmap.UnlockBits(bmp);
+            }
+        }
+
         private static int currentBind;
         public void Bind()
         {
@@ -123,7 +150,7 @@ namespace Sharp2D.Core.Graphics
                 return;
 
             if (!Created)
-                Create();
+                return;
 
             GL.BindTexture(TextureTarget.Texture2D, ID);
             currentBind = ID;

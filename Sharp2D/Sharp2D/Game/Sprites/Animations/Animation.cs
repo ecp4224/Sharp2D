@@ -41,6 +41,23 @@ namespace Sharp2D.Game.Sprites.Animations
         }
 
         [JsonIgnore]
+        public string Name
+        {
+            get
+            {
+                if (Owner != null)
+                {
+                    foreach (string name in Owner.Animations.Animations.Keys)
+                    {
+                        if (Owner.Animations[name] == this)
+                            return name;
+                    }
+                }
+                return "";
+            }
+        }
+
+        [JsonIgnore]
         public Animation this[string name]
         {
             get
@@ -302,6 +319,8 @@ namespace Sharp2D.Game.Sprites.Animations
         {
             get
             {
+                if (CurrentStep < 0)
+                    CurrentStep = 0;
                 float x = Width * CurrentStep;
                 float y = 0f;
                 for (int i = 0; i < Row; i++)

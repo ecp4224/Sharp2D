@@ -164,6 +164,10 @@ namespace Sharp2D.Core.Graphics
             if (DisplayThread != null)
             {
                 DisplayThread.Interrupt();
+                if (Settings.UseOpenTKLoop)
+                {
+                    window.Close();
+                }
                 DisplayThread.Join();
             }
         }
