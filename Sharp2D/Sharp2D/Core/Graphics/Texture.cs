@@ -70,6 +70,8 @@ namespace Sharp2D.Core.Graphics
             Stream stream = asm.GetManifestResourceStream(Name);
 
             Bitmap = new Bitmap(stream, false);
+
+            ValidateSize();
         }
 
         public void LoadTextureFromFile()
@@ -81,12 +83,17 @@ namespace Sharp2D.Core.Graphics
                 Bitmap = new Bitmap(fs);
             }
 
+            ValidateSize();
+        }
+
+        private void ValidateSize()
+        {
             ImageWidth = Bitmap.Width;
             ImageHeight = Bitmap.Height;
 
             TextureWidth = ((ImageWidth & (ImageWidth - 1)) == 0 ? ImageWidth : 2);
             TextureHeight = ((ImageHeight & (ImageHeight - 1)) == 0 ? ImageHeight : 2);
-            
+
             while (TextureWidth < ImageWidth) TextureWidth *= 2;
 
             while (TextureHeight < ImageHeight) TextureHeight *= 2;
@@ -128,6 +135,8 @@ namespace Sharp2D.Core.Graphics
                 Create();
             else
             {
+                ValidateSize();
+
                 GL.BindTexture(TextureTarget.Texture2D, ID);
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter);
