@@ -73,6 +73,8 @@ namespace AnimationPreview.Preview
         protected override void OnDisplay()
         {
             Texture.CreateOrUpdate();
+
+            MainWindow.WINDOW.CompleteReload();
         }
     }
 }
