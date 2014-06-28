@@ -73,6 +73,7 @@
     <Compile Include="Game\Sprites\Animations\AnimatedSprite.cs" />
     <Compile Include="Game\Sprites\Animations\Animation.cs" />
     <Compile Include="Game\Sprites\Animations\NullAnimatedSprite.cs" />
+    <Compile Include="Game\Sprites\DefaultSprite.cs" />
     <Compile Include="Game\Sprites\NullSprite.cs" />
     <Compile Include="Game\Sprites\OpenGL1Camera.cs" />
     <Compile Include="Game\Sprites\OpenGL3Camera.cs" />

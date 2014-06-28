@@ -164,5 +164,23 @@ namespace Sharp2D.Core.Graphics
             GL.BindTexture(TextureTarget.Texture2D, ID);
             currentBind = ID;
         }
+
+        public void ClearTexture()
+        {
+            using (var g = System.Drawing.Graphics.FromImage(Bitmap))
+            {
+                g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                using (var br = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(0, 255, 255, 255)))
+                {
+                    g.FillRectangle(br, 0, 0, Bitmap.Width, Bitmap.Height);
+                }
+            }
+        }
+
+        public void BlankTexture(int Width, int Height)
+        {
+            Bitmap = new Bitmap(Width, Height);
+            ValidateSize();
+        }
     }
 }

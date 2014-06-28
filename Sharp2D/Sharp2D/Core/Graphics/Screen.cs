@@ -111,6 +111,7 @@ namespace Sharp2D.Core.Graphics
         }
 
         private static int _tickAtStart;
+        private static Stack<Action> invokes = new Stack<Action>();
         private static ILogicContainer logics;
         private static IRenderJobContainer renders;
         private static GameWindow window;
@@ -156,6 +157,14 @@ namespace Sharp2D.Core.Graphics
                 _gameLoop();
             else
                 _openTKStart();
+        }
+
+        public static void Invoke(Action action)
+        {
+            lock (job_lock)
+            {
+                invokes.Push(action);
+            }
         }
 
         public static void TerminateScreen()
@@ -307,6 +316,14 @@ namespace Sharp2D.Core.Graphics
 
             lock (job_lock)
             {
+                while (invokes.Count > 0)
+                {
+                    if (invokes.Peek() == null)
+                        invokes.Pop();
+                    else
+                        invokes.Pop().Invoke();
+                }
+
                 renders.PreFetch();
                 foreach (IRenderJob job in renders.RenderJobs)
                 {

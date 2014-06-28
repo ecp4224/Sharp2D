@@ -42,8 +42,11 @@ namespace Sharp2D.Game.Sprites
                 gen = true;
                 CreateVBOs();
             }
+            List<Sprite> invalids = new List<Sprite>();
+            List<TextureGroup> invalid_group = new List<TextureGroup>();
             lock (group_lock)
             {
+
                 GL.BindVertexArray(vao_id);
                 
                 foreach (ShaderGroup s in group)
@@ -80,6 +83,13 @@ namespace Sharp2D.Game.Sprites
 
                         foreach (Sprite sprite in t.group)
                         {
+                            if (sprite.Texture.ID != t.key.ID)
+                            {
+                                invalids.Add(sprite);
+                                invalid_group.Add(t);
+                                continue;
+                            }
+
                             if (sprite.IsOffScreen || !sprite.Visible)
                                 continue;
 
@@ -104,6 +114,26 @@ namespace Sharp2D.Game.Sprites
                     }
                 }
             }
+
+            for (int i = 0; i < invalids.Count; i++)
+            {
+                Sprite sprite = invalids[i];
+                TextureGroup t = invalid_group[i];
+
+                ShaderGroup s = GetShaderGroupOrDefault(sprite.Shader);
+                lock (group_lock)
+                {
+                    if (t.group.Contains(sprite))
+                    {
+                        t.group.Remove(sprite);
+                        sprite.Unload();
+                    }
+                }
+
+                AddSprite(sprite);
+            }
+
+            invalids.Clear();
         }
 
         private void CreateVBOs()
