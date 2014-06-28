@@ -9,6 +9,7 @@ namespace Sharp2D.Game.Sprites
 {
     public abstract class PhysicsSprite : AnimatedSprite, ICollidable
     {
+        public event EventHandler OnCollision;
         public override float X
         {
             get
@@ -30,6 +31,12 @@ namespace Sharp2D.Game.Sprites
 
                     xSum += result.TranslationVector.X;
                     base.Y += result.TranslationVector.Y;
+
+                    if (OnCollision != null)
+                    {
+                        OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
+                        OnCollision(this, args);
+                    }
                 }
                 base.X = value + xSum;
             }
@@ -55,6 +62,12 @@ namespace Sharp2D.Game.Sprites
 
                     base.X += result.TranslationVector.X;
                     ySum += result.TranslationVector.Y;
+
+                    if (OnCollision != null)
+                    {
+                        OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
+                        OnCollision(this, args);
+                    }
                 }
                 
                 base.Y = value + ySum;

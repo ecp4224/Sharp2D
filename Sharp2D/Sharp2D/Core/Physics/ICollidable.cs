@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using Sharp2D.Core.Logic;
 
 namespace Sharp2D.Core.Physics
@@ -9,6 +10,8 @@ namespace Sharp2D.Core.Physics
         float Y { get; set; }
         float Width { get; set; }
         float Height { get; set; }
+
+        event EventHandler OnCollision;
 
         Hitbox Hitbox { get; set; }
 

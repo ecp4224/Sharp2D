@@ -58,6 +58,7 @@
     <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />
     <Compile Include="Core\Graphics\VertexArrayObject.cs" />
     <Compile Include="Core\Logic\World.cs" />
+    <Compile Include="Core\Physics\OnCollisionEventArgs.cs" />
     <Compile Include="Core\Settings\Input.cs" />
     <Compile Include="Core\Settings\Settings.cs" />
     <Compile Include="Core\Utils\Logger.cs" />
@@ -77,8 +78,10 @@
     <Compile Include="Game\Sprites\OpenGL3Camera.cs" />
     <Compile Include="Game\Sprites\OpenGL3SpriteRenderJob.cs" />
     <Compile Include="Game\Sprites\PhysicsSprite.cs" />
+    <Compile Include="Game\Sprites\Sprite.Events.cs" />
     <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />
     <Compile Include="Game\Tiled\Layer.cs" />
+    <Compile Include="Game\Tiled\TiledObject.cs" />
     <Compile Include="Game\Tiled\TileSet.cs" />
     <Compile Include="Game\Worlds\GenericCamera.cs" />
     <Compile Include="Core\Graphics\IRenderJob.cs" />

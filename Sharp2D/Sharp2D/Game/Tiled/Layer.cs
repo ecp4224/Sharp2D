@@ -35,7 +35,7 @@ namespace Sharp2D.Game.Tiled
         public int Y { get; private set; }
 
         [JsonProperty(PropertyName="type")]
-        public string Type { get; private set; }
+        public string RawType { get; private set; }
 
         [JsonProperty(PropertyName="properties")]
         public Dictionary<string, string> Properties { get; private set; }
@@ -43,10 +43,34 @@ namespace Sharp2D.Game.Tiled
         [JsonProperty(PropertyName="image")]
         public string ImagePath { get; private set; }
 
-        //private TiledObject[] objects;
+        [JsonProperty(PropertyName="objects")]
+        public List<TiledObject> Objects { get; private set; }
 
         [JsonProperty(PropertyName="data")]
         public long[] Data { get; private set; }
+
+        [JsonIgnore]
+        private LayerType type;
+
+        [JsonIgnore]
+        public LayerType Type
+        {
+            get
+            {
+                if (type == null)
+                {
+                    if (RawType == "imagelayer")
+                        type = LayerType.ImageLayer;
+                    else if (RawType == "tilelayer")
+                        type = LayerType.TileLayer;
+                    else if (RawType == "objectgroup")
+                        type = LayerType.ObjectLayer;
+                    else
+                        type = LayerType.Unknown;
+                }
+                return type;
+            }
+        }
 
         [JsonIgnore]
         public int LayerNumber { get; internal set; }
@@ -54,6 +78,7 @@ namespace Sharp2D.Game.Tiled
         [JsonIgnore]
         public Sprites.SpriteRenderJob RenderJob { get; internal set; }
 
+        [JsonIgnore]
         public bool IsPlayerLayer
         {
             get
@@ -62,27 +87,30 @@ namespace Sharp2D.Game.Tiled
             }
         }
 
+        [JsonIgnore]
         public bool IsImageLayer
         {
             get
             {
-                return Type == "imagelayer";
+                return RawType == "imagelayer";
             }
         }
 
+        [JsonIgnore]
         public bool IsObjectLayer
         {
             get
             {
-                return Type == "objectgroup";
+                return RawType == "objectgroup";
             }
         }
 
+        [JsonIgnore]
         public bool IsTileLayer
         {
             get
             {
-                return Type == "tilelayer";
+                return RawType == "tilelayer";
             }
         }
 
@@ -93,5 +121,13 @@ namespace Sharp2D.Game.Tiled
             Data = null;
             RenderJob = null;
         }
+    }
+
+    public enum LayerType
+    {
+        ImageLayer,
+        ObjectLayer,
+        TileLayer,
+        Unknown
     }
 }
