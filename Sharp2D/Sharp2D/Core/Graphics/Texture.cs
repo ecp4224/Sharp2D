@@ -56,6 +56,8 @@ namespace Sharp2D.Core.Graphics
             }
         }
 
+        public bool HasAlpha { get; private set; }
+
         public string Name { get; private set; }
 
         public Bitmap Bitmap { get; private set; }
@@ -82,6 +84,12 @@ namespace Sharp2D.Core.Graphics
             {
                 Bitmap = new Bitmap(fs);
             }
+
+            BitmapData data = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            HasAlpha = CheckAlphaChannel(data);
+
+            Bitmap.UnlockBits(data);
 
             ValidateSize();
         }
@@ -148,6 +156,22 @@ namespace Sharp2D.Core.Graphics
 
                 Bitmap.UnlockBits(bmp);
             }
+        }
+
+        private bool CheckAlphaChannel(BitmapData bmpData)
+        {
+            unsafe
+            {
+                byte* ptrAlpha = ((byte*)bmpData.Scan0.ToPointer()) + 3;
+                for (int i = bmpData.Width * bmpData.Height; i > 0; --i)  // prefix-- should be faster
+                {
+                    if (*ptrAlpha < 255)
+                        return true;
+
+                    ptrAlpha += 4;
+                }
+            }
+            return false;
         }
 
         private static int currentBind;

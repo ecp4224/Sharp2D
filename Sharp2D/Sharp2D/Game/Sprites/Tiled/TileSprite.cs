@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sharp2D.Game.Tiled;
-using Sharp2D.Game.Worlds.Tiled;
+using Sharp2D.Game.Worlds;
 
 namespace Sharp2D.Game.Sprites.Tiled
 {

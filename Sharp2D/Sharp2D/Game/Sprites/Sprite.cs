@@ -7,6 +7,7 @@ using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Utils;
 using OpenTK;
 using Sharp2D.Core.Logic;
+using Sharp2D.Game.Worlds;
 using Sharp2D.Core.Graphics.Shaders;
 
 namespace Sharp2D.Game.Sprites
@@ -23,6 +24,7 @@ namespace Sharp2D.Game.Sprites
         }
 
         internal bool FirstRun = true;
+        internal object light_lock = new object();
         
         /// <summary>
         /// Whether or not this Sprite has loaded
@@ -60,6 +62,8 @@ namespace Sharp2D.Game.Sprites
                 return new List<SpriteRenderJob>();
             }
         }
+
+        internal List<Light> Lights = new List<Light>();
         
         /// <summary>
         /// The Shader object this Sprite uses.
@@ -169,15 +173,49 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        private float x;
+        private float y;
         /// <summary>
         /// The X coordinate of this Sprite in the currently displaying world
         /// </summary>
-        public virtual float X { get; set; }
+        public virtual float X
+        {
+            get
+            {
+                return x;
+            }
+            set
+            {
+                float ox = x;
+                x = value;
+
+
+                World w = CurrentWorld;
+                if (ox != value && CurrentWorld is ILightWorld)
+                    ((ILightWorld)w).UpdateSpriteLights(this);
+            }
+        }
 
         /// <summary>
         /// The Y coordinate of this Sprite in the currently displaying world
         /// </summary>
-        public virtual float Y { get; set; }
+        public virtual float Y
+        {
+            get
+            {
+                return y;
+            }
+            set
+            {
+                float oy = y;
+                y = value;
+
+
+                World w = CurrentWorld;
+                if (oy != value && CurrentWorld is ILightWorld)
+                    ((ILightWorld)w).UpdateSpriteLights(this);
+            }
+        }
 
         /// <summary>
         /// The Layer this Sprite lives on in the currently displaying world. Note: Some <see cref="SpriteRenderJob"/>'s don't implement this variable
@@ -231,7 +269,7 @@ namespace Sharp2D.Game.Sprites
         /// <summary>
         /// Display the Sprite
         /// </summary>
-        public void Display()
+        internal void Display()
         {
             OnDisplay();
             if (Texture != null && Texture.ID == -1)

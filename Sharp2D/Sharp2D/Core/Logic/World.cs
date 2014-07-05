@@ -141,6 +141,8 @@ namespace Sharp2D.Core.Logic
 
         public void AddRenderJob(IRenderJob job)
         {
+            if (job == null)
+                throw new ArgumentException("Job cannot be null!");
             if (!Loaded)
                 throw new InvalidOperationException("This world object has not been loaded! Please call the \"Load()\" method before adding jobs!");
             if (IsDisposing)
@@ -154,6 +156,8 @@ namespace Sharp2D.Core.Logic
 
         public void AddRenderJobAt(IRenderJob job, int index)
         {
+            if (job == null)
+                throw new ArgumentException("Job cannot be null!");
             if (!Loaded)
                 throw new InvalidOperationException("This world object has not been loaded! Please call the \"Load()\" method before adding jobs!");
             if (IsDisposing)
@@ -165,6 +169,8 @@ namespace Sharp2D.Core.Logic
 
         public void RemoveRenderJob(IRenderJob job)
         {
+            if (job == null)
+                throw new ArgumentException("Job cannot be null!");
             if (!Loaded)
                 throw new InvalidOperationException("This world object has not been loaded! Please call the \"Load()\" method before removing jobs!");
             if (IsDisposing)
@@ -183,6 +189,8 @@ namespace Sharp2D.Core.Logic
 
         public void AddLogical(ILogical logical)
         {
+            if (logical == null)
+                throw new ArgumentException("Logical cannot be null!");
             if (!Loaded)
                 throw new InvalidOperationException("This world object has not been loaded! Please call the \"Load()\" method before adding jobs!");
             if (IsDisposing)
@@ -196,6 +204,8 @@ namespace Sharp2D.Core.Logic
 
         public void RemoveLogical(ILogical logical)
         {
+            if (logical == null)
+                throw new ArgumentException("Logical cannot be null!");
             if (!Loaded)
                 throw new InvalidOperationException("This world object has not been loaded! Please call the \"Load()\" method before adding jobs!");
             if (IsDisposing)
@@ -218,6 +228,8 @@ namespace Sharp2D.Core.Logic
 
         public bool HasJob(IRenderJob job)
         {
+            if (job == null)
+                throw new ArgumentException("Job cannot be null!");
             return jobs.Contains(job) || jCache.Contains(job);
         }
 

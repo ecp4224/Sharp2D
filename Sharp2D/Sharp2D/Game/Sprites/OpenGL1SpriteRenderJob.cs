@@ -11,6 +11,7 @@ using Sharp2D.Core.Graphics.Shaders;
 
 namespace Sharp2D.Game.Sprites
 {
+    [Obsolete("OpenGL1 is no longer supported at this time", true)]
     public class OpenGL1SpriteRenderJob : SpriteRenderJob
     {
         public OpenGL1SpriteRenderJob()
@@ -20,7 +21,7 @@ namespace Sharp2D.Game.Sprites
 
         public override void PerformJob()
         {
-            lock (group_lock)
+            /*lock (group_lock)
             {
                 foreach (ShaderGroup sgroup in group)
                 {
@@ -95,10 +96,10 @@ namespace Sharp2D.Game.Sprites
                             }
                             GL.End();*/
 
-                        }
-                    }
-                }
-            }
+                        //}
+                    //}
+                //}
+            //}
         }
     }
 }

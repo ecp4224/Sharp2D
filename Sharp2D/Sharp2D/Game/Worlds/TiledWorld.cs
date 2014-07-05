@@ -9,7 +9,7 @@ using Sharp2D.Game.Tiled;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Game.Sprites.Tiled;
 
-namespace Sharp2D.Game.Worlds.Tiled
+namespace Sharp2D.Game.Worlds
 {
     public abstract class TiledWorld : SpriteWorld
     {
@@ -67,6 +67,8 @@ namespace Sharp2D.Game.Worlds.Tiled
             return null;
         }
 
+        
+
         protected override void OnLoad()
         {
             string text = System.IO.File.ReadAllText(Name);
@@ -92,7 +94,6 @@ namespace Sharp2D.Game.Worlds.Tiled
 
             foreach (Layer layer in Layers)
             {
-                layer.RenderJob = SpriteRenderJob.CreateDefaultJob(); //Create a new render job for this layer
                 if (layer.IsTileLayer)
                 {
                     for (int i = 0; i < layer.Data.Length; i++)
@@ -111,7 +112,9 @@ namespace Sharp2D.Game.Worlds.Tiled
 
                         TileSprite sprite = new TileSprite((int)id, set, layer, i, this);
 
-                        layer.RenderJob.AddSprite(sprite); //Add the new tile to the job
+                        sprite.Load();
+
+                        layer.SetTile(i, sprite);
                     }
                 }
             }
@@ -125,7 +128,7 @@ namespace Sharp2D.Game.Worlds.Tiled
                     tileset.TileTexture.Create();
             }
 
-            bool _found = false;
+            /*bool _found = false;
             SpriteRenderJob @default = SpriteRenderJob.CreateDefaultJob();
 
             foreach (Layer layer in Layers)
@@ -142,11 +145,12 @@ namespace Sharp2D.Game.Worlds.Tiled
                         this.DefaultJob = @default; //Setting DefaultJob adds the job, so add it before adding the next layer
                     }
                 }
-                AddRenderJob(layer.RenderJob);
+                if (!HasJob(layer.RenderJob))
+                    AddRenderJob(layer.RenderJob);
             }
 
             if (DefaultJob == null)
-                DefaultJob = @default;
+                DefaultJob = @default;*/
         }
 
         protected override void OnUnload()

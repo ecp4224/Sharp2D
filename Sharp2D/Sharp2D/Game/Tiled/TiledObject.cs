@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
-using Sharp2D.Game.Worlds.Tiled;
+using Sharp2D.Game.Worlds;
 using Newtonsoft.Json;
 using Sharp2D.Core.Physics;
 
