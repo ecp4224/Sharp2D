@@ -151,9 +151,12 @@ namespace Sharp2D.Game.Tiled
         {
             get
             {
-                int i_x = (int)(x / 16f);
-                int i_y = (int)Math.Ceiling((y - 8f) / 16f);
-                
+                int i_x = (int)Math.Floor(x / 16f);
+                int i_y = (int)Math.Floor(y / 16f);
+
+                if (i_x < 0 || i_x > Width || i_y < 0 || i_y > Height)
+                    return null;
+
                 int index = i_x + (i_y * Width);
 
                 if (index >= sprites.Length || index < 0)

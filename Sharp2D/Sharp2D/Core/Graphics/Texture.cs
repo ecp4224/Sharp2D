@@ -67,9 +67,12 @@ namespace Sharp2D.Core.Graphics
         public void LoadTextureFromResource()
         {
             Screen.ValidateOpenGLUnsafe("Texture.LoadTextureFromResource", true);
-            Assembly asm = Assembly.GetEntryAssembly();
+            Assembly extender = Assembly.GetEntryAssembly();
+            Assembly sharp2d = this.GetType().Assembly;
 
-            Stream stream = asm.GetManifestResourceStream(Name);
+            Stream stream = extender.GetManifestResourceStream(Name);
+            if (stream == null)
+                stream = sharp2d.GetManifestResourceStream(Name);
 
             Bitmap = new Bitmap(stream, false);
 

@@ -67,7 +67,51 @@ namespace Sharp2D.Game.Worlds
             return null;
         }
 
-        
+        public Layer[] GetLayerByType(LayerType Type)
+        {
+            List<Layer> layers = new List<Layer>();
+            foreach (Layer layer in Layers)
+            {
+                if (layer.Type == Type)
+                    layers.Add(layer);
+            }
+
+            return layers.ToArray<Layer>();
+        }
+
+        public TileSprite GetTile(float pixelx, float pixely, Layer layer)
+        {
+            return layer[pixelx, pixely];
+        }
+
+        public TileSprite GetTile(int tilex, int tiley, Layer layer)
+        {
+            return layer[tilex, tiley];
+        }
+
+        public TileSprite[] GetTile(float pixelx, float pixely, LayerType type)
+        {
+            Layer[] layers = GetLayerByType(type);
+            TileSprite[] sprites = new TileSprite[layers.Length];
+            for (int i = 0; i < layers.Length; i++)
+            {
+                sprites[i] = layers[i][pixelx, pixely];
+            }
+
+            return sprites;
+        }
+
+        public TileSprite[] GetTile(int tilex, int tiley, LayerType type)
+        {
+            Layer[] layers = GetLayerByType(type);
+            TileSprite[] sprites = new TileSprite[layers.Length];
+            for (int i = 0; i < layers.Length; i++)
+            {
+                sprites[i] = layers[i][tilex, tiley];
+            }
+
+            return sprites;
+        }
 
         protected override void OnLoad()
         {
@@ -127,30 +171,6 @@ namespace Sharp2D.Game.Worlds
                 if (!tileset.TileTexture.Created)
                     tileset.TileTexture.Create();
             }
-
-            /*bool _found = false;
-            SpriteRenderJob @default = SpriteRenderJob.CreateDefaultJob();
-
-            foreach (Layer layer in Layers)
-            {
-                if (this.DefaultJob == null)
-                {
-                    if (layer.IsPlayerLayer && !_found)
-                    {
-                        _found = true;
-                    }
-                    else if (_found && !layer.IsPlayerLayer)
-                    {
-                        _found = false;
-                        this.DefaultJob = @default; //Setting DefaultJob adds the job, so add it before adding the next layer
-                    }
-                }
-                if (!HasJob(layer.RenderJob))
-                    AddRenderJob(layer.RenderJob);
-            }
-
-            if (DefaultJob == null)
-                DefaultJob = @default;*/
         }
 
         protected override void OnUnload()

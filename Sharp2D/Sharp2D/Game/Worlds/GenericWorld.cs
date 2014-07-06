@@ -10,11 +10,43 @@ using Sharp2D.Game.Sprites.Tiled;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
+using System.Drawing;
 
 namespace Sharp2D.Game.Worlds
 {
     public abstract class GenericWorld : TiledWorld, ILightWorld
     {
+        private float _brightness;
+        internal Vector3 AmbientShaderColor;
+        private Color _color;
+        public Color AmbientColor
+        {
+            get
+            {
+                return _color;
+            }
+            set
+            {
+                _color = value;
+
+                AmbientShaderColor = new Vector3(_color.R / 255f * _brightness, _color.G / 255f * _brightness, _color.B / 255f * _brightness);
+            }
+        }
+        public float AmbientBrightness
+        {
+            get
+            {
+                return _brightness;
+            }
+            set
+            {
+                _brightness = value; 
+                
+                AmbientShaderColor = new Vector3(_color.R / 255f * _brightness, _color.G / 255f * _brightness, _color.B / 255f * _brightness);
+            
+            }
+        }
+
         private List<Light> lights = new List<Light>();
         private GenericRenderJob job;
 
@@ -38,6 +70,9 @@ namespace Sharp2D.Game.Worlds
         {
             job = new GenericRenderJob(this);
 
+            AmbientBrightness = 1f;
+            AmbientColor = Color.White;
+
             SpriteRenderJob.SetDefaultJob(job);
 
             base.OnLoad();
@@ -53,27 +88,45 @@ namespace Sharp2D.Game.Worlds
         public void AddLight(Light light)
         {
             List<Sprite> sprites = Sprites;
+            float Y = light.Y + 18f;
             float xmin = light.X - (light.Radius);
             float xmax = light.X + (light.Radius);
-            float ymin = light.Y - (light.Radius);
-            float ymax = light.Y + (light.Radius);
+            float ymin = Y - (light.Radius);
+            float ymax = Y + (light.Radius);
             foreach (Sprite sprite in sprites)
             {
                 if (sprite.X > xmin && sprite.X < xmax && sprite.Y > ymin && sprite.Y < ymax)
                 {
-                    sprite.Lights.Add(light);
+                    lock (sprite.light_lock)
+                    {
+                        sprite.Lights.Add(light);
+                    }
                 }
             }
             foreach (Layer layer in Layers)
             {
-                int s_i_x = Math.Max((int)(xmin / 16f), 0);
-                int s_i_y = Math.Max((int)Math.Ceiling((ymin - 8f) / 16f), 0);
+                for (float x = xmin; x < xmax; x += 16)
+                {
+                    for (float y = ymin; y < ymax; y += 16)
+                    {
+                        TileSprite sprite = layer[x, y];
+                        if (sprite == null || sprite.Lights.Contains(light))
+                            continue;
+                        lock (sprite.light_lock)
+                        {
+                            sprite.Lights.Add(light);
+                        }
+                    }
+                }
+                /*int s_i_x = Math.Max((int)(xmin / 16f), 0);
+                int s_i_y = Math.Max((int)((ymin - 8f) / 16f), 0);
 
                 int e_i_x = Math.Max((int)(xmax / 16f), 0);
-                int e_i_y = Math.Max((int)Math.Ceiling((ymax - 8f) / 16f), 0);
+                int e_i_y = Math.Max((int)((ymax - 8f) / 16f), 0);
+                e_i_y++;
 
 
-                for (int x = s_i_x; x <= e_i_x; x++)
+                for (int x = s_i_x; x < e_i_x; x++)
                 {
                     for (int y = s_i_y; y < e_i_y; y++)
                     {
@@ -83,7 +136,7 @@ namespace Sharp2D.Game.Worlds
 
                         sprite.Lights.Add(light);
                     }
-                }
+                }*/
             }
         }
 
@@ -122,6 +175,7 @@ namespace Sharp2D.Game.Worlds
 
         private static Shader lightShader;
         private static Shader ambiantShader;
+        private static Shader alphaLightShader;
 
         private int vao_id;
         private int vbo_id;
@@ -148,6 +202,8 @@ namespace Sharp2D.Game.Worlds
             SpriteBatch culled_batch = new SpriteBatch();
             SpriteBatch culled_batch_light = new SpriteBatch();
             SpriteBatch culled_batch_alpha = new SpriteBatch();
+
+            
 
             Batch.ForEach(delegate(Sprite sprite)
             {
@@ -215,7 +271,7 @@ namespace Sharp2D.Game.Worlds
                     }
                 }
             }
-
+            
             return new SpriteBatch[] { culled_batch, culled_batch_alpha, culled_batch_light };
         }
 
@@ -240,7 +296,7 @@ namespace Sharp2D.Game.Worlds
                 ambiantShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), ambiantShader.Uniforms["camPosAndScale"]);
                 ambiantShader.Uniforms.SetUniform(aspect.X / aspect.Y, ambiantShader.Uniforms["screenRatioFix"]);
 
-                ambiantShader.Uniforms.SetUniform(1f, ambiantShader.Uniforms["brightness"]);
+                ambiantShader.Uniforms.SetUniform(parent.AmbientShaderColor, ambiantShader.Uniforms["brightness"]);
 
                 batch.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
                 {
@@ -307,7 +363,8 @@ namespace Sharp2D.Game.Worlds
                     {
                         foreach (Light light in sprite.Lights)
                         {
-                            lightShader.Uniforms.SetUniform(new Vector4(light.X, -light.Y, light.Radius, light.Intensity), lightShader.Uniforms["lightdata"]);
+                            lightShader.Uniforms.SetUniform(light.ShaderColor, lightShader.Uniforms["lightcolor"]);
+                            lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), lightShader.Uniforms["lightdata"]);
 
                             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                         }
@@ -319,16 +376,18 @@ namespace Sharp2D.Game.Worlds
 
             if (alpha_batch.Count > 0)
             {
+                alphaLightShader.Use();
+                alphaLightShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), alphaLightShader.Uniforms["camPosAndScale"]);
+                alphaLightShader.Uniforms.SetUniform(aspect.X / aspect.Y, alphaLightShader.Uniforms["screenRatioFix"]);
+
+                alphaLightShader.Uniforms.SetUniform(parent.AmbientShaderColor, alphaLightShader.Uniforms["ambient"]);
+
+
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+
                 alpha_batch.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
                 {
-                    ambiantShader.Use();
-
-                    ambiantShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), ambiantShader.Uniforms["camPosAndScale"]);
-                    ambiantShader.Uniforms.SetUniform(aspect.X / aspect.Y, ambiantShader.Uniforms["screenRatioFix"]);
-
-                    ambiantShader.Uniforms.SetUniform(1f, ambiantShader.Uniforms["brightness"]);
-
-
                     if (sprite.FirstRun)
                     {
                         sprite.Display();
@@ -345,38 +404,44 @@ namespace Sharp2D.Game.Worlds
 
                     sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
 
-                    ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), ambiantShader.Uniforms["spritePos"]);
+                    alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), alphaLightShader.Uniforms["spritePos"]);
                     float tsize = sprite.TexCoords.SquardSize;
-                    ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), ambiantShader.Uniforms["texCoordPosAndScale"]);
+                    alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), alphaLightShader.Uniforms["texCoordPosAndScale"]);
+
+                    alphaLightShader.Uniforms.SetUniform(1f, alphaLightShader.Uniforms["ambientmult"]);
 
                     GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
 
-                    if (sprite.Lights.Count == 0)
-                        return;
-
-                    lightShader.Use();
-
-                    lightShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), lightShader.Uniforms["camPosAndScale"]);
-                    lightShader.Uniforms.SetUniform(aspect.X / aspect.Y, lightShader.Uniforms["screenRatioFix"]);
-
-                    GL.Enable(EnableCap.Blend);
-                    GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
-
-                    lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), lightShader.Uniforms["spritePos"]);
-                    lightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), lightShader.Uniforms["texCoordPosAndScale"]);
-
                     lock (sprite.light_lock)
                     {
-                        foreach (Light light in sprite.Lights)
+                        if (sprite.Lights.Count > 0)
                         {
-                            lightShader.Uniforms.SetUniform(new Vector4(light.X, -light.Y, light.Radius, light.Intensity), lightShader.Uniforms["lightdata"]);
-
+                            Light light = sprite.Lights[0];
+                            alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
+                            alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
                             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                         }
                     }
 
-                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                    if (sprite.Lights.Count <= 1)
+                        return;
+
+                    alphaLightShader.Uniforms.SetUniform(0f, alphaLightShader.Uniforms["ambientmult"]);
+
+                    lock (sprite.light_lock)
+                    {
+                        for (int i = 1; i < sprite.Lights.Count; i++)
+                        {
+                            Light light = sprite.Lights[i];
+                            alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
+                            alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
+
+                            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                        }
+                    }
                 });
+
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             }
         }
 
@@ -421,7 +486,7 @@ namespace Sharp2D.Game.Worlds
             if (lightShader == null)
             {
 
-                lightShader = new Shader("shaders/sprite.vert", "shaders/sprite_light.frag"); //TODO Change files
+                lightShader = new Shader("Sharp2D.Resources.sprite_light.vert", "Sharp2D.Resources.sprite_light.frag"); //TODO Change files
 
                 lightShader.LoadAll();
                 lightShader.CompileAll();
@@ -432,12 +497,22 @@ namespace Sharp2D.Game.Worlds
 
             if (ambiantShader == null)
             {
-                ambiantShader = new Shader("shaders/sprite_amb.vert", "shaders/sprite_amb.frag");
+                ambiantShader = new Shader("Sharp2D.Resources.sprite_amb.vert", "Sharp2D.Resources.sprite_amb.frag");
                 ambiantShader.LoadAll();
                 ambiantShader.CompileAll();
                 GL.BindAttribLocation(ambiantShader.ProgramID, POS_LOCATION, "posattrib");
                 GL.BindAttribLocation(ambiantShader.ProgramID, TEXCOORD_LOCATION, "tcattrib");
                 ambiantShader.LinkAll();
+            }
+
+            if (alphaLightShader == null)
+            {
+                alphaLightShader = new Shader("Sharp2D.Resources.sprite_light_alpha.vert", "Sharp2D.Resources.sprite_light_alpha.frag");
+                alphaLightShader.LoadAll();
+                alphaLightShader.CompileAll();
+                GL.BindAttribLocation(alphaLightShader.ProgramID, POS_LOCATION, "posattrib");
+                GL.BindAttribLocation(alphaLightShader.ProgramID, TEXCOORD_LOCATION, "tcattrib");
+                alphaLightShader.LinkAll();
             }
         }
     }

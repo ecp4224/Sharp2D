@@ -280,7 +280,7 @@ namespace Sharp2D.Core.Graphics
                 }
 
                 _draw();
-                window.SwapBuffers();
+               window.SwapBuffers();
 
                 if (window.IsExiting)
                 {

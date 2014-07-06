@@ -104,11 +104,29 @@
     <Compile Include="Game\Worlds\TiledWorld.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Settings\ScreenSettings.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\sprite_amb.frag" />
+    <EmbeddedResource Include="Resources\sprite_amb.vert" />
+    <EmbeddedResource Include="Resources\sprite_light.frag" />
+    <EmbeddedResource Include="Resources\sprite_light.vert" />
+    <EmbeddedResource Include="Resources\sprite_light_alpha.frag" />
+    <EmbeddedResource Include="Resources\sprite_light_alpha.vert" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

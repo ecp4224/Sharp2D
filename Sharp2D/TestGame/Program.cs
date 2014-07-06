@@ -68,13 +68,18 @@ namespace TestGame
                 System.Threading.Thread.Sleep(1000);
                 //idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
 
+                Random rand = new Random();
                 int testCount = 100;
                 for (int i = 0; i < testCount; i++)
                 {
                     Light light = new Light(50f * i, 600, 1f, 50f);
+                    light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
+                    light.Radius = 100;
 
                     world.AddLight(light);
                 }
+                world.AmbientColor = Color.Tomato;
+                world.AmbientBrightness = 0.2f;
             }
             catch (Exception e)
             {
