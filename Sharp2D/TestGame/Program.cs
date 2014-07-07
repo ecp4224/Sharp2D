@@ -89,7 +89,6 @@ namespace TestGame
 
         public static void TestBitmapDrawing(TestWorld world)
         {
-
             Font font = new Font("Oxygen", 18f, FontStyle.Regular, GraphicsUnit.Point); //Get font object
 
             Texture texture = Texture.NewTexture("jkhjlkjh"); //Create a new texture

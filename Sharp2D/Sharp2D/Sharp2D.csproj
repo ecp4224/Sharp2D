@@ -93,6 +93,7 @@
     <Compile Include="Core\Graphics\Texture.cs" />
     <Compile Include="Core\Logic\ILogical.cs" />
     <Compile Include="Core\Logic\ILogicContainer.cs" />
+    <Compile Include="Game\Worlds\GenericRenderJob.cs" />
     <Compile Include="Game\Worlds\GenericWorld.cs" />
     <Compile Include="Game\Worlds\ILightWorld.cs" />
     <Compile Include="Game\Worlds\Light.cs" />

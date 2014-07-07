@@ -93,13 +93,13 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             group.Clear();
             _cache.Clear();
         }
 
-        public void ForEach(Action<Shader, Texture, Sprite> callBack)
+        public virtual void ForEach(Action<Shader, Texture, Sprite> callBack)
         {
             List<Sprite> invalids = new List<Sprite>();
             List<TextureGroup> invalid_group = new List<TextureGroup>();
@@ -142,7 +142,7 @@ namespace Sharp2D.Game.Sprites
             invalids.Clear();
         }
 
-        public void ForEach(Action<Sprite> callBack)
+        public virtual void ForEach(Action<Sprite> callBack)
         {
             List<Sprite> invalids = new List<Sprite>();
             List<TextureGroup> invalid_group = new List<TextureGroup>();
@@ -185,7 +185,7 @@ namespace Sharp2D.Game.Sprites
             invalids.Clear();
         }
 
-        public ShaderGroup GetShaderGroupOrDefault(Shader shader)
+        public virtual ShaderGroup GetShaderGroupOrDefault(Shader shader)
         {
             foreach (ShaderGroup s in group)
             {
@@ -198,7 +198,7 @@ namespace Sharp2D.Game.Sprites
             return ss;
         }
 
-        public ShaderGroup GetShaderGroup(Shader shader)
+        public virtual ShaderGroup GetShaderGroup(Shader shader)
         {
             foreach (ShaderGroup s in group)
             {
@@ -208,7 +208,7 @@ namespace Sharp2D.Game.Sprites
             return null;
         }
 
-        public void Add(Sprite sprite)
+        public virtual void Add(Sprite sprite)
         {
             lock (group_lock)
             {
@@ -220,7 +220,7 @@ namespace Sharp2D.Game.Sprites
             count++;
         }
 
-        public void AddRange(IList<Sprite> sprites)
+        public virtual void AddRange(IList<Sprite> sprites)
         {
             foreach (Sprite sprite in Sprites)
             {
@@ -228,7 +228,7 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        public void Remove(Sprite sprite)
+        public virtual void Remove(Sprite sprite)
         {
             ShaderGroup s = GetShaderGroupOrDefault(sprite.Shader);
             if (s == null)
@@ -249,7 +249,7 @@ namespace Sharp2D.Game.Sprites
             count--;
         }
 
-        public bool Contains(Sprite sprite)
+        public virtual bool Contains(Sprite sprite)
         {
             ShaderGroup group = GetShaderGroup(sprite.Shader);
             if (group != null)
