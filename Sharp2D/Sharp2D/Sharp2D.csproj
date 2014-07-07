@@ -79,6 +79,7 @@
     <Compile Include="Game\Sprites\OpenGL3Camera.cs" />
     <Compile Include="Game\Sprites\OpenGL3SpriteRenderJob.cs" />
     <Compile Include="Game\Sprites\PhysicsSprite.cs" />
+    <Compile Include="Game\Sprites\PlayableSprite.cs" />
     <Compile Include="Game\Sprites\Sprite.Events.cs" />
     <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />
     <Compile Include="Game\Tiled\Layer.cs" />

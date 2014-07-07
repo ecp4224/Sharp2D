@@ -149,7 +149,7 @@ namespace Sharp2D.Core.Physics
                 var edge = i < ea.Count ? ea[i] : eb[i - ea.Count];
 
                 var axis = edge.PerpendicularLeft;
-                axis = axis.Normalized(); //todo experiment with normalizefast
+                axis = axis.Normalized();
 
                 float minA = 0, minB = 0, maxA = 0, maxB = 0;
                 Project(axis, ha, ref minA, ref maxA);

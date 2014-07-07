@@ -153,6 +153,7 @@ namespace Sharp2D.Game.Sprites.Animations
             {
 
                 Animations = JsonConvert.DeserializeObject<AnimationHolder>(json);
+                Animations[0].Owner = this;
                 Width = Animations[0].Width;
                 Height = Animations[0].Height;
 

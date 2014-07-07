@@ -217,6 +217,8 @@ namespace Sharp2D.Game.Sprites.Animations
         {
             get
             {
+                if (Owner == null) { Console.WriteLine("Owner is null"); }
+                if (Owner.Animations == null) { Console.WriteLine("Animations are null"); }
                 if (width == -1)
                     return Owner.Animations.width;
                 return width;
