@@ -5,6 +5,7 @@ using Sharp2D.Core.Settings;
 using Sharp2D.Core.Utils;
 using System.Drawing;
 using System.Threading;
+using Sharp2D.Game.Worlds;
 
 namespace TestGame
 {
@@ -15,8 +16,6 @@ namespace TestGame
         {
             try
             {
-                Sharp2D.Game.Sprites.SpriteRenderJob.SetDefaultJob<Sharp2D.Game.Sprites.OpenGL3SpriteRenderJob>();
-
                 ScreenSettings settings = new ScreenSettings();
                 settings.UseOpenTKLoop = false;
 
@@ -31,7 +30,7 @@ namespace TestGame
                 world.Display();
 
                 Screen.Camera.Z = 2f;
-                world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
+                //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
 
                 TestSprite idontevenknowanymore = new TestSprite();
                 idontevenknowanymore.ChangeHitbox("PonyHitbox");
@@ -58,7 +57,7 @@ namespace TestGame
                 eddie.Y = 512;
                 world.AddSprite(eddie);*/
 
-                Screen.Camera.Z = 200f;
+                Screen.Camera.Z = 100f;
                 Screen.Camera.Y = 630f;
 
                 //if (eddie.CurrentWorld != null)
@@ -66,11 +65,21 @@ namespace TestGame
 
                 world.AddLogical(new MoveCamera());
 
-                System.Threading.Thread.Sleep(3000);
-                idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
+                System.Threading.Thread.Sleep(1000);
+                //idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
 
-                TestBitmapDrawing(world);
-                //world.AddLogical(new CheckKeys());
+                Random rand = new Random();
+                int testCount = 100;
+                for (int i = 0; i < testCount; i++)
+                {
+                    Light light = new Light(50f * i, 600, 1f, 50f);
+                    light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
+                    light.Radius = 100;
+
+                    world.AddLight(light);
+                }
+                world.AmbientColor = Color.Tomato;
+                world.AmbientBrightness = 0.2f;
             }
             catch (Exception e)
             {
@@ -104,27 +113,32 @@ namespace TestGame
             {
                 using (var b = new SolidBrush(Color.Black))
                 {
-                    float x = 0f;
-                    while (true)
+                    using (var back = new SolidBrush(Color.Green))
                     {
-                        if (x > sprite.Width)
-                            continue;
-
-                        string s = "" + chars[rand.Next(chars.Length)];
-                        g.DrawString(s, font, b, x, 0);
-                        Screen.Invoke(new Action(delegate
+                        g.FillRectangle(back, 0, 0, sprite.Width, sprite.Height);
+                        float x = 0f;
+                        while (true)
                         {
                             if (x > sprite.Width)
-                            {
-                                texture.ClearTexture();
-                                x = 0f;
-                            }
-                            texture.CreateOrUpdate();
-                        }));
-                        
-                        x += g.MeasureString(s, font).Width;
+                                continue;
 
-                        Thread.Sleep(1000);
+                            string s = "" + chars[rand.Next(chars.Length)];
+                            g.DrawString(s, font, b, x, 0);
+                            Screen.Invoke(new Action(delegate
+                            {
+                                if (x > sprite.Width)
+                                {
+                                    texture.ClearTexture();
+                                    g.FillRectangle(back, 0, 0, sprite.Width, sprite.Height);
+                                    x = 0f;
+                                }
+                                texture.CreateOrUpdate();
+                            }));
+
+                            x += g.MeasureString(s, font).Width;
+
+                            Thread.Sleep(1000);
+                        }
                     }
                 }
             }

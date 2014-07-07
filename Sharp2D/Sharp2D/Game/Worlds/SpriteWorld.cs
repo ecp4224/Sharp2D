@@ -12,7 +12,7 @@ namespace Sharp2D.Game.Worlds
     public abstract class SpriteWorld : World
     {
         private SpriteRenderJob _defaultJob;
-        public SpriteRenderJob DefaultJob
+        public virtual SpriteRenderJob DefaultJob
         {
             get { return _defaultJob;  }
             set
@@ -25,7 +25,7 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        public List<SpriteRenderJob> SpriteRenderJobs
+        public virtual List<SpriteRenderJob> SpriteRenderJobs
         {
             get
             {
@@ -33,7 +33,7 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        public List<Sprite> Sprites
+        public virtual List<Sprite> Sprites
         {
             get
             {
@@ -41,7 +41,7 @@ namespace Sharp2D.Game.Worlds
                 List<SpriteRenderJob> jobs = SpriteRenderJobs;
                 foreach (SpriteRenderJob job in jobs)
                 {
-                    sprites.AddRange(job.Sprites);
+                    sprites.AddRange(job.Batch.Sprites);
                 }
 
                 return sprites;

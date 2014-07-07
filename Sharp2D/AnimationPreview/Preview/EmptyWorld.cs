@@ -8,7 +8,7 @@ using Sharp2D.Game.Sprites;
 
 namespace AnimationPreview.Preview
 {
-    public class EmptyWorld : SpriteWorld
+    public class EmptyWorld : GenericWorld
     {
         public override string Name
         {

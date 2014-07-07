@@ -9,7 +9,7 @@ using Sharp2D.Game.Tiled;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Game.Sprites.Tiled;
 
-namespace Sharp2D.Game.Worlds.Tiled
+namespace Sharp2D.Game.Worlds
 {
     public abstract class TiledWorld : SpriteWorld
     {
@@ -70,6 +70,52 @@ namespace Sharp2D.Game.Worlds.Tiled
             return null;
         }
 
+        public Layer[] GetLayerByType(LayerType Type)
+        {
+            List<Layer> layers = new List<Layer>();
+            foreach (Layer layer in Layers)
+            {
+                if (layer.Type == Type)
+                    layers.Add(layer);
+            }
+
+            return layers.ToArray<Layer>();
+        }
+
+        public TileSprite GetTile(float pixelx, float pixely, Layer layer)
+        {
+            return layer[pixelx, pixely];
+        }
+
+        public TileSprite GetTile(int tilex, int tiley, Layer layer)
+        {
+            return layer[tilex, tiley];
+        }
+
+        public TileSprite[] GetTile(float pixelx, float pixely, LayerType type)
+        {
+            Layer[] layers = GetLayerByType(type);
+            TileSprite[] sprites = new TileSprite[layers.Length];
+            for (int i = 0; i < layers.Length; i++)
+            {
+                sprites[i] = layers[i][pixelx, pixely];
+            }
+
+            return sprites;
+        }
+
+        public TileSprite[] GetTile(int tilex, int tiley, LayerType type)
+        {
+            Layer[] layers = GetLayerByType(type);
+            TileSprite[] sprites = new TileSprite[layers.Length];
+            for (int i = 0; i < layers.Length; i++)
+            {
+                sprites[i] = layers[i][tilex, tiley];
+            }
+
+            return sprites;
+        }
+
         protected override void OnLoad()
         {
             string text = System.IO.File.ReadAllText(Name);
@@ -95,7 +141,6 @@ namespace Sharp2D.Game.Worlds.Tiled
 
             foreach (Layer layer in Layers)
             {
-                layer.RenderJob = SpriteRenderJob.CreateDefaultJob(); //Create a new render job for this layer
                 if (layer.IsTileLayer)
                 {
                     for (int i = 0; i < layer.Data.Length; i++)
@@ -114,7 +159,9 @@ namespace Sharp2D.Game.Worlds.Tiled
 
                         TileSprite sprite = new TileSprite((int)id, set, layer, i, this);
 
-                        layer.RenderJob.AddSprite(sprite); //Add the new tile to the job
+                        sprite.Load();
+
+                        layer.SetTile(i, sprite);
                     }
                 }
             }
@@ -127,29 +174,6 @@ namespace Sharp2D.Game.Worlds.Tiled
                 if (!tileset.TileTexture.Created)
                     tileset.TileTexture.Create();
             }
-
-            bool _found = false;
-            SpriteRenderJob @default = SpriteRenderJob.CreateDefaultJob();
-
-            foreach (Layer layer in Layers)
-            {
-                if (this.DefaultJob == null)
-                {
-                    if (layer.IsPlayerLayer && !_found)
-                    {
-                        _found = true;
-                    }
-                    else if (_found && !layer.IsPlayerLayer)
-                    {
-                        _found = false;
-                        this.DefaultJob = @default; //Setting DefaultJob adds the job, so add it before adding the next layer
-                    }
-                }
-                AddRenderJob(layer.RenderJob);
-            }
-
-            if (DefaultJob == null)
-                DefaultJob = @default;
         }
 
         protected override void OnUnload()

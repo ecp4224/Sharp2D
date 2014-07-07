@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sharp2D.Game.Sprites.Tiled;
 
 namespace Sharp2D.Game.Tiled
 {
@@ -76,9 +77,6 @@ namespace Sharp2D.Game.Tiled
         public int LayerNumber { get; internal set; }
 
         [JsonIgnore]
-        public Sprites.SpriteRenderJob RenderJob { get; internal set; }
-
-        [JsonIgnore]
         public bool IsPlayerLayer
         {
             get
@@ -114,12 +112,65 @@ namespace Sharp2D.Game.Tiled
             }
         }
 
+        [JsonIgnore]
+        private Sharp2D.Game.Sprites.Tiled.TileSprite[] sprites;
+
+        internal void SetTile(int index, Sharp2D.Game.Sprites.Tiled.TileSprite sprite)
+        {
+            if (sprites == null)
+                sprites = new Sprites.Tiled.TileSprite[Data.Length];
+
+            this.sprites[index] = sprite;
+        }
+
+        public TileSprite this[int index]
+        {
+            get
+            {
+                if (index >= sprites.Length || index < 0)
+                    return null;
+
+                return sprites[index];
+            }
+        }
+
+        public TileSprite this[int x, int y]
+        {
+            get
+            {
+                int index = (int)(x + (y * Width));
+
+                if (index >= sprites.Length || index < 0)
+                    return null;
+
+                return sprites[index];
+            }
+        }
+
+        public TileSprite this[float x, float y]
+        {
+            get
+            {
+                int i_x = (int)Math.Floor(x / 16f);
+                int i_y = (int)Math.Floor(y / 16f);
+
+                if (i_x < 0 || i_x > Width || i_y < 0 || i_y > Height)
+                    return null;
+
+                int index = i_x + (i_y * Width);
+
+                if (index >= sprites.Length || index < 0)
+                    return null;
+
+                return sprites[index];
+            }
+        }
+
         public void Dispose()
         {
             if (Properties != null) Properties.Clear();
             Properties = null;
             Data = null;
-            RenderJob = null;
         }
     }
 

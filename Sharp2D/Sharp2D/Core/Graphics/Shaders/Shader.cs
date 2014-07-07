@@ -131,13 +131,15 @@ namespace Sharp2D.Core.Graphics.Shaders
         private static Shader _currentShader;
         public void Use()
         {
+
+            if (OnShaderBound != null)
+                OnShaderBound(this);
+
             if (this == _currentShader)
                 return;
 
             GL.UseProgram(ProgramID);
             IsActive = true;
-            if (OnShaderBound != null)
-                OnShaderBound(this);
 
             if (_currentShader != null)
                 _currentShader.IsActive = false;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -212,7 +211,7 @@ namespace Sharp2D.Core.Graphics
             window.VSync = Settings.VSync ? VSyncMode.On : VSyncMode.Off;
             window.WindowBorder = WindowBorder.Fixed;
 
-            GL.ClearColor(10f / 255f, 190f / 255f, 1f, 1f);
+            GL.ClearColor(0f, 0f, 0f, 1f);
             GL.ClearDepth(1.0);
             GL.Viewport(0, 0, (int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
             GL.MatrixMode(MatrixMode.Projection);
@@ -281,11 +280,7 @@ namespace Sharp2D.Core.Graphics
                 }
 
                 _draw();
-                try
-                {
-                    window.SwapBuffers();
-                }
-                catch{ }
+               window.SwapBuffers();
 
                 if (window.IsExiting)
                 {
@@ -299,6 +294,7 @@ namespace Sharp2D.Core.Graphics
                 {
                     fpsCount = 0;
                     FPS = (1000f / fpsTime);
+                    Console.WriteLine("FPS: " + FPS);
                     fpsTime = 0;
                 }
 
@@ -309,7 +305,7 @@ namespace Sharp2D.Core.Graphics
         private static void _draw()
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor(10f / 255f, 190f / 255f, 1f, 1f);
+            GL.ClearColor(0f, 0f, 0f, 1f);
             
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();

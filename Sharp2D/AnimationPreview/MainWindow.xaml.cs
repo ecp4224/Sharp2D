@@ -53,8 +53,6 @@ namespace AnimationPreview
         {
             WINDOW = this;
 
-            SpriteRenderJob.SetDefaultJob<OpenGL3SpriteRenderJob>();
-
             Screen.DisplayScreenAsync();
 
             updater = new Thread(new ThreadStart(delegate

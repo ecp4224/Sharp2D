@@ -11,6 +11,7 @@ using Sharp2D.Core.Graphics.Shaders;
 
 namespace Sharp2D.Game.Sprites
 {
+    [Obsolete("OpenGL1 is no longer supported at this time", true)]
     public class OpenGL1SpriteRenderJob : SpriteRenderJob
     {
         public OpenGL1SpriteRenderJob()
@@ -20,7 +21,7 @@ namespace Sharp2D.Game.Sprites
 
         public override void PerformJob()
         {
-            lock (group_lock)
+            /*lock (group_lock)
             {
                 foreach (ShaderGroup sgroup in group)
                 {
@@ -60,11 +61,11 @@ namespace Sharp2D.Game.Sprites
                             GL.Vertex3(x + bx, y - by, z);
                             GL.End();
 
-                            if (s is ICollidable)
+                            /*if (s is PhysicsSprite)
                             {
-                                if ((s as ICollidable).Hitbox == null) { continue; }
-                                var h = (s as ICollidable).Hitbox.GetRelativeHitbox(s as ICollidable);
+                                var h = (s as PhysicsSprite).Hitbox.GetRelativeHitbox(s as PhysicsSprite);
 
+                                GL.LineWidth(2f);
                                 GL.Color3(200f / 255f, 30f / 255f, 30f / 255f);
                                 GL.Begin(PrimitiveType.LineLoop);
                                 foreach (var v in h.Vertices)
@@ -72,12 +73,33 @@ namespace Sharp2D.Game.Sprites
                                     GL.Vertex3(v.X, v.Y, 0);
                                 }
                                 GL.End();
-                                GL.Color3(1f, 1f, 1f);
-                            }                                        
-                        }
-                    }
-                }
-            }
+
+                                GL.Color3(230f / 255f, 90f / 255f, 250f / 255f);
+                                GL.Begin(PrimitiveType.LineLoop);
+                                var i = 1f;
+                                foreach (var v in h.ConstructEdgesRelative(s as PhysicsSprite))
+                                {
+                                    i++;
+                                    GL.LineWidth(i);
+                                    GL.Vertex3(v.X, v.Y, 0);
+                                }
+                                GL.End();
+
+                                GL.LineWidth(1f);
+                                GL.Color3(1, 1, 1);
+                            }
+                            
+                            GL.Begin(PrimitiveType.LineLoop);
+                            foreach (var v in h.Vertices)
+                            {
+                                GL.Vertex3(v.X, v.Y, 0);
+                            }
+                            GL.End();*/
+
+                        //}
+                    //}
+                //}
+            //}
         }
     }
 }

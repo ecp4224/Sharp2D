@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using Sharp2D.Core.Physics;
 using Sharp2D.Game.Tiled;
-using Sharp2D.Game.Worlds.Tiled;
+using Sharp2D.Game.Worlds;
 
 namespace Sharp2D.Game.Sprites.Tiled
 {
