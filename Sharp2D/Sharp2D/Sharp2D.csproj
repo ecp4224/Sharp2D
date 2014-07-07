@@ -80,6 +80,7 @@
     <Compile Include="Game\Sprites\OpenGL1Camera.cs" />
     <Compile Include="Game\Sprites\OpenGL3Camera.cs" />
     <Compile Include="Game\Sprites\PhysicsSprite.cs" />
+    <Compile Include="Game\Sprites\PlayableSprite.cs" />
     <Compile Include="Game\Sprites\Sprite.Events.cs" />
     <Compile Include="Game\Sprites\SpriteBatch.cs" />
     <Compile Include="Game\Sprites\Tiled\TileSprite.cs" />

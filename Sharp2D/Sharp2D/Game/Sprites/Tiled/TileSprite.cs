@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
+using Sharp2D.Core.Physics;
 using Sharp2D.Game.Tiled;
 using Sharp2D.Game.Worlds;
 
 namespace Sharp2D.Game.Sprites.Tiled
 {
-    public class TileSprite : Sprite
+    public class TileSprite : Sprite, ICollidable
     {
         public TiledWorld World { get; private set; }
         public int ID { get; private set; }
@@ -35,10 +37,24 @@ namespace Sharp2D.Game.Sprites.Tiled
             Y *= TileSet.TileHeight;
 
             //Y = -(parentLayer.Height - Y);
+            //Y = parentLayer.Height - Y;
 
             _setTexCoords();
 
             Texture = TileSet.TileTexture;
+
+            if (!parent.TileProperties.ContainsKey(ID.ToString()) ||
+                !parent.TileProperties[ID.ToString()].ContainsKey("ignore"))
+            {
+                Hitbox = new Hitbox("Space", new List<Vector2>
+                {
+                    new Vector2(0, 0),
+                    new Vector2(Width, 0),
+                    new Vector2(Width, Height),
+                    new Vector2(0, Height)
+                });
+                Hitbox.CollidableCache.Add(this);
+            }
         }
 
         private void _setTexCoords()
@@ -94,6 +110,14 @@ namespace Sharp2D.Game.Sprites.Tiled
         protected override void BeforeDraw()
         {
             //TODO Do something before it's drawn
+        }
+
+        public event EventHandler OnCollision;
+        public Hitbox Hitbox { get; set; }
+
+        public CollisionResult CollidesWith(ICollidable c)
+        {
+            return new CollisionResult {Intersecting = false, WillIntersect = false, TranslationVector = new Vector2()};
         }
     }
 }

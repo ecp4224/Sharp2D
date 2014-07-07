@@ -38,6 +38,9 @@ namespace Sharp2D.Game.Worlds
         [JsonProperty(PropertyName="layers")]
         public Layer[] Layers { get; private set; }
 
+        [JsonProperty(PropertyName="backgroundcolor")]
+        public string BackgroundColor { get; private set; }
+
         public int PixelWidth
         {
             get

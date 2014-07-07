@@ -25,12 +25,11 @@ namespace Sharp2D.Game.Sprites
                 {
                     if (c == this) { continue; }
 
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X, 0));
+                    var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X + xSum, 0));
 
                     if (!result.WillIntersect) { continue; }
 
                     xSum += result.TranslationVector.X;
-                    base.Y += result.TranslationVector.Y;
 
                     if (OnCollision != null)
                     {
@@ -56,11 +55,10 @@ namespace Sharp2D.Game.Sprites
                 foreach (var c in collidables)
                 {
                     if (c == this) { continue; }
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y));
+                    var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y + ySum));
 
                     if (!result.WillIntersect) { continue; }
 
-                    base.X += result.TranslationVector.X;
                     ySum += result.TranslationVector.Y;
 
                     if (OnCollision != null)
@@ -77,13 +75,13 @@ namespace Sharp2D.Game.Sprites
         private readonly List<Hitbox> _hitboxes;
         public Hitbox Hitbox { get; set; }
 
-        protected PhysicsSprite()
+        protected PhysicsSprite() : base()
         {
             Hitbox.CollidableCache.Add(this);
 
             _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
             if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
-
+            Console.WriteLine("CMAALELFLYSLFALFLKSFSODFOSF");
             Hitbox = _hitboxes[0];
         }
 
