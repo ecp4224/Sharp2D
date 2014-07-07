@@ -8,7 +8,7 @@ using Sharp2D.Core.Graphics;
 
 namespace Sharp2D.Core.Settings
 {
-    public class ScreenSettings : Setting
+    public class ScreenSettings : SaveableSettings
     { 
         /// <summary>
         /// <para>The title of the window</para>

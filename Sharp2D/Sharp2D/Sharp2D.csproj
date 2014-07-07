@@ -61,8 +61,10 @@
     <Compile Include="Core\Network\Client.cs" />
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\Physics\OnCollisionEventArgs.cs" />
+    <Compile Include="Core\Settings\EngineSettings.cs" />
+    <Compile Include="Core\Settings\GlobalSettings.cs" />
     <Compile Include="Core\Settings\Input.cs" />
-    <Compile Include="Core\Settings\Settings.cs" />
+    <Compile Include="Core\Settings\SaveableSettings.cs" />
     <Compile Include="Core\Utils\Logger.cs" />
     <Compile Include="Core\Utils\MathUtils.cs" />
     <Compile Include="Core\Physics\Hitbox.cs" />

@@ -205,6 +205,9 @@ namespace Sharp2D.Core.Graphics
 
         private static void _prepare()
         {
+            GlobalSettings.ScreenSettings = Settings;
+            GlobalSettings.EngineSettings = new EngineSettings();
+
             window = new GameWindow((int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
             window.Visible = true;
             window.Title = Settings.WindowTitle;
