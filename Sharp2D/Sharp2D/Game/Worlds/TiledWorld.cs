@@ -141,6 +141,7 @@ namespace Sharp2D.Game.Worlds
 
             foreach (Layer layer in Layers)
             {
+                
                 if (layer.IsTileLayer)
                 {
                     for (int i = 0; i < layer.Data.Length; i++)

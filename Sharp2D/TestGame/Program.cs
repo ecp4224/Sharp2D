@@ -33,9 +33,8 @@ namespace TestGame
                 //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
 
                 TestSprite idontevenknowanymore = new TestSprite();
-                idontevenknowanymore.ChangeHitbox("PonyHitbox");
                 idontevenknowanymore.X = 456;
-                idontevenknowanymore.Y = 600;
+                idontevenknowanymore.Y = 680;
                 world.AddSprite(idontevenknowanymore);
 
                 /*spriteSause = new TestSprite(); 
@@ -58,18 +57,19 @@ namespace TestGame
                 world.AddSprite(eddie);*/
 
                 Screen.Camera.Z = 100f;
-                Screen.Camera.Y = 630f;
+                Screen.Camera.Y = idontevenknowanymore.Y - 55;
+                Screen.Camera.X = -idontevenknowanymore.X;
 
                 //if (eddie.CurrentWorld != null)
                 //    Logger.Debug(eddie.CurrentWorld.Name);
 
-                world.AddLogical(new MoveCamera());
+                //world.AddLogical(new MoveCamera());
 
                 System.Threading.Thread.Sleep(1000);
                 //idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
 
                 Random rand = new Random();
-                int testCount = 100;
+                int testCount = 0;
                 for (int i = 0; i < testCount; i++)
                 {
                     Light light = new Light(50f * i, 600, 1f, 50f);
@@ -78,8 +78,8 @@ namespace TestGame
 
                     world.AddLight(light);
                 }
-                world.AmbientColor = Color.Tomato;
-                world.AmbientBrightness = 0.2f;
+                //world.AmbientColor = Color.Tomato;
+                world.AmbientBrightness = 0.4f;
             }
             catch (Exception e)
             {

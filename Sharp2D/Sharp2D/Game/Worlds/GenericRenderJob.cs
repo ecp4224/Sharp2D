@@ -114,6 +114,8 @@ namespace Sharp2D.Game.Worlds
             cull_height /= 2f;
             foreach (Layer layer in parent.Layers)
             {
+                if (!layer.IsTileLayer)
+                    continue;
                 float ex = cx + (cull_width + (3f * 16f));
                 float ey = cy + cull_height;
                 float sx = cx - cull_width;
@@ -305,6 +307,7 @@ namespace Sharp2D.Game.Worlds
                         return;
 
                     alphaLightShader.Uniforms.SetUniform(0f, alphaLightShader.Uniforms["ambientmult"]);
+                    GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
 
                     lock (sprite.light_lock)
                     {

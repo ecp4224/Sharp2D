@@ -48,7 +48,7 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        public void AddSprite(Sprite s, SpriteRenderJob job)
+        public virtual void AddSprite(Sprite s, SpriteRenderJob job)
         {
             if (!HasJob(job))
             {
@@ -63,7 +63,7 @@ namespace Sharp2D.Game.Worlds
                 AddLogical((ILogical)s);
         }
 
-        public void AddSprite(Sprite s)
+        public virtual void AddSprite(Sprite s)
         {
             if (DefaultJob != null)
             {
@@ -75,7 +75,7 @@ namespace Sharp2D.Game.Worlds
                 AddLogical((ILogical)s);
         }
 
-        public void RemoveSprite(Sprite s)
+        public virtual void RemoveSprite(Sprite s)
         {
             List<SpriteRenderJob> jobs = SpriteRenderJobs;
             foreach (SpriteRenderJob job in jobs)

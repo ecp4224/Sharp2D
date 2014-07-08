@@ -20,7 +20,7 @@ bld/
 # Roslyn cache directories
 *.ide/
 
-packages
+packages/*
 Sharp2D/packages/*
 
 # MSTest test Results

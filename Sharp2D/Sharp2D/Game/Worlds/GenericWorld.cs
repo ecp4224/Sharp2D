@@ -11,6 +11,7 @@ using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
 using System.Drawing;
+using Sharp2D.Core.Logic;
 
 namespace Sharp2D.Game.Worlds
 {
@@ -76,6 +77,40 @@ namespace Sharp2D.Game.Worlds
             SpriteRenderJob.SetDefaultJob(job);
 
             base.OnLoad();
+
+            Layer[] layers = GetLayerByType(LayerType.ObjectLayer);
+            foreach (Layer layer in layers)
+            {
+                TiledObject[] objects = layer.Objects;
+                foreach (TiledObject obj in objects)
+                {
+                    if (obj.RawType.ToLower() == "light")
+                    {
+                        float x = obj.X;
+                        float y = obj.Y;
+                        float radius = Math.Max(obj.Width, obj.Height);
+                        x = x + (radius / 2f);
+                        y = y + (radius / 2f);
+
+                        float intense = 1f;
+                        Color color = Color.White;
+                        if (obj.Properties != null)
+                        {
+                            if (obj.Properties.ContainsKey("brightness"))
+                            {
+                                float.TryParse(obj.Properties["brightness"], out intense);
+                            }
+                            if (obj.Properties.ContainsKey("color"))
+                            {
+                                color = Color.FromName(obj.Properties["color"]);
+                            }
+                        }
+
+                        Light light = new Light(x, y, intense, radius, color);
+                        AddLight(light);
+                    }
+                }
+            }
         }
 
         protected override void OnDisplay()
@@ -83,6 +118,14 @@ namespace Sharp2D.Game.Worlds
             base.OnDisplay();
 
             DefaultJob = job;
+
+            if (job.Batch.Count > 0)
+            {
+                job.Batch.ForEach(delegate(Sprite s)
+                {
+                    UpdateSpriteLights(s);
+                });
+            }
         }
 
         public void AddLight(Light light)
@@ -95,9 +138,9 @@ namespace Sharp2D.Game.Worlds
             float ymax = Y + (light.Radius);
             foreach (Sprite sprite in sprites)
             {
-                if (sprite.X > xmin && sprite.X < xmax && sprite.Y > ymin && sprite.Y < ymax)
+                lock (sprite.light_lock)
                 {
-                    lock (sprite.light_lock)
+                    if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
                     {
                         sprite.Lights.Add(light);
                     }
@@ -105,6 +148,8 @@ namespace Sharp2D.Game.Worlds
             }
             foreach (Layer layer in Layers)
             {
+                if (!layer.IsTileLayer)
+                    continue;
                 for (float x = xmin; x < xmax; x += 16)
                 {
                     for (float y = ymin; y < ymax; y += 16)
@@ -118,28 +163,34 @@ namespace Sharp2D.Game.Worlds
                         }
                     }
                 }
-                /*int s_i_x = Math.Max((int)(xmin / 16f), 0);
-                int s_i_y = Math.Max((int)((ymin - 8f) / 16f), 0);
-
-                int e_i_x = Math.Max((int)(xmax / 16f), 0);
-                int e_i_y = Math.Max((int)((ymax - 8f) / 16f), 0);
-                e_i_y++;
-
-
-                for (int x = s_i_x; x < e_i_x; x++)
-                {
-                    for (int y = s_i_y; y < e_i_y; y++)
-                    {
-                        TileSprite sprite = layer[x, y];
-                        if (sprite == null)
-                            continue;
-
-                        sprite.Lights.Add(light);
-                    }
-                }*/
             }
+
+            lights.Add(light);
         }
 
+        public override void AddSprite(Sprite s)
+        {
+            base.AddSprite(s);
+
+            UpdateSpriteLights(s);
+        }
+
+        public override void AddSprite(Sprite s, SpriteRenderJob job)
+        {
+            base.AddSprite(s, job);
+
+            UpdateSpriteLights(s);
+        }
+
+        public override void RemoveSprite(Sprite s)
+        {
+            base.RemoveSprite(s);
+
+            lock (s.light_lock)
+            {
+                s.Lights.Clear();
+            }
+        }
 
         public void UpdateSpriteLights(Sprite sprite)
         {
@@ -148,6 +199,8 @@ namespace Sharp2D.Game.Worlds
 
             float X = sprite.X;
             float Y = sprite.Y;
+            float Width = sprite.Width;
+            float Height = sprite.Height;
             lock (sprite.light_lock)
             {
                 sprite.Lights.Clear();
@@ -157,8 +210,8 @@ namespace Sharp2D.Game.Worlds
                     float xmax = light.X + (light.Radius);
                     float ymin = light.Y - (light.Radius);
                     float ymax = light.Y + (light.Radius);
-                    
-                    if (X > xmin && X < xmax && Y > ymin && Y < ymax)
+
+                    if (X + Width >= xmin && X <= xmax && Y >= ymin && Y - Height <= ymax)
                     {
                         sprite.Lights.Add(light);
                     }

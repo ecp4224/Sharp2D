@@ -27,7 +27,7 @@ void main(){
 		vec3 lightout = attenuation * lightcolor;
 		vec3 ambientout = ambient * ambientmult;
 		
-		fragColor.rgb = (lightout + ambientout) * difcolor.rgb;
+		fragColor.rgb = (lightout + ambientout) * difcolor.rgb * difcolor.a;
 		fragColor.a = ambientmult * difcolor.a;
 //		fragColor = vec4(1.0);
 }
