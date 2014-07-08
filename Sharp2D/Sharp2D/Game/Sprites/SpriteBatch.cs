@@ -262,5 +262,18 @@ namespace Sharp2D.Game.Sprites
             }
             return false;
         }
+
+        public virtual void Clear()
+        {
+            foreach (ShaderGroup g in group)
+            {
+                foreach (TextureGroup tg in g.group)
+                {
+                    tg.group.Clear();
+                }
+                g.group.Clear();
+            }
+            group.Clear();
+        }
     }
 }

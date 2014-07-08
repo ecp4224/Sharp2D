@@ -57,6 +57,7 @@
     <Compile Include="Core\Graphics\Shaders\Source.cs" />
     <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />
     <Compile Include="Core\Graphics\VertexArrayObject.cs" />
+    <Compile Include="Core\Logic\IAttachable.cs" />
     <Compile Include="Core\Logic\World.cs" />
     <Compile Include="Core\Network\Client.cs" />
     <Compile Include="Core\Network\Session.cs" />

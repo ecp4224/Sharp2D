@@ -16,7 +16,7 @@ namespace Sharp2D.Game.Sprites
     /// <para>A Sprite is an object that can be drawn by a <see cref="SpriteRenderJob"/>.</para>
     /// <para>A Sprite is a quad that can any width or height, but ALWAYS has a texture</para>
     /// </summary>
-    public abstract partial class Sprite : IDisposable
+    public abstract partial class Sprite : IDisposable, IAttachable
     {
         ~Sprite()
         {
@@ -186,9 +186,15 @@ namespace Sharp2D.Game.Sprites
             }
             set
             {
+                float dif = value - x;
+
                 float ox = x;
                 x = value;
 
+                foreach (IAttachable attached in _children)
+                {
+                    attached.X += dif;
+                }
 
                 World w = CurrentWorld;
                 if (ox != value && CurrentWorld is ILightWorld)
@@ -207,9 +213,15 @@ namespace Sharp2D.Game.Sprites
             }
             set
             {
+                float dif = value - y;
+
                 float oy = y;
                 y = value;
 
+                foreach (IAttachable attached in _children)
+                {
+                    attached.Y += dif;
+                }
 
                 World w = CurrentWorld;
                 if (oy != value && CurrentWorld is ILightWorld)
@@ -312,5 +324,26 @@ namespace Sharp2D.Game.Sprites
 
         protected abstract void OnDisplay();
 
+
+        private List<IAttachable> _children = new List<IAttachable>();
+        private List<IAttachable> _parents = new List<IAttachable>();
+        public IList<IAttachable> Children
+        {
+            get { return _children; }
+        }
+
+        public IList<IAttachable> Parents
+        {
+            get { return _parents; }
+        }
+
+        public void Attach(IAttachable ToAttach)
+        {
+            if (_children.Contains(ToAttach))
+                throw new ArgumentException("This attachable object is already attached!");
+
+            _children.Add(ToAttach);
+            ToAttach.Parents.Add(this);
+        }
     }
 }

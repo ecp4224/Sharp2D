@@ -130,6 +130,36 @@ namespace Sharp2D.Game.Worlds
 
         public void AddLight(Light light)
         {
+            if (lights.Contains(light))
+                throw new ArgumentException("This light is already in this world!");
+
+            _cullSpritesForLights(light);
+
+            lights.Add(light);
+
+            light.World = this;
+        }
+
+        public void UpdateLight(Light light)
+        {
+            Screen.ValidateOpenGLUnsafe("UpdateLight");
+
+            lock (job.render_lock)
+            {
+                foreach (Sprite s in light.affected)
+                {
+                    lock (s.light_lock)
+                    {
+                        s.Lights.Remove(light);
+                    }
+                }
+
+                _cullSpritesForLights(light);
+            }
+        }
+
+        private void _cullSpritesForLights(Light light)
+        {
             List<Sprite> sprites = Sprites;
             float Y = light.Y + 18f;
             float xmin = light.X - (light.Radius);
@@ -143,6 +173,7 @@ namespace Sharp2D.Game.Worlds
                     if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
                     {
                         sprite.Lights.Add(light);
+                        light.affected.Add(sprite);
                     }
                 }
             }
@@ -160,12 +191,11 @@ namespace Sharp2D.Game.Worlds
                         lock (sprite.light_lock)
                         {
                             sprite.Lights.Add(light);
+                            light.affected.Add(sprite);
                         }
                     }
                 }
             }
-
-            lights.Add(light);
         }
 
         public override void AddSprite(Sprite s)
@@ -188,6 +218,11 @@ namespace Sharp2D.Game.Worlds
 
             lock (s.light_lock)
             {
+                foreach (Light l in s.Lights)
+                {
+                    l.affected.Remove(s);
+                }
+
                 s.Lights.Clear();
             }
         }
@@ -203,6 +238,11 @@ namespace Sharp2D.Game.Worlds
             float Height = sprite.Height;
             lock (sprite.light_lock)
             {
+                foreach (Light l in sprite.Lights)
+                {
+                    l.affected.Remove(sprite);
+                }
+
                 sprite.Lights.Clear();
                 foreach (Light light in lights)
                 {
@@ -214,6 +254,7 @@ namespace Sharp2D.Game.Worlds
                     if (X + Width >= xmin && X <= xmax && Y >= ymin && Y - Height <= ymax)
                     {
                         sprite.Lights.Add(light);
+                        light.affected.Add(sprite);
                     }
                 }
             }

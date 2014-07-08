@@ -37,25 +37,6 @@ namespace TestGame
                 idontevenknowanymore.Y = 680;
                 world.AddSprite(idontevenknowanymore);
 
-                /*spriteSause = new TestSprite(); 
-                spriteSause.X = 256;
-                spriteSause.Y = 128;
-                spriteSause.MoveFlag = true;
-
-            
-                TestSprite enemy = new TestSprite();
-                enemy.ChangeHitbox("TriangleHitbox");
-                enemy.X = 512;
-                enemy.Y = 128;
-                world.AddSprite(enemy);
-                world.AddSprite(spriteSause);
-
-                TestSprite eddie = new TestSprite();
-                eddie.ChangeHitbox("UhidkHitbox");
-                eddie.X = 512;
-                eddie.Y = 512;
-                world.AddSprite(eddie);*/
-
                 Screen.Camera.Z = 100f;
                 Screen.Camera.Y = idontevenknowanymore.Y - 55;
                 Screen.Camera.X = -idontevenknowanymore.X;
@@ -69,10 +50,19 @@ namespace TestGame
                 //idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
 
                 Random rand = new Random();
+
+                Light light = new Light(idontevenknowanymore.X, idontevenknowanymore.Y, 1f, 50f);
+                light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
+                light.Radius = 100;
+
+                world.AddLight(light);
+
+                idontevenknowanymore.Attach(light);
+
                 int testCount = 0;
                 for (int i = 0; i < testCount; i++)
                 {
-                    Light light = new Light(50f * i, 600, 1f, 50f);
+                    light = new Light(50f * i, 600, 1f, 50f);
                     light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
                     light.Radius = 100;
 
@@ -80,6 +70,12 @@ namespace TestGame
                 }
                 //world.AmbientColor = Color.Tomato;
                 world.AmbientBrightness = 0.4f;
+
+                while (true)
+                {
+                    idontevenknowanymore.X += 1f;
+                    Thread.Sleep(150);
+                }
             }
             catch (Exception e)
             {
