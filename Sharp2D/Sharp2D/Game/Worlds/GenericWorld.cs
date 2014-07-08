@@ -67,6 +67,20 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
+        /// <summary>
+        /// Invoke a delegate while blocking the render thread. This operation is only really useful for updates to render info that may take a few frames to execute, and
+        /// you don't want any drawing during that time
+        /// </summary>
+        /// <param name="action"></param>
+        public void InvokeWithRenderLock(Action action)
+        {
+            Screen.ValidateOpenGLUnsafe("InvokeWithRenderLock");
+            lock (job.render_lock)
+            {
+                action();
+            }
+        }
+
         protected override void OnLoad()
         {
             job = new GenericRenderJob(this);
@@ -144,7 +158,7 @@ namespace Sharp2D.Game.Worlds
         {
             Screen.ValidateOpenGLUnsafe("UpdateLight");
 
-            lock (job.render_lock)
+            InvokeWithRenderLock(delegate
             {
                 foreach (Sprite s in light.affected)
                 {
@@ -155,7 +169,7 @@ namespace Sharp2D.Game.Worlds
                 }
 
                 _cullSpritesForLights(light);
-            }
+            });
         }
 
         private void _cullSpritesForLights(Light light)
