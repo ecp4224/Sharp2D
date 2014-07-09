@@ -142,6 +142,34 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
+        public Light AddLight(float X, float Y)
+        {
+            Light light = new Light(X, Y);
+            AddLight(light);
+            return light;
+        }
+
+        public Light AddLight(float X, float Y, float Intensity)
+        {
+            Light light = new Light(X, Y, Intensity);
+            AddLight(light);
+            return light;
+        }
+
+        public Light AddLight(float X, float Y, float Intensity, float Radius)
+        {
+            Light light = new Light(X, Y, Intensity, Radius);
+            AddLight(light);
+            return light;
+        }
+
+        public Light AddLight(float X, float Y, float Intensity, float Radius, Color color)
+        {
+            Light light = new Light(X, Y, Intensity, Radius, color);
+            AddLight(light);
+            return light;
+        }
+
         public void AddLight(Light light)
         {
             if (lights.Contains(light))
