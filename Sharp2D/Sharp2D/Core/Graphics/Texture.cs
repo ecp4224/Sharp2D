@@ -9,6 +9,7 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using OpenTK.Graphics.OpenGL;
 using System.IO;
+using Sharp2D.Core.Utils;
 
 namespace Sharp2D.Core.Graphics
 {
@@ -76,6 +77,8 @@ namespace Sharp2D.Core.Graphics
 
             Bitmap = new Bitmap(stream, false);
 
+            HasAlpha = Bitmap.ContainsAlpha();
+
             ValidateSize();
         }
 
@@ -88,11 +91,7 @@ namespace Sharp2D.Core.Graphics
                 Bitmap = new Bitmap(fs);
             }
 
-            BitmapData data = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            HasAlpha = CheckAlphaChannel(data);
-
-            Bitmap.UnlockBits(data);
+            HasAlpha = Bitmap.ContainsAlpha();
 
             ValidateSize();
         }

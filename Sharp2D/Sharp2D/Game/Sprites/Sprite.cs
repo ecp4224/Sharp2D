@@ -9,6 +9,7 @@ using OpenTK;
 using Sharp2D.Core.Logic;
 using Sharp2D.Game.Worlds;
 using Sharp2D.Core.Graphics.Shaders;
+using System.Drawing;
 
 namespace Sharp2D.Game.Sprites
 {
@@ -132,6 +133,7 @@ namespace Sharp2D.Game.Sprites
                 return ContainingWorlds.Where(w => w.Displaying).First();
             }
         }
+
         public TexCoords TexCoords;
         private float _rot;
 

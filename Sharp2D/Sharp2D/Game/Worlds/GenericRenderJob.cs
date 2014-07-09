@@ -138,7 +138,7 @@ namespace Sharp2D.Game.Worlds
                         if (sprite == null)
                             continue;
 
-                        if (sprite.Texture != null && sprite.Texture.HasAlpha)
+                        if (/*sprite.Texture != null && sprite.Texture.HasAlpha*/ sprite.TileHasAlpha)
                         {
                             culled_batch_alpha.Add(sprite);
                         }
@@ -311,7 +311,6 @@ namespace Sharp2D.Game.Worlds
                             return;
 
                         alphaLightShader.Uniforms.SetUniform(0f, alphaLightShader.Uniforms["ambientmult"]);
-                        GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
 
                         lock (sprite.light_lock)
                         {

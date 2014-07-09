@@ -29,7 +29,6 @@ namespace TestGame
 
                 world.Display();
 
-                Screen.Camera.Z = 2f;
                 //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
 
                 TestSprite idontevenknowanymore = new TestSprite();

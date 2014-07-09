@@ -7,6 +7,8 @@ using OpenTK;
 using Sharp2D.Core.Physics;
 using Sharp2D.Game.Tiled;
 using Sharp2D.Game.Worlds;
+using Sharp2D.Core.Utils;
+using System.Drawing;
 
 namespace Sharp2D.Game.Sprites.Tiled
 {
@@ -84,6 +86,44 @@ namespace Sharp2D.Game.Sprites.Tiled
             TexCoords = new Core.Utils.TexCoords(x, y, width, height, TileSet.TileTexture);
 
             World.texcoords_cache.Add(ID, TexCoords);
+        }
+
+        private bool cached_alpha_answer;
+        private bool valid_alpha_answer = false;
+        public bool TileHasAlpha
+        {
+            get
+            {
+                if (valid_alpha_answer)
+                    return cached_alpha_answer;
+
+                int tilepos = (ID - TileSet.FirstGID) + 1;
+                int step = (tilepos - 1) % TileSet.TilesPerRow, row = 0;
+
+                for (int i = 0; i != ID; i++)
+                {
+                    if (i % TileSet.TilesPerRow == 0 && i != 0)
+                        row++;
+                }
+
+                int x = TileSet.TileWidth * step;
+                int y = TileSet.TileHeight * row;
+                int width = TileSet.TileWidth;
+                int height = TileSet.TileHeight;
+
+
+                Bitmap testBmp = new Bitmap(width, height);
+                using (Graphics g = Graphics.FromImage(testBmp))
+                {
+                    g.DrawImage(Texture.Bitmap, new RectangleF(0, 0, width, height), new RectangleF(x, y, width, height), GraphicsUnit.Pixel);
+                }
+
+                cached_alpha_answer = testBmp.ContainsAlpha();
+                valid_alpha_answer = true;
+
+                testBmp.Dispose();
+                return cached_alpha_answer;
+            }
         }
 
 
