@@ -32,7 +32,7 @@ namespace AnimationPreview.Preview
         {
             get
             {
-                return JsonFilePath;
+                return AnimationConfigPath;
             }
             set
             {
@@ -40,7 +40,7 @@ namespace AnimationPreview.Preview
             }
         }
 
-        public override string JsonFilePath
+        public override string AnimationConfigPath
         {
             get
             {
