@@ -24,6 +24,8 @@ namespace Sharp2D.Game.Sprites
 
         public override void Update()
         {
+            base.Update();
+
             var count = Screen.TickCount;
             var delta = count - _lastTick;
 
