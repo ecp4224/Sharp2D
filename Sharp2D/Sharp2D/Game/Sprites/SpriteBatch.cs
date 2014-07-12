@@ -85,7 +85,7 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        public int Count
+        public virtual int Count
         {
             get
             {

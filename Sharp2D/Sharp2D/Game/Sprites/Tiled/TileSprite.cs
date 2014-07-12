@@ -38,6 +38,8 @@ namespace Sharp2D.Game.Sprites.Tiled
             X *= TileSet.TileWidth;
             Y *= TileSet.TileHeight;
 
+            Layer = 1;
+
             //Y = -(parentLayer.Height - Y);
             //Y = parentLayer.Height - Y;
 

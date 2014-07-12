@@ -11,7 +11,9 @@ uniform sampler2D texture0; //only one texture for now, we can get creative late
 out vec4 fragColor;
 
 void main(){
-		vec3 difcolor = texture(texture0, fragtexcoord).rgb;
+		vec4 pdifcolor = texture(texture0, fragtexcoord);
+		if(pdifcolor.a <= 0) discard;
+		vec3 difcolor = pdifcolor.rgb;
 		
 		
 		vec2 lightpos = lightdata.xy;
@@ -24,5 +26,5 @@ void main(){
 		
 		fragColor.rgb = attenuation * lightcolor * difcolor;
 		fragColor.a = 1.0;
-//		fragColor = vec4(1.0);
+//		fragColor += vec4(0.1);
 }

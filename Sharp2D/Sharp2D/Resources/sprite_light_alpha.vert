@@ -1,6 +1,7 @@
 #version 150
 
 uniform float screenRatioFix;
+uniform float spriteDepth;
 uniform vec4 spritePos;
 uniform vec4 texCoordPosAndScale;
 uniform vec3 camPosAndScale;
@@ -26,5 +27,5 @@ void main(){
 	preCamPlace.x /= screenRatioFix;
 
 	fragtexcoord = texCoordPosAndScale.xy - (tcattrib * texCoordPosAndScale.zw);
-	gl_Position = vec4(preCamPlace, 0.0, 1.0);
+	gl_Position = vec4(preCamPlace, spriteDepth, 1.0);
 }

@@ -30,15 +30,34 @@ namespace TestGame
                 world.Display();
 
                 //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
+                Random rand = new Random();
 
-                TestSprite idontevenknowanymore = new TestSprite();
+                Screen.Camera.Z = 100f;
+                int TEST = 10;
+                for (int i = 0; i < TEST; i++)
+                {
+                    TestSprite wat = new TestSprite();
+                    wat.X = rand.Next(600 - 400) + 400;
+                    wat.Y = rand.Next(700 - 500) + 580;
+                    wat.Layer = (float)rand.NextDouble();
+
+                    world.AddSprite(wat);
+                    //if (i + 1 >= TEST)
+                    //{
+                        Screen.Camera.Y = wat.Y - 55;
+                        Screen.Camera.X = -wat.X;
+                    //}
+                }
+
+                /*TestSprite idontevenknowanymore = new TestSprite();
                 idontevenknowanymore.X = 456;
                 idontevenknowanymore.Y = 680;
+                idontevenknowanymore.Layer = 0;
                 world.AddSprite(idontevenknowanymore);
 
                 Screen.Camera.Z = 100f;
                 Screen.Camera.Y = idontevenknowanymore.Y - 55;
-                Screen.Camera.X = -idontevenknowanymore.X;
+                Screen.Camera.X = -idontevenknowanymore.X;*/
 
                 //if (eddie.CurrentWorld != null)
                 //    Logger.Debug(eddie.CurrentWorld.Name);
@@ -48,15 +67,13 @@ namespace TestGame
                 System.Threading.Thread.Sleep(1000);
                 //idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
 
-                Random rand = new Random();
-
-                Light light = new Light(idontevenknowanymore.X, idontevenknowanymore.Y, 1f, 50f);
+                Light light = new Light(456, 680, 1f, 50f);
                 light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
                 light.Radius = 100;
 
                 world.AddLight(light);
 
-                idontevenknowanymore.Attach(light);
+                //idontevenknowanymore.Attach(light);
 
                 int testCount = 0;
                 for (int i = 0; i < testCount; i++)
@@ -72,7 +89,7 @@ namespace TestGame
 
                 while (true)
                 {
-                    idontevenknowanymore.X += 1f;
+                    //idontevenknowanymore.X += 1f;
                     Thread.Sleep(150);
                 }
             }

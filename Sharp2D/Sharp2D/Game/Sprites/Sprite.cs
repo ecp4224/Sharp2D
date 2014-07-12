@@ -231,10 +231,11 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        private float z = 0.1f;
         /// <summary>
         /// The Layer this Sprite lives on in the currently displaying world. Note: Some <see cref="SpriteRenderJob"/>'s don't implement this variable
         /// </summary>
-        public virtual float Layer { get; set; }
+        public virtual float Layer { get { return z; } set { z = value; } }
 
         /// <summary>
         /// Request the RenderJob to run the OnDisplay method again

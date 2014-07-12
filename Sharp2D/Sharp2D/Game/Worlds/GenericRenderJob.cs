@@ -16,6 +16,7 @@ namespace Sharp2D.Game.Worlds
 {
     class DrawBatch : SpriteBatch
     {
+        public List<Sprite> alphaSprites = new List<Sprite>();
         public int type;
         private int drawCount;
         public int DrawCount
@@ -29,18 +30,92 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
+        public override int Count
+        {
+            get
+            {
+                if (type != 2)
+                {
+                    return base.Count;
+                }
+                else
+                {
+                    return alphaSprites.Count;
+                }
+            }
+        }
+
+        public override void ForEach(Action<Shader, Texture, Sprite> callBack)
+        {
+            if (type != 2)
+            {
+                base.ForEach(callBack);
+            }
+            else
+            {
+                foreach (Sprite sprite in alphaSprites)
+                {
+                    callBack(sprite.Shader, sprite.Texture, sprite);
+                }
+            }
+        }
+
+        public override void ForEach(Action<Sprite> callBack)
+        {
+            if (type != 2)
+            {
+                base.ForEach(callBack);
+            }
+            else
+            {
+                foreach (Sprite sprite in alphaSprites)
+                {
+                    callBack(sprite);
+                }
+            }
+        }
+
         public override void Add(Sprite sprite)
         {
-            base.Add(sprite);
+            if (type != 2)
+            {
+                base.Add(sprite);
+            }
+            else
+            {
+                alphaSprites.Add(sprite);
+                Order();
+            }
             if (type == 1)
                 drawCount += sprite.Lights.Count;
             else
                 drawCount += sprite.Lights.Count + 1;
         }
+
+        public override void Remove(Sprite sprite)
+        {
+            if (type != 2)
+            {
+                base.Remove(sprite);
+            }
+            else
+            {
+                alphaSprites.Remove(sprite);
+                Order();
+            }
+        }
+
+        private void Order()
+        {
+            if (type == 2)
+            {
+                alphaSprites.Sort((x, y) => (int)(x.Layer - y.Layer));
+            }
+        }
     }
     public class GenericRenderJob : SpriteRenderJob
     {
-
+        
         internal object render_lock = new object();
 
         protected const int POS_LOCATION = 0;
@@ -175,6 +250,7 @@ namespace Sharp2D.Game.Worlds
                 Vector2 aspect = Screen.Settings.WindowAspectRatio;
                 if (batch.Count > 0)
                 {
+                   
                     ambiantShader.Use();
 
                     ambiantShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), ambiantShader.Uniforms["camPosAndScale"]);
@@ -203,10 +279,12 @@ namespace Sharp2D.Game.Worlds
                         ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), ambiantShader.Uniforms["spritePos"]);
                         float tsize = sprite.TexCoords.SquardSize;
                         ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), ambiantShader.Uniforms["texCoordPosAndScale"]);
+                        ambiantShader.Uniforms.SetUniform(sprite.Layer, ambiantShader.Uniforms["spriteDepth"]);
 
                         GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                     });
                 }
+                GL.DepthMask(false);
                 if (batch_light.Count > 0)
                 {
                     lightShader.Use();
@@ -242,6 +320,7 @@ namespace Sharp2D.Game.Worlds
                         lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), lightShader.Uniforms["spritePos"]);
                         float tsize = sprite.TexCoords.SquardSize;
                         lightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), lightShader.Uniforms["texCoordPosAndScale"]);
+                        lightShader.Uniforms.SetUniform(sprite.Layer, lightShader.Uniforms["spriteDepth"]);
 
                         lock (sprite.light_lock)
                         {
@@ -291,6 +370,7 @@ namespace Sharp2D.Game.Worlds
                         alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), alphaLightShader.Uniforms["spritePos"]);
                         float tsize = sprite.TexCoords.SquardSize;
                         alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), alphaLightShader.Uniforms["texCoordPosAndScale"]);
+                        alphaLightShader.Uniforms.SetUniform(sprite.Layer, alphaLightShader.Uniforms["spriteDepth"]);
 
                         alphaLightShader.Uniforms.SetUniform(1f, alphaLightShader.Uniforms["ambientmult"]);
 
@@ -332,6 +412,7 @@ namespace Sharp2D.Game.Worlds
                 batch_light.Clear();
                 alpha_batch.Clear();
             }
+            GL.DepthMask(true);
         }
 
         protected void OnFirstRun()

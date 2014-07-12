@@ -12,6 +12,7 @@ out vec4 fragColor;
 
 void main(){
 		vec4 difcolor = texture(texture0, fragtexcoord);
+		if(difcolor.a <= 0.0) discard;
 		
 		fragColor.rgb = brightness * difcolor.rgb;
 		fragColor.a = difcolor.a;

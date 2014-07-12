@@ -216,20 +216,22 @@ namespace Sharp2D.Core.Graphics
 
             GL.ClearColor(0f, 0f, 0f, 1f);
             GL.ClearDepth(1.0);
-            GL.Viewport(0, 0, (int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
-            GL.MatrixMode(MatrixMode.Projection);
+         //   GL.Viewport(0, 0, (int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
+         //   GL.MatrixMode(MatrixMode.Projection);
             
-            GL.LoadIdentity();
+         //   GL.LoadIdentity();
             
-            GL.Ortho(0f, Settings.GameSize.Width, Settings.GameSize.Height, 0f, 0.1f, -1000f);
-            GL.MatrixMode(MatrixMode.Modelview);
+         //   GL.Ortho(0f, Settings.GameSize.Width, Settings.GameSize.Height, 0f, 0.1f, -1000f);
+          //  GL.MatrixMode(MatrixMode.Modelview);
 
-            GL.Enable(EnableCap.Texture2D);
+           // GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.Blend);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, 8448);
+          //  GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, 8448);
 
-            GL.LoadIdentity();
+          //  GL.LoadIdentity();
         }
 
         static void window_UpdateFrame(object sender, FrameEventArgs e)
@@ -312,10 +314,11 @@ namespace Sharp2D.Core.Graphics
         private static void _draw()
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.DepthBufferBit);
             GL.ClearColor(0f, 0f, 0f, 1f);
             
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
+          //  GL.MatrixMode(MatrixMode.Modelview);
+         //   GL.LoadIdentity();
 
             Settings.Camera.BeforeRender();
 

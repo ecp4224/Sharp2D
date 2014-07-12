@@ -81,7 +81,6 @@ namespace Sharp2D.Game.Sprites
 
             _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
             if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
-            Console.WriteLine("CMAALELFLYSLFALFLKSFSODFOSF");
             Hitbox = _hitboxes[0];
         }
 
