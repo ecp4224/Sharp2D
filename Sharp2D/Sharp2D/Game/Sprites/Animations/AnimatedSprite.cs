@@ -100,10 +100,13 @@ namespace Sharp2D.Game.Sprites.Animations
                 if (LastTick + CurrentlyPlayingAnimation.Speed <= Screen.TickCount)
                 {
                     LastTick = Screen.TickCount;
-                    if (!CurrentlyPlayingAnimation.Reverse)
-                        CurrentlyPlayingAnimation.CurrentStep++;
-                    else
-                        CurrentlyPlayingAnimation.CurrentStep--;
+                    if (CurrentlyPlayingAnimation.Playing)
+                    {
+                        if (!CurrentlyPlayingAnimation.Reverse)
+                            CurrentlyPlayingAnimation.CurrentStep++;
+                        else
+                            CurrentlyPlayingAnimation.CurrentStep--;
+                    }
                 }
                 TexCoords = CurrentlyPlayingAnimation.CurrentTexCoords;
             }
