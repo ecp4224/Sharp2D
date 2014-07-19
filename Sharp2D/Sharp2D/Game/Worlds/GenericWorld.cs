@@ -48,7 +48,8 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        private List<Light> lights = new List<Light>();
+        internal List<Light> lights = new List<Light>();
+        internal List<Light> dynamicLights = new List<Light>();
         private GenericRenderJob job;
 
         public IList<Light> Lights
@@ -120,7 +121,7 @@ namespace Sharp2D.Game.Worlds
                             }
                         }
 
-                        Light light = new Light(x, y, intense, radius, color);
+                        Light light = new Light(x, y, intense, radius, color, LightType.StaticPointLight);
                         AddLight(light);
                     }
                 }
@@ -142,30 +143,30 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        public Light AddLight(float X, float Y)
+        public Light AddLight(float X, float Y, LightType LightType)
         {
-            Light light = new Light(X, Y);
+            Light light = new Light(X, Y, LightType);
             AddLight(light);
             return light;
         }
 
-        public Light AddLight(float X, float Y, float Intensity)
+        public Light AddLight(float X, float Y, float Intensity, LightType LightType)
         {
-            Light light = new Light(X, Y, Intensity);
+            Light light = new Light(X, Y, Intensity, LightType);
             AddLight(light);
             return light;
         }
 
-        public Light AddLight(float X, float Y, float Intensity, float Radius)
+        public Light AddLight(float X, float Y, float Intensity, float Radius, LightType LightType)
         {
-            Light light = new Light(X, Y, Intensity, Radius);
+            Light light = new Light(X, Y, Intensity, Radius, LightType);
             AddLight(light);
             return light;
         }
 
-        public Light AddLight(float X, float Y, float Intensity, float Radius, Color color)
+        public Light AddLight(float X, float Y, float Intensity, float Radius, Color color, LightType LightType)
         {
-            Light light = new Light(X, Y, Intensity, Radius, color);
+            Light light = new Light(X, Y, Intensity, Radius, color, LightType);
             AddLight(light);
             return light;
         }
@@ -175,18 +176,29 @@ namespace Sharp2D.Game.Worlds
             if (lights.Contains(light))
                 throw new ArgumentException("This light is already in this world!");
 
-            _cullSpritesForLights(light);
+            if (light.IsStatic)
+            {
+                _cullSpritesForLights(light);
+            }
 
-            lights.Add(light);
+            if (light.IsStatic)
+            {
+                lights.Add(light);
+            }
+            else
+            {
+                dynamicLights.Add(light);
+            }
 
             light.World = this;
         }
 
+        [Obsolete("StaticLights cant move and DynamicLights are dynamic")]
         public void UpdateLight(Light light)
         {
             Screen.ValidateOpenGLUnsafe("UpdateLight");
 
-            InvokeWithRenderLock(delegate
+            /*InvokeWithRenderLock(delegate
             {
                 foreach (Sprite s in light.affected)
                 {
@@ -197,11 +209,14 @@ namespace Sharp2D.Game.Worlds
                 }
 
                 _cullSpritesForLights(light);
-            });
+            });*/
         }
 
         private void _cullSpritesForLights(Light light)
         {
+            if (!light.IsStatic)
+                return;
+
             List<Sprite> sprites = Sprites;
             float Y = light.Y + 18f;
             float xmin = light.X - (light.Radius);
@@ -210,12 +225,14 @@ namespace Sharp2D.Game.Worlds
             float ymax = Y + (light.Radius);
             foreach (Sprite sprite in sprites)
             {
+                if (!sprite.IsStatic)
+                    continue;
+
                 lock (sprite.light_lock)
                 {
                     if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
                     {
                         sprite.Lights.Add(light);
-                        light.affected.Add(sprite);
                     }
                 }
             }
@@ -227,13 +244,12 @@ namespace Sharp2D.Game.Worlds
                 {
                     for (float y = ymin; y < ymax; y += 16)
                     {
-                        TileSprite sprite = layer[x, y];
+                        TileSprite sprite = layer[x, y]; //TileSprites are always static
                         if (sprite == null || sprite.Lights.Contains(light))
                             continue;
                         lock (sprite.light_lock)
                         {
                             sprite.Lights.Add(light);
-                            light.affected.Add(sprite);
                         }
                     }
                 }
@@ -258,20 +274,18 @@ namespace Sharp2D.Game.Worlds
         {
             base.RemoveSprite(s);
 
-            lock (s.light_lock)
+            if (s.IsStatic)
             {
-                foreach (Light l in s.Lights)
+                lock (s.light_lock)
                 {
-                    l.affected.Remove(s);
+                    s.Lights.Clear();
                 }
-
-                s.Lights.Clear();
             }
         }
 
         public void UpdateSpriteLights(Sprite sprite)
         {
-            if (sprite is TileSprite)
+            if (!sprite.IsStatic || sprite is TileSprite)
                 return;
 
             float X = sprite.X;
@@ -280,11 +294,6 @@ namespace Sharp2D.Game.Worlds
             float Height = sprite.Height;
             lock (sprite.light_lock)
             {
-                foreach (Light l in sprite.Lights)
-                {
-                    l.affected.Remove(sprite);
-                }
-
                 sprite.Lights.Clear();
                 foreach (Light light in lights)
                 {
@@ -296,7 +305,6 @@ namespace Sharp2D.Game.Worlds
                     if (X + Width >= xmin && X <= xmax && Y >= ymin && Y - Height <= ymax)
                     {
                         sprite.Lights.Add(light);
-                        light.affected.Add(sprite);
                     }
                 }
             }

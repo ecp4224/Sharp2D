@@ -37,6 +37,13 @@ namespace Sharp2D.Game.Sprites
         /// </summary>
         public bool Visible { get; set; }
 
+        /// <summary>
+        /// <para>This determines how this sprite is cached by the rendering system.</para>
+        /// <para>This property should be set when the sprite is loaded, and after it's position has been set. The position should not be changed after this property has been set to true.</para>
+        /// <para>This property defaults to false.</para>
+        /// </summary>
+        public bool IsStatic { get; set; }
+
         private Texture _texture;
         private Shader _shader;
         
@@ -65,7 +72,16 @@ namespace Sharp2D.Game.Sprites
         }
 
         internal List<Light> Lights = new List<Light>();
-        
+        internal List<Light> dynamicLights = new List<Light>();
+
+        internal int LightCount
+        {
+            get
+            {
+                return Lights.Count + dynamicLights.Count;
+            }
+        }
+
         /// <summary>
         /// The Shader object this Sprite uses.
         /// </summary>
@@ -154,15 +170,41 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        private float width;
+        private float height;
         /// <summary>
         /// The width of this Sprite
         /// </summary>
-        public virtual float Width { get; set; }
+        public virtual float Width
+        {
+            get
+            {
+                return width;
+            }
+            set
+            {
+                width = value;
+
+                drawX = x + (width / 2f);
+            }
+        }
 
         /// <summary>
         /// The height of this Sprite
         /// </summary>
-        public virtual float Height { get; set; }
+        public virtual float Height
+        {
+            get
+            {
+                return height;
+            }
+            set
+            {
+                height = value;
+
+                drawY = y + (height / 2f);
+            }
+        }
 
         /// <summary>
         /// Whether or not this Sprite is off screen
@@ -175,6 +217,8 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        internal float drawX;
+        internal float drawY;
         private float x;
         private float y;
         /// <summary>
@@ -201,6 +245,8 @@ namespace Sharp2D.Game.Sprites
                 World w = CurrentWorld;
                 if (ox != value && CurrentWorld is ILightWorld)
                     ((ILightWorld)w).UpdateSpriteLights(this);
+
+                drawX = x + (Width / 2f);
             }
         }
 
@@ -228,6 +274,8 @@ namespace Sharp2D.Game.Sprites
                 World w = CurrentWorld;
                 if (oy != value && CurrentWorld is ILightWorld)
                     ((ILightWorld)w).UpdateSpriteLights(this);
+
+                drawY = y - (Height / 2f);
             }
         }
 

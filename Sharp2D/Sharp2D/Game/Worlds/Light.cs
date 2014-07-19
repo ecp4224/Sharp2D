@@ -12,11 +12,18 @@ namespace Sharp2D.Game.Worlds
 {
     public class Light : IAttachable
     {
-        internal List<Sprite> affected = new List<Sprite>();
-
         internal Vector3 ShaderColor;
         private Color _color;
         private float _intense;
+
+        /// <summary>
+        /// <para>This property determines how the lighting is calculated on static sprites.</para>
+        /// <para>Lights cannot be moved if they are static</para>
+        /// </summary>
+        public bool IsStatic { get; private set; }
+
+        public LightType LightType { get; private set; }
+
         public Color Color
         {
             get
@@ -54,6 +61,9 @@ namespace Sharp2D.Game.Worlds
             }
             set
             {
+                if (IsStatic)
+                    throw new InvalidOperationException("Static lights cannot be moved!");
+
                 float dif = value - x;
 
                 x = value;
@@ -62,9 +72,6 @@ namespace Sharp2D.Game.Worlds
                 {
                     attach.X += dif;
                 }
-
-                if (_world != null)
-                    _world.UpdateLight(this);
             }
         }
         public float Y
@@ -75,6 +82,9 @@ namespace Sharp2D.Game.Worlds
             }
             set
             {
+                if (IsStatic)
+                    throw new InvalidOperationException("Static lights cannot be moved!");
+
                 float dif = value - y;
 
                 y = value;
@@ -83,10 +93,6 @@ namespace Sharp2D.Game.Worlds
                 {
                     attach.Y += dif;
                 }
-
-
-                if (_world != null)
-                    _world.UpdateLight(this);
             }
         }
         public float Intensity
@@ -104,20 +110,23 @@ namespace Sharp2D.Game.Worlds
         }
         public float Radius { get; set; }
 
-        public Light(float X, float Y, float Intensity, float Radius, Color color)
+        public Light(float X, float Y, float Intensity, float Radius, Color color, LightType LightType)
         {
             this.X = X;
             this.Y = Y;
             this.Intensity = Intensity;
             this.Radius = Radius;
             this.Color = color;
+
+            this.LightType = LightType;
+            this.IsStatic = (LightType & LightType.Static) != 0;
         }
 
-        public Light(float X, float Y, float Intensity, float Radius) : this(X, Y, Intensity, Radius, Color.White) { }
+        public Light(float X, float Y, float Intensity, float Radius, LightType LightType) : this(X, Y, Intensity, Radius, Color.White, LightType) { }
 
-        public Light(float X, float Y, float Intensity) : this(X, Y, Intensity, 1f) { }
+        public Light(float X, float Y, float Intensity, LightType LightType) : this(X, Y, Intensity, 1f, LightType) { }
 
-        public Light(float X, float Y) : this(X, Y, 1f, 1f) { } //TODO Make good defaults for this
+        public Light(float X, float Y, LightType LightType) : this(X, Y, 1f, 50f, LightType) { } //TODO Make good defaults for this
 
 
         private List<IAttachable> _children = new List<IAttachable>();
@@ -140,5 +149,16 @@ namespace Sharp2D.Game.Worlds
             _children.Add(ToAttach);
             ToAttach.Parents.Add(this);
         }
+    }
+
+    [Flags]
+    public enum LightType
+    {
+        Static = 0,
+        Dynamic = 1,
+        PointLight = 2,
+
+        StaticPointLight = PointLight | Static,
+        DynamicPointLight = PointLight | Dynamic
     }
 }

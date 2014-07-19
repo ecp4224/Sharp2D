@@ -146,6 +146,37 @@ namespace Sharp2D.Game.Worlds
             this.parent = parent;
         }
 
+        private void CullLights(Sprite sprite)
+        {
+            foreach (Light light in parent.dynamicLights)
+            {
+                float Y = light.Y + 18f;
+                float xmin = light.X - (light.Radius);
+                float xmax = light.X + (light.Radius);
+                float ymin = Y - (light.Radius);
+                float ymax = Y + (light.Radius);
+                if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
+                {
+                    sprite.dynamicLights.Add(light);
+                }
+            }
+            if (!sprite.IsStatic)
+            {
+                foreach (Light light in parent.lights)
+                {
+                    float Y = light.Y + 18f;
+                    float xmin = light.X - (light.Radius);
+                    float xmax = light.X + (light.Radius);
+                    float ymin = Y - (light.Radius);
+                    float ymax = Y + (light.Radius);
+                    if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
+                    {
+                        sprite.Lights.Add(light);
+                    }
+                }
+            }
+        }
+
         DrawBatch[] CreateCulledBatches()
         {
             DrawBatch culled_batch = new DrawBatch();
@@ -160,6 +191,7 @@ namespace Sharp2D.Game.Worlds
             {
                 if (!sprite.IsOffScreen && sprite.Visible)
                 {
+                    CullLights(sprite);
                     if (sprite.Texture != null && sprite.Texture.HasAlpha)
                     {
                         culled_batch_alpha.Add(sprite);
@@ -167,7 +199,7 @@ namespace Sharp2D.Game.Worlds
                     else
                     {
                         culled_batch.Add(sprite);
-                        if (sprite.Lights.Count > 0)
+                        if (sprite.LightCount > 0)
                         {
                             culled_batch_light.Add(sprite);
                         }
@@ -213,6 +245,7 @@ namespace Sharp2D.Game.Worlds
                         if (sprite == null)
                             continue;
 
+                        CullLights(sprite);
                         if (/*sprite.Texture != null && sprite.Texture.HasAlpha*/ sprite.TileHasAlpha)
                         {
                             culled_batch_alpha.Add(sprite);
@@ -220,7 +253,7 @@ namespace Sharp2D.Game.Worlds
                         else
                         {
                             culled_batch.Add(sprite);
-                            if (sprite.Lights.Count > 0)
+                            if (sprite.LightCount > 0)
                             {
                                 culled_batch_light.Add(sprite);
                             }
@@ -297,7 +330,7 @@ namespace Sharp2D.Game.Worlds
 
                     batch_light.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
                     {
-                        if (sprite.Lights.Count == 0)
+                        if (sprite.LightCount == 0)
                             return;
 
 
@@ -330,6 +363,19 @@ namespace Sharp2D.Game.Worlds
                                 lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), lightShader.Uniforms["lightdata"]);
 
                                 GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+                            foreach (Light light in sprite.dynamicLights)
+                            {
+                                lightShader.Uniforms.SetUniform(light.ShaderColor, lightShader.Uniforms["lightcolor"]);
+                                lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), lightShader.Uniforms["lightdata"]);
+
+                                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+
+                            sprite.dynamicLights.Clear();
+                            if (!sprite.IsStatic)
+                            {
+                                sprite.Lights.Clear();
                             }
                         }
                     });
@@ -378,29 +424,63 @@ namespace Sharp2D.Game.Worlds
 
                         lock (sprite.light_lock)
                         {
+                            Light light = null;
                             if (sprite.Lights.Count > 0)
                             {
-                                Light light = sprite.Lights[0];
+                                light = sprite.Lights[0];
+                            }
+                            else if (sprite.dynamicLights.Count > 0)
+                            {
+                                light = sprite.dynamicLights[0];
+                            }
+                            
+                            if (light != null)
+                            {
                                 alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
                                 alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
                                 GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                             }
                         }
 
-                        if (sprite.Lights.Count <= 1)
+                        if (sprite.LightCount <= 1)
                             return;
 
                         alphaLightShader.Uniforms.SetUniform(0f, alphaLightShader.Uniforms["ambientmult"]);
 
                         lock (sprite.light_lock)
                         {
-                            for (int i = 1; i < sprite.Lights.Count; i++)
+                            int i = 0;
+                            if (sprite.Lights.Count > 0) //If the sprite had static lights
+                            {
+                                i = 1; //Then the first light has already been applied
+                            }
+                            for (; i < sprite.Lights.Count; i++)
                             {
                                 Light light = sprite.Lights[i];
                                 alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
                                 alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
 
                                 GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+
+                            i = 0;
+                            if (sprite.Lights.Count == 0) //If the sprite had no static lights
+                            {
+                                i = 1; //Then the first dynamic light has already been applied 
+                            }
+                            for (; i < sprite.dynamicLights.Count; i++)
+                            {
+                                Light light = sprite.dynamicLights[i];
+                                alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
+                                alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
+
+                                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+
+                            sprite.dynamicLights.Clear();
+                            if (!sprite.IsStatic)
+                            {
+                                sprite.Lights.Clear();
                             }
                         }
                     });

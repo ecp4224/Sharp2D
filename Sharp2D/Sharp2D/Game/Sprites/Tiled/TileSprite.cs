@@ -88,6 +88,8 @@ namespace Sharp2D.Game.Sprites.Tiled
             TexCoords = new Core.Utils.TexCoords(x, y, width, height, TileSet.TileTexture);
 
             World.texcoords_cache.Add(ID, TexCoords);
+
+            IsStatic = true;
         }
 
         private bool cached_alpha_answer;

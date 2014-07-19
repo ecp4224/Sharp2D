@@ -6,6 +6,7 @@ using Sharp2D.Core.Utils;
 using System.Drawing;
 using System.Threading;
 using Sharp2D.Game.Worlds;
+using System.Collections.Generic;
 
 namespace TestGame
 {
@@ -29,10 +30,9 @@ namespace TestGame
 
                 world.Display();
 
-                //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
                 Random rand = new Random();
 
-                Screen.Camera.Z = 100f;
+                Screen.Camera.Z = 150f;
                 int TEST = 10;
                 for (int i = 0; i < TEST; i++)
                 {
@@ -42,56 +42,46 @@ namespace TestGame
                     wat.Layer = (float)rand.NextDouble();
 
                     world.AddSprite(wat);
-                    //if (i + 1 >= TEST)
-                    //{
-                        Screen.Camera.Y = wat.Y - 55;
-                        Screen.Camera.X = -wat.X;
-                    //}
+
+                    Screen.Camera.Y = wat.Y - 55;
+                    Screen.Camera.X = -wat.X;
                 }
 
-                /*TestSprite idontevenknowanymore = new TestSprite();
-                idontevenknowanymore.X = 456;
-                idontevenknowanymore.Y = 680;
-                idontevenknowanymore.Layer = 0;
-                world.AddSprite(idontevenknowanymore);
-
-                Screen.Camera.Z = 100f;
-                Screen.Camera.Y = idontevenknowanymore.Y - 55;
-                Screen.Camera.X = -idontevenknowanymore.X;*/
-
-                //if (eddie.CurrentWorld != null)
-                //    Logger.Debug(eddie.CurrentWorld.Name);
-
-                //world.AddLogical(new MoveCamera());
-
-                System.Threading.Thread.Sleep(1000);
-                //idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
-
-                Light light = new Light(456, 680, 1f, 50f);
+                Light light2 = new Light(456, 500, 1f, 50f, LightType.DynamicPointLight);
+                Light light = new Light(456, 680, 1f, 50f, LightType.DynamicPointLight);
+                Screen.Camera.X = -456;
+                Screen.Camera.Y = 680;
+                light2.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
                 light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
                 light.Radius = 100;
+                light2.Radius = 100;
 
                 world.AddLight(light);
-
-                //idontevenknowanymore.Attach(light);
+                world.AddLight(light2);
 
                 int testCount = 0;
                 for (int i = 0; i < testCount; i++)
                 {
-                    light = new Light(50f * i, 600, 1f, 50f);
+                    light = new Light(50f * i, 600, 1f, 50f, LightType.StaticPointLight);
                     light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
                     light.Radius = 100;
 
                     world.AddLight(light);
                 }
-                //world.AmbientColor = Color.Tomato;
-                world.AmbientBrightness = 0.4f;
+                world.AmbientBrightness = 0f;
 
-                while (true)
+                double count = 0;
+                world.AddLogical(delegate
                 {
-                    //idontevenknowanymore.X += 1f;
-                    Thread.Sleep(150);
-                }
+                    count += 0.2;
+                    double c = Math.Cos(count);
+                    double s = Math.Sin(count);
+                    light.X = 456f + (float)(c * 50.0);
+                    light.Y = 680f + (float)(s * 50.0);
+
+                    light2.X = 456f + (float)(-c * 100.0);
+                    light2.Y = 500f + (float)(-s * 100.0);
+                });
             }
             catch (Exception e)
             {
