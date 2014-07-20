@@ -326,7 +326,6 @@ namespace Sharp2D.Core.Logic
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
     }
 }

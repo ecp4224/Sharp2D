@@ -218,11 +218,10 @@ namespace Sharp2D.Game.Worlds
                 return;
 
             List<Sprite> sprites = Sprites;
-            float Y = light.Y + 18f;
             float xmin = light.X - (light.Radius);
             float xmax = light.X + (light.Radius);
-            float ymin = Y - (light.Radius);
-            float ymax = Y + (light.Radius);
+            float ymin = light.Y - (light.Radius);
+            float ymax = light.Y + (light.Radius);
             foreach (Sprite sprite in sprites)
             {
                 if (!sprite.IsStatic)
@@ -230,7 +229,7 @@ namespace Sharp2D.Game.Worlds
 
                 lock (sprite.light_lock)
                 {
-                    if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
+                    if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
                     {
                         sprite.Lights.Add(light);
                     }
@@ -302,7 +301,7 @@ namespace Sharp2D.Game.Worlds
                     float ymin = light.Y - (light.Radius);
                     float ymax = light.Y + (light.Radius);
 
-                    if (X + Width >= xmin && X <= xmax && Y >= ymin && Y - Height <= ymax)
+                    if (X + (Width / 2f) >= xmin && X - (Width / 2f) <= xmax && Y + (Height / 2f) >= ymin && Y - (Height / 2f) <= ymax)
                     {
                         sprite.Lights.Add(light);
                     }

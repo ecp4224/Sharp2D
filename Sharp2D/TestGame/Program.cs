@@ -42,19 +42,20 @@ namespace TestGame
                 Random rand = new Random();
 
                 Screen.Camera.Z = 150f;
-                /*int TEST = 10;
+                int TEST = 0;
                 for (int i = 0; i < TEST; i++)
                 {
                     TestSprite wat = new TestSprite();
                     wat.X = rand.Next(600 - 400) + 400;
                     wat.Y = rand.Next(700 - 500) + 580;
                     wat.Layer = (float)rand.NextDouble();
+                    wat.FlipState = Sharp2D.Game.Sprites.FlipState.Horizontal;
 
                     world.AddSprite(wat);
 
                     Screen.Camera.Y = wat.Y - 55;
                     Screen.Camera.X = -wat.X;
-                }*/
+                }
 
                 Light light2 = new Light(456, 500, 1f, 50f, LightType.DynamicPointLight);
                 Light light = new Light(456, 680, 1f, 50f, LightType.DynamicPointLight);
@@ -78,8 +79,6 @@ namespace TestGame
                     world.AddLight(light);
                 }
                 world.AmbientBrightness = 0.5f;
-
-                Screen.Settings.LogicTickRate = 500;
 
                 double count = 0;
                 world.AddLogical(delegate

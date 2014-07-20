@@ -287,6 +287,8 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        public virtual FlipState FlipState { get; set; }
+
         /// <summary>
         /// The Y coordinate of this Sprite in the currently displaying world
         /// </summary>
@@ -462,5 +464,14 @@ namespace Sharp2D.Game.Sprites
             _children.Add(ToAttach);
             ToAttach.Parents.Add(this);
         }
+    }
+
+    [Flags]
+    public enum FlipState
+    {
+        Vertical = 0,
+        Horizontal = 1,
+
+        VerticalHorizontal = Vertical | Horizontal
     }
 }

@@ -155,7 +155,7 @@ namespace Sharp2D.Game.Worlds
                 float xmax = light.X + (light.Radius);
                 float ymin = Y - (light.Radius);
                 float ymax = Y + (light.Radius);
-                if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
+                if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
                 {
                     sprite.dynamicLights.Add(light);
                 }
@@ -169,7 +169,7 @@ namespace Sharp2D.Game.Worlds
                     float xmax = light.X + (light.Radius);
                     float ymin = Y - (light.Radius);
                     float ymax = Y + (light.Radius);
-                    if (sprite.X + sprite.Width >= xmin && sprite.X <= xmax && sprite.Y >= ymin && sprite.Y - sprite.Height <= ymax)
+                    if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
                     {
                         sprite.Lights.Add(light);
                     }
@@ -309,7 +309,15 @@ namespace Sharp2D.Game.Worlds
 
                         sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
 
-                        ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), ambiantShader.Uniforms["spritePos"]);
+                        float Width = sprite.Width;
+                        float Height = sprite.Height;
+
+                        if ((sprite.FlipState & FlipState.Vertical) != 0)
+                            Height = -Height;
+                        if ((sprite.FlipState & FlipState.Horizontal) != 0)
+                            Width = -Width;
+
+                        ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), ambiantShader.Uniforms["spritePos"]);
                         float tsize = sprite.TexCoords.SquardSize;
                         ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), ambiantShader.Uniforms["texCoordPosAndScale"]);
                         ambiantShader.Uniforms.SetUniform(sprite.Layer, ambiantShader.Uniforms["spriteDepth"]);
@@ -349,8 +357,16 @@ namespace Sharp2D.Game.Worlds
                             texture.Bind();
 
                         sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
+                        
+                        float Width = sprite.Width;
+                        float Height = sprite.Height;
 
-                        lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), lightShader.Uniforms["spritePos"]);
+                        if ((sprite.FlipState & FlipState.Vertical) != 0)
+                            Height = -Height;
+                        if ((sprite.FlipState & FlipState.Horizontal) != 0)
+                            Width = -Width;
+
+                        lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), lightShader.Uniforms["spritePos"]);
                         float tsize = sprite.TexCoords.SquardSize;
                         lightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), lightShader.Uniforms["texCoordPosAndScale"]);
                         lightShader.Uniforms.SetUniform(sprite.Layer, lightShader.Uniforms["spriteDepth"]);
@@ -413,7 +429,15 @@ namespace Sharp2D.Game.Worlds
 
                         sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
 
-                        alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), alphaLightShader.Uniforms["spritePos"]);
+                        float Width = sprite.Width;
+                        float Height = sprite.Height;
+
+                        if ((sprite.FlipState & FlipState.Vertical) != 0)
+                            Height = -Height;
+                        if ((sprite.FlipState & FlipState.Horizontal) != 0)
+                            Width = -Width;
+
+                        alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), alphaLightShader.Uniforms["spritePos"]);
                         float tsize = sprite.TexCoords.SquardSize;
                         alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), alphaLightShader.Uniforms["texCoordPosAndScale"]);
                         alphaLightShader.Uniforms.SetUniform(sprite.Layer, alphaLightShader.Uniforms["spriteDepth"]);
