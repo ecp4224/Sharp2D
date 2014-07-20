@@ -26,7 +26,7 @@ namespace Sharp2D.Core.Graphics
                 settings.Fullscreen = false;
                 settings.VSync = false;
                 settings.Camera = new Sharp2D.Game.Worlds.GenericCamera() {
-                    Z = 1f
+                    Z = 100f
                 };
                 settings.WindowTitle = "Sharp2D";
                 settings.UseOpenTKLoop = true;
@@ -55,6 +55,8 @@ namespace Sharp2D.Core.Graphics
         public static ScreenSettings Settings { get; private set; }
 
         public static double FPS { get; private set; }
+
+        public static double UPS { get; private set; }
 
         public static int TickCount
         {
@@ -144,11 +146,6 @@ namespace Sharp2D.Core.Graphics
         {
             if (DisplayThread == null)
                 DisplayThread = Thread.CurrentThread;
-            
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-
             Settings = settings;
 
             IsRunning = true;
@@ -216,27 +213,18 @@ namespace Sharp2D.Core.Graphics
 
             GL.ClearColor(0f, 0f, 0f, 1f);
             GL.ClearDepth(1.0);
-         //   GL.Viewport(0, 0, (int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
-         //   GL.MatrixMode(MatrixMode.Projection);
-            
-         //   GL.LoadIdentity();
-            
-         //   GL.Ortho(0f, Settings.GameSize.Width, Settings.GameSize.Height, 0f, 0.1f, -1000f);
-          //  GL.MatrixMode(MatrixMode.Modelview);
 
-           // GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-          //  GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, 8448);
-
-          //  GL.LoadIdentity();
         }
 
         static void window_UpdateFrame(object sender, FrameEventArgs e)
         {
+            window.Title = Settings.WindowTitle + "  FPS: " + FPS + "  UPS: " + UPS;
             _logicTick();
+            UPS = window.UpdateFrequency;
         }
 
         static void window_RenderFrame(object sender, FrameEventArgs e)
@@ -265,10 +253,13 @@ namespace Sharp2D.Core.Graphics
             long now = TickCount;
             float delta;
             float fpsTime = 0;
+            int updates = 0;
             int loop = 0;
             int ntick = TickCount;
+            long ms = TickCount;
             while (IsRunning && !window.IsExiting)
             {
+                window.Title = Settings.WindowTitle + "  FPS: " + FPS + "  UPS: " + UPS;
                 cur = now;
                 now = TickCount;
                 delta = (now - cur) / 100f;
@@ -282,6 +273,13 @@ namespace Sharp2D.Core.Graphics
 
                     ntick += SkipTicks;
                     loop++;
+                    updates++;
+                    if (TickCount - ms >= 1000)
+                    {
+                        UPS = updates;
+                        updates = 0;
+                        ms = TickCount;
+                    }
                 }
 
                 _draw();
@@ -303,22 +301,15 @@ namespace Sharp2D.Core.Graphics
                 {
                     fpsCount = 0;
                     FPS = (1000f / fpsTime);
-                    Console.WriteLine("FPS: " + FPS);
                     fpsTime = 0;
                 }
-
-                Thread.Sleep(1);
             }
         }
 
         private static void _draw()
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.Clear(ClearBufferMask.DepthBufferBit);
             GL.ClearColor(0f, 0f, 0f, 1f);
-            
-          //  GL.MatrixMode(MatrixMode.Modelview);
-         //   GL.LoadIdentity();
 
             Settings.Camera.BeforeRender();
 

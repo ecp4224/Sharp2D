@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Sharp2D.Core.Graphics;
+using OpenTK;
 
 namespace Sharp2D.Core.Utils
 {
@@ -14,6 +16,30 @@ namespace Sharp2D.Core.Utils
         {
             T temp = (T)obj;
             return EqualityComparer<T>.Default.Equals(temp, default(T));
+        }
+
+        public static List<Vector2> AsVector2List(this List<IMoveable2d> obj)
+        {
+            List<Vector2> toReturn = new List<Vector2>(obj.Count);
+            
+            foreach (IMoveable2d s in obj)
+            {
+                toReturn.Add(s.Vector2d);
+            }
+
+            return toReturn;
+        }
+
+        public static List<Vector3> AsVector3List(this List<IMoveable3d> obj)
+        {
+            List<Vector3> toReturn = new List<Vector3>(obj.Count);
+
+            foreach (IMoveable3d s in obj)
+            {
+                toReturn.Add(s.Vector3d);
+            }
+
+            return toReturn;
         }
 
         public static bool ContainsAlpha(this Bitmap Bitmap)

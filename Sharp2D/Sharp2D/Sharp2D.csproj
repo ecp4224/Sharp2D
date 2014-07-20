@@ -52,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Graphics\Camera.cs" />
+    <Compile Include="Core\Graphics\IMoveable2d.cs" />
+    <Compile Include="Core\Graphics\IMoveable3d.cs" />
     <Compile Include="Core\Graphics\Shaders\AttributeHolder.cs" />
     <Compile Include="Core\Graphics\Shaders\Shader.cs" />
     <Compile Include="Core\Graphics\Shaders\Source.cs" />
@@ -81,7 +83,6 @@
     <Compile Include="Game\Sprites\DefaultSprite.cs" />
     <Compile Include="Game\Sprites\NullSprite.cs" />
     <Compile Include="Game\Sprites\OpenGL1Camera.cs" />
-    <Compile Include="Game\Sprites\OpenGL3Camera.cs" />
     <Compile Include="Game\Sprites\PhysicsSprite.cs" />
     <Compile Include="Game\Sprites\PlayableSprite.cs" />
     <Compile Include="Game\Sprites\Sprite.Events.cs" />

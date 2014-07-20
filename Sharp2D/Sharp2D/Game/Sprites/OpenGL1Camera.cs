@@ -8,6 +8,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Sharp2D.Game.Sprites
 {
+    [Obsolete("OpenGL 1 is no longer supported at this time", true)]
     public class OpenGL1Camera : Camera
     {
         public OpenGL1Camera()

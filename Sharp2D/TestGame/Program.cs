@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Threading;
 using Sharp2D.Game.Worlds;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace TestGame
 {
@@ -24,16 +25,24 @@ namespace TestGame
 
                 System.Threading.Thread.Sleep(1000);
 
+                Stopwatch watch = new Stopwatch();
+
+                Console.WriteLine("Staring world load timer..");
+                watch.Start();
+
                 TestWorld world = new TestWorld();
 
                 world.Load();
 
                 world.Display();
 
+                watch.Stop();
+                Console.WriteLine("World loaded and displayed in: " + watch.ElapsedMilliseconds);
+
                 Random rand = new Random();
 
                 Screen.Camera.Z = 150f;
-                int TEST = 10;
+                /*int TEST = 10;
                 for (int i = 0; i < TEST; i++)
                 {
                     TestSprite wat = new TestSprite();
@@ -45,7 +54,7 @@ namespace TestGame
 
                     Screen.Camera.Y = wat.Y - 55;
                     Screen.Camera.X = -wat.X;
-                }
+                }*/
 
                 Light light2 = new Light(456, 500, 1f, 50f, LightType.DynamicPointLight);
                 Light light = new Light(456, 680, 1f, 50f, LightType.DynamicPointLight);
@@ -59,7 +68,7 @@ namespace TestGame
                 world.AddLight(light);
                 world.AddLight(light2);
 
-                int testCount = 0;
+                int testCount = 10;
                 for (int i = 0; i < testCount; i++)
                 {
                     light = new Light(50f * i, 600, 1f, 50f, LightType.StaticPointLight);

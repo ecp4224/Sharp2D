@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Sharp2D.Core.Graphics;
+using Sharp2D.Game.Sprites;
+using Sharp2D.Core.Utils;
 
 namespace Sharp2D.Game.Worlds
 {
+    /// <summary>
+    /// A static camera with no sprite culling
+    /// </summary>
     public class GenericCamera : Camera
     {
-        public override void BeforeRender()
-        {
-            
-        }
-
         public override bool IsOutsideCamera(float X, float Y, float Width, float Height)
         {
             return false;

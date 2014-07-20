@@ -17,7 +17,7 @@ namespace Sharp2D.Game.Sprites
     /// <para>A Sprite is an object that can be drawn by a <see cref="SpriteRenderJob"/>.</para>
     /// <para>A Sprite is a quad that can any width or height, but ALWAYS has a texture</para>
     /// </summary>
-    public abstract partial class Sprite : IDisposable, IAttachable
+    public abstract partial class Sprite : IDisposable, IAttachable, IMoveable2d, IMoveable3d
     {
         ~Sprite()
         {
@@ -79,6 +79,39 @@ namespace Sharp2D.Game.Sprites
             get
             {
                 return Lights.Count + dynamicLights.Count;
+            }
+        }
+        private Vector2 location;
+
+        /// <summary>
+        /// A 2d vector that represents where the sprite is in the current world
+        /// </summary>
+        public Vector2 Vector2d
+        {
+            get
+            {
+                return location;
+            }
+            set
+            {
+                location = value;
+            }
+        }
+
+        /// <summary>
+        /// A 3d vector that represents where the sprite is in the current world, where Z is the Layer
+        /// </summary>
+        public Vector3 Vector3d
+        {
+            get
+            {
+                return new Vector3(X, Y, Layer);
+            }
+            set
+            {
+                X = value.X;
+                Y = value.Y;
+                Z = value.Z;
             }
         }
 
@@ -170,8 +203,19 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        private float width;
-        private float height;
+        private Vector2 size;
+
+        /// <summary>
+        /// Get the size of a the sprite as a vector. Where X is the width and Y is the height
+        /// </summary>
+        public virtual Vector2 Size
+        {
+            get
+            {
+                return size;
+            }
+        }
+
         /// <summary>
         /// The width of this Sprite
         /// </summary>
@@ -179,13 +223,11 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return width;
+                return size.X;
             }
             set
             {
-                width = value;
-
-                drawX = x + (width / 2f);
+                size.X = value;
             }
         }
 
@@ -196,13 +238,11 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return height;
+                return size.Y;
             }
             set
             {
-                height = value;
-
-                drawY = y + (height / 2f);
+                size.Y = value;
             }
         }
 
@@ -217,10 +257,6 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        internal float drawX;
-        internal float drawY;
-        private float x;
-        private float y;
         /// <summary>
         /// The X coordinate of this Sprite in the currently displaying world
         /// </summary>
@@ -228,25 +264,26 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return x;
+                return location.X;
             }
             set
             {
-                float dif = value - x;
+                float dif = value - location.X;
 
-                float ox = x;
-                x = value;
+                float ox = location.X;
+                location.X = value;
 
                 foreach (IAttachable attached in _children)
                 {
                     attached.X += dif;
                 }
 
-                World w = CurrentWorld;
-                if (ox != value && CurrentWorld is ILightWorld)
-                    ((ILightWorld)w).UpdateSpriteLights(this);
-
-                drawX = x + (Width / 2f);
+                if (IsStatic)
+                {
+                    World w = CurrentWorld;
+                    if (ox != value && CurrentWorld is ILightWorld)
+                        ((ILightWorld)w).UpdateSpriteLights(this);
+                }
             }
         }
 
@@ -257,25 +294,54 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return y;
+                return location.Y;
             }
             set
             {
-                float dif = value - y;
+                float dif = value - location.Y;
 
-                float oy = y;
-                y = value;
+                float oy = location.Y;
+                location.Y = value;
 
                 foreach (IAttachable attached in _children)
                 {
                     attached.Y += dif;
                 }
 
-                World w = CurrentWorld;
-                if (oy != value && CurrentWorld is ILightWorld)
-                    ((ILightWorld)w).UpdateSpriteLights(this);
+                if (IsStatic)
+                {
+                    World w = CurrentWorld;
+                    if (oy != value && CurrentWorld is ILightWorld)
+                        ((ILightWorld)w).UpdateSpriteLights(this);
+                }
+            }
+        }
 
-                drawY = y - (Height / 2f);
+        public float Z
+        {
+            get
+            {
+                return z;
+            }
+            set
+            {
+                float dif = value - z;
+
+                float oy = z;
+                z = value;
+
+                foreach (IAttachable attached in _children)
+                {
+                    if (attached is IMoveable3d)
+                        ((IMoveable3d)attached).Z += dif;
+                }
+
+                if (IsStatic)
+                {
+                    World w = CurrentWorld;
+                    if (oy != value && CurrentWorld is ILightWorld)
+                        ((ILightWorld)w).UpdateSpriteLights(this);
+                }
             }
         }
 
@@ -283,7 +349,7 @@ namespace Sharp2D.Game.Sprites
         /// <summary>
         /// The Layer this Sprite lives on in the currently displaying world. Note: Some <see cref="SpriteRenderJob"/>'s don't implement this variable
         /// </summary>
-        public virtual float Layer { get { return z; } set { z = value; } }
+        public virtual float Layer { get { return Z; } set { Z = value; } }
 
         /// <summary>
         /// Request the RenderJob to run the OnDisplay method again
