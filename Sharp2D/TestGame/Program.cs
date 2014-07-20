@@ -77,7 +77,9 @@ namespace TestGame
 
                     world.AddLight(light);
                 }
-                world.AmbientBrightness = 0f;
+                world.AmbientBrightness = 0.5f;
+
+                Screen.Camera.PanTo(5f, 1f, PanType.Smooth, 2500);
 
                 double count = 0;
                 world.AddLogical(delegate

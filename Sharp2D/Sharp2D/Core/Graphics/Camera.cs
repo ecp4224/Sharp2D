@@ -12,7 +12,7 @@ namespace Sharp2D.Core.Graphics
     public abstract class Camera
     {
 
-        private List<IMoveable2d> toFollow;
+        private List<IMoveable2d> toFollow = new List<IMoveable2d>();
 
         private bool moving = false;
         private PanType type;
