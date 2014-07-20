@@ -79,7 +79,7 @@ namespace TestGame
                 }
                 world.AmbientBrightness = 0.5f;
 
-                Screen.Camera.PanTo(5f, 1f, PanType.Smooth, 2500);
+                Screen.Settings.LogicTickRate = 500;
 
                 double count = 0;
                 world.AddLogical(delegate
