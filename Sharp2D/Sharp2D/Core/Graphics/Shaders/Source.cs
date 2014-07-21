@@ -73,5 +73,15 @@ namespace Sharp2D.Core.Graphics.Shaders
             GL.CompileShader(ID);
             Utils.Logger.Debug(GL.GetShaderInfoLog(ID));
         }
+
+        public void Reload()
+        {
+
+        }
+
+        public void Delete()
+        {
+
+        }
     }
 }

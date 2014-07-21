@@ -15,6 +15,12 @@ namespace Sharp2D.Game.Sprites
         private const float Gravity = 100f;
         private long _lastTick = Screen.TickCount;
 
+        public bool IsMoving
+        {
+            get;
+            private set;
+        }
+
         protected PlayableSprite()
         {
             Speed = 5;
@@ -33,8 +39,12 @@ namespace Sharp2D.Game.Sprites
 
         public override void Update()
         {
+            base.Update();
+
             var count = Screen.TickCount;
             var delta = count - _lastTick;
+
+            IsMoving = Input.Keyboard["MoveUp"] || Input.Keyboard["MoveDown"] || Input.Keyboard["MoveLeft"] || Input.Keyboard["MoveRight"];
 
             if (Input.Keyboard["MoveUp"]) { Y -= Speed; }
             if (Input.Keyboard["MoveDown"]) { Y += Speed; }

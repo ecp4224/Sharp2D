@@ -14,6 +14,7 @@ out vec4 fragColor;
 
 void main(){
 		vec4 difcolor = texture(texture0, fragtexcoord);
+		if(difcolor.a <= 0.0) discard;
 		
 		
 		vec2 lightpos = lightdata.xy;

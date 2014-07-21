@@ -28,7 +28,7 @@ namespace Sharp2D.Game.Sprites.Animations
 
         public abstract string Name { get; }
 
-        public virtual string JsonFilePath
+        public virtual string AnimationConfigPath
         {
             get
             {
@@ -100,10 +100,13 @@ namespace Sharp2D.Game.Sprites.Animations
                 if (LastTick + CurrentlyPlayingAnimation.Speed <= Screen.TickCount)
                 {
                     LastTick = Screen.TickCount;
-                    if (!CurrentlyPlayingAnimation.Reverse)
-                        CurrentlyPlayingAnimation.CurrentStep++;
-                    else
-                        CurrentlyPlayingAnimation.CurrentStep--;
+                    if (CurrentlyPlayingAnimation.Playing)
+                    {
+                        if (!CurrentlyPlayingAnimation.Reverse)
+                            CurrentlyPlayingAnimation.CurrentStep++;
+                        else
+                            CurrentlyPlayingAnimation.CurrentStep--;
+                    }
                 }
                 TexCoords = CurrentlyPlayingAnimation.CurrentTexCoords;
             }
@@ -128,9 +131,9 @@ namespace Sharp2D.Game.Sprites.Animations
         private void LoadJSON()
         {
             string json = null;
-            if (File.Exists(JsonFilePath))
+            if (File.Exists(AnimationConfigPath))
             {
-                json = File.ReadAllText(JsonFilePath);
+                json = File.ReadAllText(AnimationConfigPath);
             }
             else
             {

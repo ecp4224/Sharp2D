@@ -202,6 +202,23 @@ namespace Sharp2D.Core.Logic
                 lCache.Add(logical);
         }
 
+        public void AddLogical(Action action)
+        {
+            if (action == null)
+                throw new ArgumentException("Action cannot be null!");
+            if (!Loaded)
+                throw new InvalidOperationException("This world object has not been loaded! Please call the \"Load()\" method before adding jobs!");
+            if (IsDisposing)
+                throw new InvalidOperationException("This world object is currently disposing, can not add logical item..");
+
+            DummyLogical logical = new DummyLogical(action);
+
+            if (!lFetch)
+                logics.Add(logical);
+            else
+                lCache.Add(logical);
+        }
+
         public void RemoveLogical(ILogical logical)
         {
             if (logical == null)
@@ -291,5 +308,24 @@ namespace Sharp2D.Core.Logic
 
 
         private bool used = false;
+    }
+
+    internal class DummyLogical : ILogical
+    {
+        Action callback;
+
+        public DummyLogical(Action callback)
+        {
+            this.callback = callback;
+        }
+
+        public void Update()
+        {
+            callback();
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }

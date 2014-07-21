@@ -9,6 +9,7 @@ using OpenTK;
 using Sharp2D.Core.Logic;
 using Sharp2D.Game.Worlds;
 using Sharp2D.Core.Graphics.Shaders;
+using System.Drawing;
 
 namespace Sharp2D.Game.Sprites
 {
@@ -16,7 +17,7 @@ namespace Sharp2D.Game.Sprites
     /// <para>A Sprite is an object that can be drawn by a <see cref="SpriteRenderJob"/>.</para>
     /// <para>A Sprite is a quad that can any width or height, but ALWAYS has a texture</para>
     /// </summary>
-    public abstract partial class Sprite : IDisposable
+    public abstract partial class Sprite : IDisposable, IAttachable, IMoveable2d, IMoveable3d
     {
         ~Sprite()
         {
@@ -35,6 +36,13 @@ namespace Sharp2D.Game.Sprites
         /// Whether or not this Sprite is visible
         /// </summary>
         public bool Visible { get; set; }
+
+        /// <summary>
+        /// <para>This determines how this sprite is cached by the rendering system.</para>
+        /// <para>This property should be set when the sprite is loaded, and after it's position has been set. The position should not be changed after this property has been set to true.</para>
+        /// <para>This property defaults to false.</para>
+        /// </summary>
+        public bool IsStatic { get; set; }
 
         private Texture _texture;
         private Shader _shader;
@@ -64,7 +72,49 @@ namespace Sharp2D.Game.Sprites
         }
 
         internal List<Light> Lights = new List<Light>();
-        
+        internal List<Light> dynamicLights = new List<Light>();
+
+        internal int LightCount
+        {
+            get
+            {
+                return Lights.Count + dynamicLights.Count;
+            }
+        }
+        private Vector2 location;
+
+        /// <summary>
+        /// A 2d vector that represents where the sprite is in the current world
+        /// </summary>
+        public Vector2 Vector2d
+        {
+            get
+            {
+                return location;
+            }
+            set
+            {
+                location = value;
+            }
+        }
+
+        /// <summary>
+        /// A 3d vector that represents where the sprite is in the current world, where Z is the Layer
+        /// </summary>
+        public Vector3 Vector3d
+        {
+            get
+            {
+                return new Vector3(X, Y, Layer);
+            }
+            set
+            {
+                X = value.X;
+                Y = value.Y;
+                Z = value.Z;
+            }
+        }
+
         /// <summary>
         /// The Shader object this Sprite uses.
         /// </summary>
@@ -130,6 +180,7 @@ namespace Sharp2D.Game.Sprites
                 return ContainingWorlds.FirstOrDefault(w => w.Displaying);
             }
         }
+
         public TexCoords TexCoords;
         private float _rot;
 
@@ -150,15 +201,48 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        private Vector2 size;
+
+        /// <summary>
+        /// Get the size of a the sprite as a vector. Where X is the width and Y is the height
+        /// </summary>
+        public virtual Vector2 Size
+        {
+            get
+            {
+                return size;
+            }
+        }
+
         /// <summary>
         /// The width of this Sprite
         /// </summary>
-        public virtual float Width { get; set; }
+        public virtual float Width
+        {
+            get
+            {
+                return size.X;
+            }
+            set
+            {
+                size.X = value;
+            }
+        }
 
         /// <summary>
         /// The height of this Sprite
         /// </summary>
-        public virtual float Height { get; set; }
+        public virtual float Height
+        {
+            get
+            {
+                return size.Y;
+            }
+            set
+            {
+                size.Y = value;
+            }
+        }
 
         /// <summary>
         /// Whether or not this Sprite is off screen
@@ -171,8 +255,6 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        private float x;
-        private float y;
         /// <summary>
         /// The X coordinate of this Sprite in the currently displaying world
         /// </summary>
@@ -180,19 +262,30 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return x;
+                return location.X;
             }
             set
             {
-                float ox = x;
-                x = value;
+                float dif = value - location.X;
 
+                float ox = location.X;
+                location.X = value;
 
-                World w = CurrentWorld;
-                if (ox != value && CurrentWorld is ILightWorld)
-                    ((ILightWorld)w).UpdateSpriteLights(this);
+                foreach (IAttachable attached in _children)
+                {
+                    attached.X += dif;
+                }
+
+                if (IsStatic)
+                {
+                    World w = CurrentWorld;
+                    if (ox != value && CurrentWorld is ILightWorld)
+                        ((ILightWorld)w).UpdateSpriteLights(this);
+                }
             }
         }
+
+        public virtual FlipState FlipState { get; set; }
 
         /// <summary>
         /// The Y coordinate of this Sprite in the currently displaying world
@@ -201,24 +294,62 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return y;
+                return location.Y;
             }
             set
             {
-                float oy = y;
-                y = value;
+                float dif = value - location.Y;
 
+                float oy = location.Y;
+                location.Y = value;
 
-                World w = CurrentWorld;
-                if (oy != value && CurrentWorld is ILightWorld)
-                    ((ILightWorld)w).UpdateSpriteLights(this);
+                foreach (IAttachable attached in _children)
+                {
+                    attached.Y += dif;
+                }
+
+                if (IsStatic)
+                {
+                    World w = CurrentWorld;
+                    if (oy != value && CurrentWorld is ILightWorld)
+                        ((ILightWorld)w).UpdateSpriteLights(this);
+                }
             }
         }
 
+        public float Z
+        {
+            get
+            {
+                return z;
+            }
+            set
+            {
+                float dif = value - z;
+
+                float oy = z;
+                z = value;
+
+                foreach (IAttachable attached in _children)
+                {
+                    if (attached is IMoveable3d)
+                        ((IMoveable3d)attached).Z += dif;
+                }
+
+                if (IsStatic)
+                {
+                    World w = CurrentWorld;
+                    if (oy != value && CurrentWorld is ILightWorld)
+                        ((ILightWorld)w).UpdateSpriteLights(this);
+                }
+            }
+        }
+
+        private float z = 0.1f;
         /// <summary>
         /// The Layer this Sprite lives on in the currently displaying world. Note: Some <see cref="SpriteRenderJob"/>'s don't implement this variable
         /// </summary>
-        public virtual float Layer { get; set; }
+        public virtual float Layer { get { return Z; } set { Z = value; } }
 
         /// <summary>
         /// Request the RenderJob to run the OnDisplay method again
@@ -310,5 +441,35 @@ namespace Sharp2D.Game.Sprites
 
         protected abstract void OnDisplay();
 
+
+        private List<IAttachable> _children = new List<IAttachable>();
+        private List<IAttachable> _parents = new List<IAttachable>();
+        public IList<IAttachable> Children
+        {
+            get { return _children; }
+        }
+
+        public IList<IAttachable> Parents
+        {
+            get { return _parents; }
+        }
+
+        public void Attach(IAttachable ToAttach)
+        {
+            if (_children.Contains(ToAttach))
+                throw new ArgumentException("This attachable object is already attached!");
+
+            _children.Add(ToAttach);
+            ToAttach.Parents.Add(this);
+        }
+    }
+
+    [Flags]
+    public enum FlipState
+    {
+        Vertical = 0,
+        Horizontal = 1,
+
+        VerticalHorizontal = Vertical | Horizontal
     }
 }

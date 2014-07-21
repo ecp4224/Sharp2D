@@ -6,6 +6,8 @@ using Sharp2D.Core.Utils;
 using System.Drawing;
 using System.Threading;
 using Sharp2D.Game.Worlds;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace TestGame
 {
@@ -23,63 +25,73 @@ namespace TestGame
 
                 System.Threading.Thread.Sleep(1000);
 
+                Stopwatch watch = new Stopwatch();
+
+                Console.WriteLine("Staring world load timer..");
+                watch.Start();
+
                 TestWorld world = new TestWorld();
 
                 world.Load();
 
                 world.Display();
 
-                Screen.Camera.Z = 2f;
-                //world.AddLogical(new MoveCamera() { Start = Screen.TickCount });
-
-                TestSprite idontevenknowanymore = new TestSprite();
-                idontevenknowanymore.ChangeHitbox("PonyHitbox");
-                idontevenknowanymore.X = 456;
-                idontevenknowanymore.Y = 600;
-                world.AddSprite(idontevenknowanymore);
-
-                /*spriteSause = new TestSprite(); 
-                spriteSause.X = 256;
-                spriteSause.Y = 128;
-                spriteSause.MoveFlag = true;
-
-            
-                TestSprite enemy = new TestSprite();
-                enemy.ChangeHitbox("TriangleHitbox");
-                enemy.X = 512;
-                enemy.Y = 128;
-                world.AddSprite(enemy);
-                world.AddSprite(spriteSause);
-
-                TestSprite eddie = new TestSprite();
-                eddie.ChangeHitbox("UhidkHitbox");
-                eddie.X = 512;
-                eddie.Y = 512;
-                world.AddSprite(eddie);*/
-
-                Screen.Camera.Z = 100f;
-                Screen.Camera.Y = 630f;
-
-                //if (eddie.CurrentWorld != null)
-                //    Logger.Debug(eddie.CurrentWorld.Name);
-
-                world.AddLogical(new MoveCamera());
-
-                System.Threading.Thread.Sleep(1000);
-                //idontevenknowanymore.CurrentlyPlayingAnimation["hat"].Play();
+                watch.Stop();
+                Console.WriteLine("World loaded and displayed in: " + watch.ElapsedMilliseconds);
 
                 Random rand = new Random();
-                int testCount = 100;
+
+                Screen.Camera.Z = 150f;
+                int TEST = 0;
+                for (int i = 0; i < TEST; i++)
+                {
+                    TestSprite wat = new TestSprite();
+                    wat.X = rand.Next(600 - 400) + 400;
+                    wat.Y = rand.Next(700 - 500) + 580;
+                    wat.Layer = (float)rand.NextDouble();
+                    wat.FlipState = Sharp2D.Game.Sprites.FlipState.Horizontal;
+
+                    world.AddSprite(wat);
+
+                    Screen.Camera.Y = wat.Y - 55;
+                    Screen.Camera.X = -wat.X;
+                }
+
+                Light light2 = new Light(456, 500, 1f, 50f, LightType.DynamicPointLight);
+                Light light = new Light(456, 680, 1f, 50f, LightType.DynamicPointLight);
+                Screen.Camera.X = -456;
+                Screen.Camera.Y = 680;
+                light2.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
+                light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
+                light.Radius = 100;
+                light2.Radius = 100;
+
+                world.AddLight(light);
+                world.AddLight(light2);
+
+                int testCount = 10;
                 for (int i = 0; i < testCount; i++)
                 {
-                    Light light = new Light(50f * i, 600, 1f, 50f);
+                    light = new Light(50f * i, 600, 1f, 50f, LightType.StaticPointLight);
                     light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
                     light.Radius = 100;
 
                     world.AddLight(light);
                 }
-                world.AmbientColor = Color.Tomato;
-                world.AmbientBrightness = 0.2f;
+                world.AmbientBrightness = 0.5f;
+
+                double count = 0;
+                world.AddLogical(delegate
+                {
+                    count += 0.2;
+                    double c = Math.Cos(count);
+                    double s = Math.Sin(count);
+                    light.X = 456f + (float)(c * 50.0);
+                    light.Y = 680f + (float)(s * 50.0);
+
+                    light2.X = 456f + (float)(-c * 100.0);
+                    light2.Y = 500f + (float)(-s * 100.0);
+                });
             }
             catch (Exception e)
             {

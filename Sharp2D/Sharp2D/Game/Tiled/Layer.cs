@@ -45,31 +45,31 @@ namespace Sharp2D.Game.Tiled
         public string ImagePath { get; private set; }
 
         [JsonProperty(PropertyName="objects")]
-        public List<TiledObject> Objects { get; private set; }
+        public TiledObject[] Objects { get; private set; }
 
         [JsonProperty(PropertyName="data")]
         public long[] Data { get; private set; }
 
         [JsonIgnore]
-        private LayerType type;
+        private LayerType _type = LayerType.Unknown;
 
         [JsonIgnore]
         public LayerType Type
         {
             get
             {
-                if (type == null)
+                if (_type == LayerType.Unknown)
                 {
                     if (RawType == "imagelayer")
-                        type = LayerType.ImageLayer;
+                        _type = LayerType.ImageLayer;
                     else if (RawType == "tilelayer")
-                        type = LayerType.TileLayer;
+                        _type = LayerType.TileLayer;
                     else if (RawType == "objectgroup")
-                        type = LayerType.ObjectLayer;
+                        _type = LayerType.ObjectLayer;
                     else
-                        type = LayerType.Unknown;
+                        _type = LayerType.Unknown;
                 }
-                return type;
+                return _type;
             }
         }
 

@@ -11,6 +11,7 @@ using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
 using System.Drawing;
+using Sharp2D.Core.Logic;
 
 namespace Sharp2D.Game.Worlds
 {
@@ -47,7 +48,8 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        private List<Light> lights = new List<Light>();
+        internal List<Light> lights = new List<Light>();
+        internal List<Light> dynamicLights = new List<Light>();
         private GenericRenderJob job;
 
         public IList<Light> Lights
@@ -66,6 +68,20 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
+        /// <summary>
+        /// Invoke a delegate while blocking the render thread. This operation is only really useful for updates to render info that may take a few frames to execute, and
+        /// you don't want any drawing during that time
+        /// </summary>
+        /// <param name="action"></param>
+        public void InvokeWithRenderLock(Action action)
+        {
+            Screen.ValidateOpenGLUnsafe("InvokeWithRenderLock");
+            lock (job.render_lock)
+            {
+                action();
+            }
+        }
+
         protected override void OnLoad()
         {
             job = new GenericRenderJob(this);
@@ -76,6 +92,40 @@ namespace Sharp2D.Game.Worlds
             SpriteRenderJob.SetDefaultJob(job);
 
             base.OnLoad();
+
+            Layer[] layers = GetLayerByType(LayerType.ObjectLayer);
+            foreach (Layer layer in layers)
+            {
+                TiledObject[] objects = layer.Objects;
+                foreach (TiledObject obj in objects)
+                {
+                    if (obj.RawType.ToLower() == "light")
+                    {
+                        float x = obj.X;
+                        float y = obj.Y;
+                        float radius = Math.Max(obj.Width, obj.Height);
+                        x = x + (radius / 2f);
+                        y = y + (radius / 2f);
+
+                        float intense = 1f;
+                        Color color = Color.White;
+                        if (obj.Properties != null)
+                        {
+                            if (obj.Properties.ContainsKey("brightness"))
+                            {
+                                float.TryParse(obj.Properties["brightness"], out intense);
+                            }
+                            if (obj.Properties.ContainsKey("color"))
+                            {
+                                color = Color.FromName(obj.Properties["color"]);
+                            }
+                        }
+
+                        Light light = new Light(x, y, intense, radius, color, LightType.StaticPointLight);
+                        AddLight(light);
+                    }
+                }
+            }
         }
 
         protected override void OnDisplay()
@@ -83,21 +133,103 @@ namespace Sharp2D.Game.Worlds
             base.OnDisplay();
 
             DefaultJob = job;
+
+            if (job.Batch.Count > 0)
+            {
+                job.Batch.ForEach(delegate(Sprite s)
+                {
+                    UpdateSpriteLights(s);
+                });
+            }
+        }
+
+        public Light AddLight(float X, float Y, LightType LightType)
+        {
+            Light light = new Light(X, Y, LightType);
+            AddLight(light);
+            return light;
+        }
+
+        public Light AddLight(float X, float Y, float Intensity, LightType LightType)
+        {
+            Light light = new Light(X, Y, Intensity, LightType);
+            AddLight(light);
+            return light;
+        }
+
+        public Light AddLight(float X, float Y, float Intensity, float Radius, LightType LightType)
+        {
+            Light light = new Light(X, Y, Intensity, Radius, LightType);
+            AddLight(light);
+            return light;
+        }
+
+        public Light AddLight(float X, float Y, float Intensity, float Radius, Color color, LightType LightType)
+        {
+            Light light = new Light(X, Y, Intensity, Radius, color, LightType);
+            AddLight(light);
+            return light;
         }
 
         public void AddLight(Light light)
         {
+            if (lights.Contains(light))
+                throw new ArgumentException("This light is already in this world!");
+
+            if (light.IsStatic)
+            {
+                _cullSpritesForLights(light);
+            }
+
+            if (light.IsStatic)
+            {
+                lights.Add(light);
+            }
+            else
+            {
+                dynamicLights.Add(light);
+            }
+
+            light.World = this;
+        }
+
+        [Obsolete("StaticLights cant move and DynamicLights are dynamic")]
+        public void UpdateLight(Light light)
+        {
+            Screen.ValidateOpenGLUnsafe("UpdateLight");
+
+            /*InvokeWithRenderLock(delegate
+            {
+                foreach (Sprite s in light.affected)
+                {
+                    lock (s.light_lock)
+                    {
+                        s.Lights.Remove(light);
+                    }
+                }
+
+                _cullSpritesForLights(light);
+            });*/
+        }
+
+        private void _cullSpritesForLights(Light light)
+        {
+            if (!light.IsStatic)
+                return;
+
             List<Sprite> sprites = Sprites;
-            float Y = light.Y + 18f;
             float xmin = light.X - (light.Radius);
             float xmax = light.X + (light.Radius);
-            float ymin = Y - (light.Radius);
-            float ymax = Y + (light.Radius);
+            float ymin = light.Y - (light.Radius);
+            float ymax = light.Y + (light.Radius);
             foreach (Sprite sprite in sprites)
             {
-                if (sprite.X > xmin && sprite.X < xmax && sprite.Y > ymin && sprite.Y < ymax)
+                if (!sprite.IsStatic)
+                    continue;
+
+                lock (sprite.light_lock)
                 {
-                    lock (sprite.light_lock)
+                    if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
                     {
                         sprite.Lights.Add(light);
                     }
@@ -105,11 +237,13 @@ namespace Sharp2D.Game.Worlds
             }
             foreach (Layer layer in Layers)
             {
+                if (!layer.IsTileLayer)
+                    continue;
                 for (float x = xmin; x < xmax; x += 16)
                 {
                     for (float y = ymin; y < ymax; y += 16)
                     {
-                        TileSprite sprite = layer[x, y];
+                        TileSprite sprite = layer[x, y]; //TileSprites are always static
                         if (sprite == null || sprite.Lights.Contains(light))
                             continue;
                         lock (sprite.light_lock)
@@ -118,36 +252,45 @@ namespace Sharp2D.Game.Worlds
                         }
                     }
                 }
-                /*int s_i_x = Math.Max((int)(xmin / 16f), 0);
-                int s_i_y = Math.Max((int)((ymin - 8f) / 16f), 0);
-
-                int e_i_x = Math.Max((int)(xmax / 16f), 0);
-                int e_i_y = Math.Max((int)((ymax - 8f) / 16f), 0);
-                e_i_y++;
-
-
-                for (int x = s_i_x; x < e_i_x; x++)
-                {
-                    for (int y = s_i_y; y < e_i_y; y++)
-                    {
-                        TileSprite sprite = layer[x, y];
-                        if (sprite == null)
-                            continue;
-
-                        sprite.Lights.Add(light);
-                    }
-                }*/
             }
         }
 
+        public override void AddSprite(Sprite s)
+        {
+            base.AddSprite(s);
+
+            UpdateSpriteLights(s);
+        }
+
+        public override void AddSprite(Sprite s, SpriteRenderJob job)
+        {
+            base.AddSprite(s, job);
+
+            UpdateSpriteLights(s);
+        }
+
+        public override void RemoveSprite(Sprite s)
+        {
+            base.RemoveSprite(s);
+
+            if (s.IsStatic)
+            {
+                lock (s.light_lock)
+                {
+                    s.Lights.Clear();
+                }
+            }
+        }
 
         public void UpdateSpriteLights(Sprite sprite)
         {
-            if (sprite is TileSprite)
+            if (!sprite.IsStatic || sprite is TileSprite)
                 return;
 
             float X = sprite.X;
             float Y = sprite.Y;
+            float Width = sprite.Width;
+            float Height = sprite.Height;
             lock (sprite.light_lock)
             {
                 sprite.Lights.Clear();
@@ -157,8 +300,8 @@ namespace Sharp2D.Game.Worlds
                     float xmax = light.X + (light.Radius);
                     float ymin = light.Y - (light.Radius);
                     float ymax = light.Y + (light.Radius);
-                    
-                    if (X > xmin && X < xmax && Y > ymin && Y < ymax)
+
+                    if (X + (Width / 2f) >= xmin && X - (Width / 2f) <= xmax && Y + (Height / 2f) >= ymin && Y - (Height / 2f) <= ymax)
                     {
                         sprite.Lights.Add(light);
                     }

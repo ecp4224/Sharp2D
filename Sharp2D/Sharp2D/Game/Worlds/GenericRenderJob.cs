@@ -16,6 +16,7 @@ namespace Sharp2D.Game.Worlds
 {
     class DrawBatch : SpriteBatch
     {
+        public List<Sprite> alphaSprites = new List<Sprite>();
         public int type;
         private int drawCount;
         public int DrawCount
@@ -29,17 +30,93 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
+        public override int Count
+        {
+            get
+            {
+                if (type != 2)
+                {
+                    return base.Count;
+                }
+                else
+                {
+                    return alphaSprites.Count;
+                }
+            }
+        }
+
+        public override void ForEach(Action<Shader, Texture, Sprite> callBack)
+        {
+            if (type != 2)
+            {
+                base.ForEach(callBack);
+            }
+            else
+            {
+                foreach (Sprite sprite in alphaSprites)
+                {
+                    callBack(sprite.Shader, sprite.Texture, sprite);
+                }
+            }
+        }
+
+        public override void ForEach(Action<Sprite> callBack)
+        {
+            if (type != 2)
+            {
+                base.ForEach(callBack);
+            }
+            else
+            {
+                foreach (Sprite sprite in alphaSprites)
+                {
+                    callBack(sprite);
+                }
+            }
+        }
+
         public override void Add(Sprite sprite)
         {
-            base.Add(sprite);
+            if (type != 2)
+            {
+                base.Add(sprite);
+            }
+            else
+            {
+                alphaSprites.Add(sprite);
+                Order();
+            }
             if (type == 1)
                 drawCount += sprite.Lights.Count;
             else
                 drawCount += sprite.Lights.Count + 1;
         }
+
+        public override void Remove(Sprite sprite)
+        {
+            if (type != 2)
+            {
+                base.Remove(sprite);
+            }
+            else
+            {
+                alphaSprites.Remove(sprite);
+                Order();
+            }
+        }
+
+        private void Order()
+        {
+            if (type == 2)
+            {
+                alphaSprites.Sort((x, y) => (int)(x.Layer - y.Layer));
+            }
+        }
     }
     public class GenericRenderJob : SpriteRenderJob
     {
+        
+        internal object render_lock = new object();
 
         protected const int POS_LOCATION = 0;
         protected const int TEXCOORD_LOCATION = 1;
@@ -55,7 +132,7 @@ namespace Sharp2D.Game.Worlds
 
         private float[] quad_points = new float[] 
         {
-            0.0f, 0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 1.0f, 0.0f,   1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f, 0.0f, 1.0f
+            -0.5f, -0.5f, 0.0f, 0.0f,   0.5f, -0.5f, 1.0f, 0.0f,   0.5f, 0.5f, 1.0f, 1.0f,   -0.5f, 0.5f, 0.0f, 1.0f
         };
         private uint[] rectangleindicies = new uint[] 
         {
@@ -67,6 +144,37 @@ namespace Sharp2D.Game.Worlds
         {
             Screen.Camera = new OpenGL3Camera();
             this.parent = parent;
+        }
+
+        private void CullLights(Sprite sprite)
+        {
+            foreach (Light light in parent.dynamicLights)
+            {
+                float Y = light.Y + 18f;
+                float xmin = light.X - (light.Radius);
+                float xmax = light.X + (light.Radius);
+                float ymin = Y - (light.Radius);
+                float ymax = Y + (light.Radius);
+                if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
+                {
+                    sprite.dynamicLights.Add(light);
+                }
+            }
+            if (!sprite.IsStatic)
+            {
+                foreach (Light light in parent.lights)
+                {
+                    float Y = light.Y + 18f;
+                    float xmin = light.X - (light.Radius);
+                    float xmax = light.X + (light.Radius);
+                    float ymin = Y - (light.Radius);
+                    float ymax = Y + (light.Radius);
+                    if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
+                    {
+                        sprite.Lights.Add(light);
+                    }
+                }
+            }
         }
 
         DrawBatch[] CreateCulledBatches()
@@ -83,6 +191,7 @@ namespace Sharp2D.Game.Worlds
             {
                 if (!sprite.IsOffScreen && sprite.Visible)
                 {
+                    CullLights(sprite);
                     if (sprite.Texture != null && sprite.Texture.HasAlpha)
                     {
                         culled_batch_alpha.Add(sprite);
@@ -90,7 +199,7 @@ namespace Sharp2D.Game.Worlds
                     else
                     {
                         culled_batch.Add(sprite);
-                        if (sprite.Lights.Count > 0)
+                        if (sprite.LightCount > 0)
                         {
                             culled_batch_light.Add(sprite);
                         }
@@ -114,6 +223,8 @@ namespace Sharp2D.Game.Worlds
             cull_height /= 2f;
             foreach (Layer layer in parent.Layers)
             {
+                if (!layer.IsTileLayer)
+                    continue;
                 float ex = cx + (cull_width + (3f * 16f));
                 float ey = cy + cull_height;
                 float sx = cx - cull_width;
@@ -134,14 +245,15 @@ namespace Sharp2D.Game.Worlds
                         if (sprite == null)
                             continue;
 
-                        if (sprite.Texture != null && sprite.Texture.HasAlpha)
+                        CullLights(sprite);
+                        if (/*sprite.Texture != null && sprite.Texture.HasAlpha*/ sprite.TileHasAlpha)
                         {
                             culled_batch_alpha.Add(sprite);
                         }
                         else
                         {
                             culled_batch.Add(sprite);
-                            if (sprite.Lights.Count > 0)
+                            if (sprite.LightCount > 0)
                             {
                                 culled_batch_light.Add(sprite);
                             }
@@ -155,172 +267,256 @@ namespace Sharp2D.Game.Worlds
 
         public override void PerformJob()
         {
-            if (!gen)
+            lock (render_lock)
             {
-                gen = true;
-                OnFirstRun();
-            }
-
-            DrawBatch[] batches = CreateCulledBatches();
-            DrawBatch batch = batches[0];
-            DrawBatch alpha_batch = batches[1];
-            DrawBatch batch_light = batches[2];
-
-            Vector2 aspect = Screen.Settings.WindowAspectRatio;
-            if (batch.Count > 0)
-            {
-                ambiantShader.Use();
-
-                ambiantShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), ambiantShader.Uniforms["camPosAndScale"]);
-                ambiantShader.Uniforms.SetUniform(aspect.X / aspect.Y, ambiantShader.Uniforms["screenRatioFix"]);
-
-                ambiantShader.Uniforms.SetUniform(parent.AmbientShaderColor, ambiantShader.Uniforms["brightness"]);
-
-                batch.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
+                if (!gen)
                 {
-                    if (sprite.FirstRun)
-                    {
-                        sprite.Display();
-                        sprite.FirstRun = false;
-                    }
+                    gen = true;
+                    OnFirstRun();
+                }
 
-                    if (shader != null)
-                        shader.Use();
+                DrawBatch[] batches = CreateCulledBatches();
+                DrawBatch batch = batches[0];
+                DrawBatch alpha_batch = batches[1];
+                DrawBatch batch_light = batches[2];
 
-                    if (texture != null && sprite.Texture.ID != texture.ID)
-                        sprite.Texture.Bind();
-                    else if (texture != null)
-                        texture.Bind();
-
-                    sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
-
-                    ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), ambiantShader.Uniforms["spritePos"]);
-                    float tsize = sprite.TexCoords.SquardSize;
-                    ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), ambiantShader.Uniforms["texCoordPosAndScale"]);
-
-                    GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
-                });
-            }
-            if (batch_light.Count > 0)
-            {
-                lightShader.Use();
-
-                lightShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), lightShader.Uniforms["camPosAndScale"]);
-                lightShader.Uniforms.SetUniform(aspect.X / aspect.Y, lightShader.Uniforms["screenRatioFix"]);
-
-                GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
-
-                batch_light.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
+                Vector2 aspect = Screen.Settings.WindowAspectRatio;
+                if (batch.Count > 0)
                 {
-                    if (sprite.Lights.Count == 0)
-                        return;
+                   
+                    ambiantShader.Use();
 
+                    ambiantShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), ambiantShader.Uniforms["camPosAndScale"]);
+                    ambiantShader.Uniforms.SetUniform(aspect.X / aspect.Y, ambiantShader.Uniforms["screenRatioFix"]);
 
-                    if (sprite.FirstRun)
+                    ambiantShader.Uniforms.SetUniform(parent.AmbientShaderColor, ambiantShader.Uniforms["brightness"]);
+
+                    batch.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
                     {
-                        sprite.Display();
-                        sprite.FirstRun = false;
-                    }
-
-                    if (shader != null)
-                        shader.Use();
-
-                    if (texture != null && sprite.Texture.ID != texture.ID)
-                        sprite.Texture.Bind();
-                    else if (texture != null)
-                        texture.Bind();
-
-                    sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
-
-                    lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), lightShader.Uniforms["spritePos"]);
-                    float tsize = sprite.TexCoords.SquardSize;
-                    lightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), lightShader.Uniforms["texCoordPosAndScale"]);
-
-                    lock (sprite.light_lock)
-                    {
-                        foreach (Light light in sprite.Lights)
+                        if (sprite.FirstRun)
                         {
-                            lightShader.Uniforms.SetUniform(light.ShaderColor, lightShader.Uniforms["lightcolor"]);
-                            lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), lightShader.Uniforms["lightdata"]);
-
-                            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            sprite.Display();
+                            sprite.FirstRun = false;
                         }
-                    }
-                });
 
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            }
+                        if (shader != null)
+                            shader.Use();
 
-            if (alpha_batch.Count > 0)
-            {
-                alphaLightShader.Use();
-                alphaLightShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), alphaLightShader.Uniforms["camPosAndScale"]);
-                alphaLightShader.Uniforms.SetUniform(aspect.X / aspect.Y, alphaLightShader.Uniforms["screenRatioFix"]);
+                        if (texture != null && sprite.Texture.ID != texture.ID)
+                            sprite.Texture.Bind();
+                        else if (texture != null)
+                            texture.Bind();
 
-                alphaLightShader.Uniforms.SetUniform(parent.AmbientShaderColor, alphaLightShader.Uniforms["ambient"]);
+                        sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
 
+                        float Width = sprite.Width;
+                        float Height = sprite.Height;
 
-                GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+                        if ((sprite.FlipState & FlipState.Vertical) != 0)
+                            Height = -Height;
+                        if ((sprite.FlipState & FlipState.Horizontal) != 0)
+                            Width = -Width;
 
-                alpha_batch.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
+                        ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), ambiantShader.Uniforms["spritePos"]);
+                        float tsize = sprite.TexCoords.SquardSize;
+                        ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), ambiantShader.Uniforms["texCoordPosAndScale"]);
+                        ambiantShader.Uniforms.SetUniform(sprite.Layer, ambiantShader.Uniforms["spriteDepth"]);
+
+                        GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                    });
+                }
+                GL.DepthMask(false);
+                if (batch_light.Count > 0)
                 {
-                    if (sprite.FirstRun)
+                    lightShader.Use();
+
+                    lightShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), lightShader.Uniforms["camPosAndScale"]);
+                    lightShader.Uniforms.SetUniform(aspect.X / aspect.Y, lightShader.Uniforms["screenRatioFix"]);
+
+                    GL.Enable(EnableCap.Blend);
+                    GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+
+                    batch_light.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
                     {
-                        sprite.Display();
-                        sprite.FirstRun = false;
-                    }
+                        if (sprite.LightCount == 0)
+                            return;
 
-                    if (shader != null)
-                        shader.Use();
 
-                    if (texture != null && sprite.Texture.ID != texture.ID)
-                        sprite.Texture.Bind();
-                    else if (texture != null)
-                        texture.Bind();
-
-                    sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
-
-                    alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, sprite.Width, sprite.Height), alphaLightShader.Uniforms["spritePos"]);
-                    float tsize = sprite.TexCoords.SquardSize;
-                    alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), alphaLightShader.Uniforms["texCoordPosAndScale"]);
-
-                    alphaLightShader.Uniforms.SetUniform(1f, alphaLightShader.Uniforms["ambientmult"]);
-
-                    GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
-
-                    lock (sprite.light_lock)
-                    {
-                        if (sprite.Lights.Count > 0)
+                        if (sprite.FirstRun)
                         {
-                            Light light = sprite.Lights[0];
-                            alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
-                            alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
-                            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            sprite.Display();
+                            sprite.FirstRun = false;
                         }
-                    }
 
-                    if (sprite.Lights.Count <= 1)
-                        return;
+                        if (shader != null)
+                            shader.Use();
 
-                    alphaLightShader.Uniforms.SetUniform(0f, alphaLightShader.Uniforms["ambientmult"]);
+                        if (texture != null && sprite.Texture.ID != texture.ID)
+                            sprite.Texture.Bind();
+                        else if (texture != null)
+                            texture.Bind();
 
-                    lock (sprite.light_lock)
-                    {
-                        for (int i = 1; i < sprite.Lights.Count; i++)
+                        sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
+                        
+                        float Width = sprite.Width;
+                        float Height = sprite.Height;
+
+                        if ((sprite.FlipState & FlipState.Vertical) != 0)
+                            Height = -Height;
+                        if ((sprite.FlipState & FlipState.Horizontal) != 0)
+                            Width = -Width;
+
+                        lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), lightShader.Uniforms["spritePos"]);
+                        float tsize = sprite.TexCoords.SquardSize;
+                        lightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), lightShader.Uniforms["texCoordPosAndScale"]);
+                        lightShader.Uniforms.SetUniform(sprite.Layer, lightShader.Uniforms["spriteDepth"]);
+
+                        lock (sprite.light_lock)
                         {
-                            Light light = sprite.Lights[i];
-                            alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
-                            alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
+                            foreach (Light light in sprite.Lights)
+                            {
+                                lightShader.Uniforms.SetUniform(light.ShaderColor, lightShader.Uniforms["lightcolor"]);
+                                lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), lightShader.Uniforms["lightdata"]);
 
-                            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+                            foreach (Light light in sprite.dynamicLights)
+                            {
+                                lightShader.Uniforms.SetUniform(light.ShaderColor, lightShader.Uniforms["lightcolor"]);
+                                lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), lightShader.Uniforms["lightdata"]);
+
+                                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+
+                            sprite.dynamicLights.Clear();
+                            if (!sprite.IsStatic)
+                            {
+                                sprite.Lights.Clear();
+                            }
                         }
-                    }
-                });
+                    });
 
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                }
+
+                if (alpha_batch.Count > 0)
+                {
+                    alphaLightShader.Use();
+                    alphaLightShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), alphaLightShader.Uniforms["camPosAndScale"]);
+                    alphaLightShader.Uniforms.SetUniform(aspect.X / aspect.Y, alphaLightShader.Uniforms["screenRatioFix"]);
+
+                    alphaLightShader.Uniforms.SetUniform(parent.AmbientShaderColor, alphaLightShader.Uniforms["ambient"]);
+
+
+                    GL.Enable(EnableCap.Blend);
+                    GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+
+                    alpha_batch.ForEach(delegate(Shader shader, Texture texture, Sprite sprite)
+                    {
+                        if (sprite.FirstRun)
+                        {
+                            sprite.Display();
+                            sprite.FirstRun = false;
+                        }
+
+                        if (shader != null)
+                            shader.Use();
+
+                        if (texture != null && sprite.Texture.ID != texture.ID)
+                            sprite.Texture.Bind();
+                        else if (texture != null)
+                            texture.Bind();
+
+                        sprite.PrepareDraw(); //Let the sprite setup for drawing, maybe setup it's own custom shader
+
+                        float Width = sprite.Width;
+                        float Height = sprite.Height;
+
+                        if ((sprite.FlipState & FlipState.Vertical) != 0)
+                            Height = -Height;
+                        if ((sprite.FlipState & FlipState.Horizontal) != 0)
+                            Width = -Width;
+
+                        alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), alphaLightShader.Uniforms["spritePos"]);
+                        float tsize = sprite.TexCoords.SquardSize;
+                        alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), alphaLightShader.Uniforms["texCoordPosAndScale"]);
+                        alphaLightShader.Uniforms.SetUniform(sprite.Layer, alphaLightShader.Uniforms["spriteDepth"]);
+
+                        alphaLightShader.Uniforms.SetUniform(1f, alphaLightShader.Uniforms["ambientmult"]);
+
+                        GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+
+                        lock (sprite.light_lock)
+                        {
+                            Light light = null;
+                            if (sprite.Lights.Count > 0)
+                            {
+                                light = sprite.Lights[0];
+                            }
+                            else if (sprite.dynamicLights.Count > 0)
+                            {
+                                light = sprite.dynamicLights[0];
+                            }
+                            
+                            if (light != null)
+                            {
+                                alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
+                                alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
+                                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+                        }
+
+                        if (sprite.LightCount <= 1)
+                            return;
+
+                        alphaLightShader.Uniforms.SetUniform(0f, alphaLightShader.Uniforms["ambientmult"]);
+
+                        lock (sprite.light_lock)
+                        {
+                            int i = 0;
+                            if (sprite.Lights.Count > 0) //If the sprite had static lights
+                            {
+                                i = 1; //Then the first light has already been applied
+                            }
+                            for (; i < sprite.Lights.Count; i++)
+                            {
+                                Light light = sprite.Lights[i];
+                                alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
+                                alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
+
+                                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+
+                            i = 0;
+                            if (sprite.Lights.Count == 0) //If the sprite had no static lights
+                            {
+                                i = 1; //Then the first dynamic light has already been applied 
+                            }
+                            for (; i < sprite.dynamicLights.Count; i++)
+                            {
+                                Light light = sprite.dynamicLights[i];
+                                alphaLightShader.Uniforms.SetUniform(light.ShaderColor, alphaLightShader.Uniforms["lightcolor"]);
+                                alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), alphaLightShader.Uniforms["lightdata"]);
+
+                                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                            }
+
+                            sprite.dynamicLights.Clear();
+                            if (!sprite.IsStatic)
+                            {
+                                sprite.Lights.Clear();
+                            }
+                        }
+                    });
+
+                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                }
+
+                batch.Clear();
+                batch_light.Clear();
+                alpha_batch.Clear();
             }
+            GL.DepthMask(true);
         }
 
         protected void OnFirstRun()
@@ -392,6 +588,27 @@ namespace Sharp2D.Game.Worlds
                 GL.BindAttribLocation(alphaLightShader.ProgramID, TEXCOORD_LOCATION, "tcattrib");
                 alphaLightShader.LinkAll();
             }
+        }
+    }
+    
+    public class OpenGL3Camera : Camera
+    {
+        public OpenGL3Camera()
+        {
+            Z = 100f;
+        }
+
+        public override bool IsOutsideCamera(float X, float Y, float Width, float Height)
+        {
+            Y = -Y;
+            float temp = Screen.Camera.Z / 100f;
+            float temp2 = 7f / temp;
+            float temp3 = 64f * temp;
+            return
+                (X + Width) + Screen.Camera.X < -temp3 - (Screen.Settings.GameSize.Width / temp2) ||
+                Screen.Camera.X + (X + Width) > temp3 + (Screen.Settings.GameSize.Width / temp2) ||
+                (Y + Height) + Screen.Camera.Y < -temp3 - (Screen.Settings.GameSize.Height / temp2) ||
+                Screen.Camera.Y + (Y + Height) > temp3 + (Screen.Settings.GameSize.Height / temp2);
         }
     }
 }

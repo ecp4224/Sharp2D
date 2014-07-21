@@ -146,5 +146,10 @@ namespace Sharp2D.Core.Graphics.Shaders
             
             _currentShader = this;
         }
+
+        public void Reload()
+        {
+
+        }
     }
 }
