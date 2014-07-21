@@ -188,7 +188,7 @@ namespace Sharp2D.Core.Physics
             var x = Vertices.Select(v => v.X).ToArray();
             var y = Vertices.Select(v => v.Y).ToArray();
 
-            return new[] {x.Min() - offset, x.Max() + offset, y.Min() - offset, y.Max() + offset};
+            return new[] { x.Min() - offset, x.Max() + offset, y.Min() - offset, y.Max() + offset };
         }
 
         public Vector2 this[int index]

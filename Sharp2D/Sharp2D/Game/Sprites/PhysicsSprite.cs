@@ -75,13 +75,12 @@ namespace Sharp2D.Game.Sprites
         private readonly List<Hitbox> _hitboxes;
         public Hitbox Hitbox { get; set; }
 
-        protected PhysicsSprite() : base()
+        protected PhysicsSprite()
         {
             Hitbox.CollidableCache.Add(this);
 
             _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
-            if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
-            Console.WriteLine("CMAALELFLYSLFALFLKSFSODFOSF");
+            if (_hitboxes == null) { return; }
             Hitbox = _hitboxes[0];
         }
 
@@ -90,9 +89,9 @@ namespace Sharp2D.Game.Sprites
             return Hitbox.CheckCollision(this, c, new Vector2(0, 0));
         }
 
-        public void ChangeHitbox(string name) //todo handle invalid name
+        public void ChangeHitbox(string name)
         {
-            Hitbox = (from h in _hitboxes where h.Name == name select h).First();
+            Hitbox = (from h in _hitboxes where h.Name == name select h).FirstOrDefault();
         }
     }
 }
