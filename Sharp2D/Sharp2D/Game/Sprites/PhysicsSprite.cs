@@ -22,14 +22,13 @@ namespace Sharp2D.Game.Sprites
                 var xSum = 0f;
                 if (Hitbox != null)
                 {
-                    var collidables = Hitbox.CollidableCache;
-                    foreach (var c in collidables)
+                    Hitbox.ForEachCollidable(delegate(ICollidable c)
                     {
-                        if (c == this) { continue; }
+                        if (c == this) { return; }
 
                         var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X + xSum, 0));
 
-                        if (!result.WillIntersect) { continue; }
+                        if (!result.WillIntersect) { return; }
 
                         xSum += result.TranslationVector.X;
 
@@ -38,7 +37,8 @@ namespace Sharp2D.Game.Sprites
                             OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
                             OnCollision(this, args);
                         }
-                    }
+
+                    });
                 }
                 base.X = value + xSum;
             }
@@ -56,13 +56,12 @@ namespace Sharp2D.Game.Sprites
                 var ySum = 0f;
                 if (Hitbox != null)
                 {
-                    var collidables = Hitbox.CollidableCache;
-                    foreach (var c in collidables)
+                    Hitbox.ForEachCollidable(delegate(ICollidable c)
                     {
-                        if (c == this) { continue; }
+                        if (c == this) { return; }
                         var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y + ySum));
 
-                        if (!result.WillIntersect) { continue; }
+                        if (!result.WillIntersect) { return; }
 
                         ySum += result.TranslationVector.Y;
 
@@ -71,7 +70,8 @@ namespace Sharp2D.Game.Sprites
                             OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
                             OnCollision(this, args);
                         }
-                    }
+
+                    });
                 }
                 
                 base.Y = value + ySum;
@@ -83,7 +83,7 @@ namespace Sharp2D.Game.Sprites
 
         protected PhysicsSprite() : base()
         {
-            Hitbox.CollidableCache.Add(this);
+            Hitbox.AddCollidable(this);
 
             _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
             if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
