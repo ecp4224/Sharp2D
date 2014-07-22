@@ -81,9 +81,10 @@ namespace Sharp2D.Game.Sprites
         private readonly List<Hitbox> _hitboxes;
         public Hitbox Hitbox { get; set; }
 
-        protected PhysicsSprite() : base()
+        protected override void OnLoad()
         {
             Hitbox.AddCollidable(this);
+            base.OnLoad();
 
             _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
             if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
