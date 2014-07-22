@@ -20,21 +20,24 @@ namespace Sharp2D.Game.Sprites
             set
             {
                 var xSum = 0f;
-                var collidables = Hitbox.CollidableCache;
-                foreach (var c in collidables)
+                if (Hitbox != null)
                 {
-                    if (c == this) { continue; }
-
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X + xSum, 0));
-
-                    if (!result.WillIntersect) { continue; }
-
-                    xSum += result.TranslationVector.X;
-
-                    if (OnCollision != null)
+                    var collidables = Hitbox.CollidableCache;
+                    foreach (var c in collidables)
                     {
-                        OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
-                        OnCollision(this, args);
+                        if (c == this) { continue; }
+
+                        var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X + xSum, 0));
+
+                        if (!result.WillIntersect) { continue; }
+
+                        xSum += result.TranslationVector.X;
+
+                        if (OnCollision != null)
+                        {
+                            OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
+                            OnCollision(this, args);
+                        }
                     }
                 }
                 base.X = value + xSum;
@@ -51,20 +54,23 @@ namespace Sharp2D.Game.Sprites
             set
             {
                 var ySum = 0f;
-                var collidables = Hitbox.CollidableCache;
-                foreach (var c in collidables)
+                if (Hitbox != null)
                 {
-                    if (c == this) { continue; }
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y + ySum));
-
-                    if (!result.WillIntersect) { continue; }
-
-                    ySum += result.TranslationVector.Y;
-
-                    if (OnCollision != null)
+                    var collidables = Hitbox.CollidableCache;
+                    foreach (var c in collidables)
                     {
-                        OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
-                        OnCollision(this, args);
+                        if (c == this) { continue; }
+                        var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y + ySum));
+
+                        if (!result.WillIntersect) { continue; }
+
+                        ySum += result.TranslationVector.Y;
+
+                        if (OnCollision != null)
+                        {
+                            OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
+                            OnCollision(this, args);
+                        }
                     }
                 }
                 

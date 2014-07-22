@@ -469,8 +469,9 @@ namespace Sharp2D.Game.Sprites
     [Flags]
     public enum FlipState
     {
-        Vertical = 0,
-        Horizontal = 1,
+        None = 0,
+        Vertical = 1,
+        Horizontal = 2,
 
         VerticalHorizontal = Vertical | Horizontal
     }
