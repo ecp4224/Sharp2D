@@ -132,7 +132,6 @@ namespace Sharp2D.Game.Sprites
                     if (t.group.Contains(sprite))
                     {
                         t.group.Remove(sprite);
-                        sprite.Unload();
                     }
                 }
 
@@ -175,7 +174,6 @@ namespace Sharp2D.Game.Sprites
                     if (t.group.Contains(sprite))
                     {
                         t.group.Remove(sprite);
-                        sprite.Unload();
                     }
                 }
 
