@@ -47,8 +47,8 @@ namespace Sharp2D.Game.Sprites.Tiled
 
             Texture = TileSet.TileTexture;
 
-            if (parent.TileProperties.ContainsKey(ID.ToString()) &&
-                parent.TileProperties[ID.ToString()].ContainsKey("collide"))
+            if (parent.TileProperties.ContainsKey(ID) &&
+                parent.TileProperties[ID].ContainsKey("collide"))
             {
                 Hitbox = new Hitbox("Space", new List<Vector2>
                 {

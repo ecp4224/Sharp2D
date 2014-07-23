@@ -78,7 +78,7 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
-        private readonly List<Hitbox> _hitboxes;
+        private List<Hitbox> _hitboxes;
         public Hitbox Hitbox { get; set; }
 
         protected override void OnLoad()

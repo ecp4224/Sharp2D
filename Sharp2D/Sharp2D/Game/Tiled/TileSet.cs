@@ -43,10 +43,13 @@ namespace Sharp2D.Game.Tiled
         public Dictionary<string, string> Properties { get; private set; }
 
         [JsonProperty(PropertyName="tileproperties")]
-        public Dictionary<string, Dictionary<string, string>> TileProperties { get; private set; }
+        private Dictionary<string, Dictionary<string, string>> _tileProperties { get; set; }
 
         [JsonIgnore]
         public Texture TileTexture { get; private set; }
+
+        [JsonIgnore]
+        public TileProperties TileProperties { get; private set; }
 
         public int TilesPerRow
         {
@@ -93,8 +96,12 @@ namespace Sharp2D.Game.Tiled
 
             if (Properties == null)
                 Properties = new Dictionary<string, string>();
-            if (TileProperties == null)
-                TileProperties = new Dictionary<string, Dictionary<string, string>>();
+            if (_tileProperties == null)
+            {
+                _tileProperties = new Dictionary<string, Dictionary<string, string>>();
+            }
+
+            TileProperties = new TileProperties(_tileProperties, FirstGID);
         }
 
         public void Dispose()
@@ -104,6 +111,39 @@ namespace Sharp2D.Game.Tiled
             if (TileProperties != null)
                 TileProperties.Clear();
             TileTexture = null;
+        }
+    }
+
+    public class TileProperties : Dictionary<string, Dictionary<string, string>>
+    {
+        private int FirstGID;
+        public TileProperties(Dictionary<string, Dictionary<string, string>> properties, int FirstGID)
+            : base(properties)
+        {
+            this.FirstGID = FirstGID;
+        }
+
+        public bool ContainsKey(int ID)
+        {
+            ID -= FirstGID;
+
+            return base.ContainsKey("" + ID);
+        }
+
+        public Dictionary<string, string> this[int ID]
+        {
+            get
+            {
+                ID -= FirstGID;
+
+                return base["" + ID];
+            }
+            set
+            {
+                ID -= FirstGID;
+
+                base["" + ID] = value;
+            }
         }
     }
 }
