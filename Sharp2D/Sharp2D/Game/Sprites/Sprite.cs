@@ -177,9 +177,7 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                if (ContainingWorlds.Count == 0)
-                    return null;
-                return ContainingWorlds.Where(w => w.Displaying).First();
+                return ContainingWorlds.FirstOrDefault(w => w.Displaying);
             }
         }
 

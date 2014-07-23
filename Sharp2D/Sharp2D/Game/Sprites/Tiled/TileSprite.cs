@@ -61,6 +61,17 @@ namespace Sharp2D.Game.Sprites.Tiled
             }
         }
 
+        public bool HasProperty(string key)
+        {
+            return (TileSet.TileProperties.ContainsKey(ID.ToString()) || TileSet.TileProperties[ID.ToString()].ContainsKey(key));
+        }
+
+        public string GetProperty(string key)
+        {
+            return !HasProperty(key) ? null : TileSet.TileProperties[ID.ToString()][key];
+        }
+
+
         private void _setTexCoords()
         {
             if (World.texcoords_cache.ContainsKey(ID))
