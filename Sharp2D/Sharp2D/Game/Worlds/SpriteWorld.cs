@@ -85,6 +85,9 @@ namespace Sharp2D.Game.Worlds
             }
             s._worlds.Remove(this);
             s.OnRemovedFromWorld(this);
+
+            if (s is ILogical)
+                RemoveLogical((ILogical)s);
         }
     }
 }
