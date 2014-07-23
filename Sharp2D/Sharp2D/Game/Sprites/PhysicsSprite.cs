@@ -91,6 +91,11 @@ namespace Sharp2D.Game.Sprites
             Hitbox = _hitboxes[0];
         }
 
+        protected override void OnUnload()
+        {
+            Hitbox.RemoveCollidable(this);
+        }
+
         public CollisionResult CollidesWith(ICollidable c)
         {
             return Hitbox.CheckCollision(this, c, new Vector2(0, 0));
