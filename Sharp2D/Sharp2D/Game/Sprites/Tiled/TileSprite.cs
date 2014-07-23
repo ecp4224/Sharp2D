@@ -63,12 +63,12 @@ namespace Sharp2D.Game.Sprites.Tiled
 
         public bool HasProperty(string key)
         {
-            return (TileSet.TileProperties.ContainsKey(ID.ToString()) || TileSet.TileProperties[ID.ToString()].ContainsKey(key));
+            return TileSet.TileProperties.ContainsKey(ID) && TileSet.TileProperties[ID].ContainsKey(key);
         }
 
         public string GetProperty(string key)
         {
-            return !HasProperty(key) ? null : TileSet.TileProperties[ID.ToString()][key];
+            return !HasProperty(key) ? null : TileSet.TileProperties[ID][key];
         }
 
 
