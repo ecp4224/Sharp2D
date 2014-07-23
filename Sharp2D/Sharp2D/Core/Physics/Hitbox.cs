@@ -12,16 +12,30 @@ namespace Sharp2D.Core.Physics
     public sealed class Hitbox
     {
         private static List<ICollidable> _collidableCache = new List<ICollidable>();
+        private static List<ICollidable> toRemove = new List<ICollidable>();
+        private static List<ICollidable> toAdd = new List<ICollidable>();
+
+        private static bool looping = false;
         private static object cache_lock = new object();
 
         public static void ForEachCollidable(Action<ICollidable> action)
         {
             lock (cache_lock)
             {
+                looping = true;
                 foreach (ICollidable c in _collidableCache)
                 {
                     action(c);
                 }
+                looping = false;
+
+                foreach (ICollidable c in toRemove)
+                {
+                    _collidableCache.Remove(c);
+                }
+                toRemove.Clear();
+                _collidableCache.AddRange(toAdd);
+                toAdd.Clear();
             }
         }
 
@@ -29,7 +43,10 @@ namespace Sharp2D.Core.Physics
         {
             lock (cache_lock)
             {
-                _collidableCache.Add(collidable);
+                if (!looping)
+                    _collidableCache.Add(collidable);
+                else
+                    toAdd.Add(collidable);
             }
         }
 
@@ -37,7 +54,10 @@ namespace Sharp2D.Core.Physics
         {
             lock (cache_lock)
             {
-                _collidableCache.Remove(collidable);
+                if (!looping)
+                    _collidableCache.Remove(collidable);
+                else
+                    toRemove.Add(collidable);
             }
         }
 
