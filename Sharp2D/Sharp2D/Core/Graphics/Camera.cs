@@ -83,7 +83,7 @@ namespace Sharp2D.Core.Graphics
             else if (toFollow.Count > 0)
             {
                 Vector2 center = MathUtils.CenterOf(toFollow.AsVector2List());
-                X = center.X;
+                X = -center.X;
                 Y = center.Y;
             }
         }
