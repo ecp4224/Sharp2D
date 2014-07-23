@@ -20,22 +20,25 @@ namespace Sharp2D.Game.Sprites
             set
             {
                 var xSum = 0f;
-                var collidables = Hitbox.CollidableCache;
-                foreach (var c in collidables)
+                if (Hitbox != null)
                 {
-                    if (c == this) { continue; }
-
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X + xSum, 0));
-
-                    if (!result.WillIntersect) { continue; }
-
-                    xSum += result.TranslationVector.X;
-
-                    if (OnCollision != null)
+                    Hitbox.ForEachCollidable(delegate(ICollidable c)
                     {
-                        OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
-                        OnCollision(this, args);
-                    }
+                        if (c == this) { return; }
+
+                        var result = Hitbox.CheckCollision(this, c, new Vector2(value - base.X + xSum, 0));
+
+                        if (!result.WillIntersect) { return; }
+
+                        xSum += result.TranslationVector.X;
+
+                        if (OnCollision != null)
+                        {
+                            OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
+                            OnCollision(this, args);
+                        }
+
+                    });
                 }
                 base.X = value + xSum;
             }
@@ -51,21 +54,24 @@ namespace Sharp2D.Game.Sprites
             set
             {
                 var ySum = 0f;
-                var collidables = Hitbox.CollidableCache;
-                foreach (var c in collidables)
+                if (Hitbox != null)
                 {
-                    if (c == this) { continue; }
-                    var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y + ySum));
-
-                    if (!result.WillIntersect) { continue; }
-
-                    ySum += result.TranslationVector.Y;
-
-                    if (OnCollision != null)
+                    Hitbox.ForEachCollidable(delegate(ICollidable c)
                     {
-                        OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
-                        OnCollision(this, args);
-                    }
+                        if (c == this) { return; }
+                        var result = Hitbox.CheckCollision(this, c, new Vector2(0, value - base.Y + ySum));
+
+                        if (!result.WillIntersect) { return; }
+
+                        ySum += result.TranslationVector.Y;
+
+                        if (OnCollision != null)
+                        {
+                            OnCollisionEventArgs args = new OnCollisionEventArgs(this, c);
+                            OnCollision(this, args);
+                        }
+
+                    });
                 }
                 
                 base.Y = value + ySum;
@@ -75,12 +81,13 @@ namespace Sharp2D.Game.Sprites
         private readonly List<Hitbox> _hitboxes;
         public Hitbox Hitbox { get; set; }
 
-        protected PhysicsSprite()
+        protected override void OnLoad()
         {
-            Hitbox.CollidableCache.Add(this);
+            Hitbox.AddCollidable(this);
+            base.OnLoad();
 
             _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
-            if (_hitboxes == null) { return; }
+            if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
             Hitbox = _hitboxes[0];
         }
 
@@ -89,9 +96,9 @@ namespace Sharp2D.Game.Sprites
             return Hitbox.CheckCollision(this, c, new Vector2(0, 0));
         }
 
-        public void ChangeHitbox(string name)
+        public void ChangeHitbox(string name) //todo handle invalid name
         {
-            Hitbox = (from h in _hitboxes where h.Name == name select h).FirstOrDefault();
+            Hitbox = (from h in _hitboxes where h.Name == name select h).First();
         }
     }
 }

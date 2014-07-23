@@ -57,7 +57,7 @@ namespace Sharp2D.Game.Sprites.Tiled
                     new Vector2(Width, Height),
                     new Vector2(0, Height)
                 });
-                Hitbox.CollidableCache.Add(this);
+                Hitbox.AddCollidable(this);
             }
         }
 
