@@ -5,15 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sharp2D.Game.Tiled;
+using Sharp2D.Core;
 using Sharp2D.Game.Sprites;
-using Sharp2D.Game.Sprites.Tiled;
 
 namespace Sharp2D.Game.Worlds
 {
     public abstract class TiledWorld : SpriteWorld
     {
-        internal readonly Dictionary<int, Core.Utils.TexCoords> texcoords_cache = new Dictionary<int, Core.Utils.TexCoords>();
+        internal readonly Dictionary<int, TexCoords> texcoords_cache = new Dictionary<int, TexCoords>();
         [JsonProperty(PropertyName = "height")]
         public int Height { get; private set; }
 

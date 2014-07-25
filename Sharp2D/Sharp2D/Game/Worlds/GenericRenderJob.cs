@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
-using Sharp2D.Game.Tiled;
-using Sharp2D.Game.Sprites.Tiled;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;

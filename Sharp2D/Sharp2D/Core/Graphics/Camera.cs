@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sharp2D.Core.Utils;
 using OpenTK;
+using Sharp2D;
+using Sharp2D.Core.Interfaces;
 
 
 namespace Sharp2D.Core.Graphics

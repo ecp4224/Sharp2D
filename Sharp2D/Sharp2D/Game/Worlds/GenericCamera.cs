@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Sharp2D.Core.Graphics;
-using Sharp2D.Game.Sprites;
-using Sharp2D.Core.Utils;
 
 namespace Sharp2D.Game.Worlds
 {

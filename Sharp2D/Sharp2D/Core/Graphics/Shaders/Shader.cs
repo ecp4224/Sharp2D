@@ -102,7 +102,7 @@ namespace Sharp2D.Core.Graphics.Shaders
             {
                 throw new InvalidProgramException("Linking the program failed!\n" + GL.GetShaderInfoLog(ProgramID));
             }
-            Utils.Logger.Debug(GL.GetProgramInfoLog(ProgramID));
+            Logger.Debug(GL.GetProgramInfoLog(ProgramID));
 
             Uniforms = new UniformHolder(ProgramID);
 

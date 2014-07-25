@@ -4,8 +4,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sharp2D.Core.Graphics;
-using Sharp2D.Core.Graphics.Shaders;
+using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D.Game.Sprites
 {

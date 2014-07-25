@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sharp2D.Core.Logic;
-using Sharp2D.Core.Graphics;
+using Sharp2D.Core;
+using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Sprites;
 
 namespace Sharp2D.Game.Worlds

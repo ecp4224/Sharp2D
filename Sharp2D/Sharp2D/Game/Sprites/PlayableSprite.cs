@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Sharp2D.Core.Graphics;
-using Sharp2D.Core.Settings;
-using Sharp2D.Core.Utils;
-using Sharp2D.Game.Tiled;
+using Sharp2D.Core;
 using Sharp2D.Game.Worlds;
 
 namespace Sharp2D.Game.Sprites
