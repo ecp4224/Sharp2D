@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sharp2D.Core.Physics;
-using Sharp2D.Core.Settings;
-using Sharp2D.Game.Sprites;
-using Sharp2D.Game.Sprites.Animations;
+using Sharp2D;
 
 namespace TestGame
 {
@@ -19,7 +16,7 @@ namespace TestGame
 
         public Leopold()
         {
-            Texture = Sharp2D.Core.Graphics.Texture.NewTexture("sprites/Leopold/Leopold.png");
+            Texture = Texture.NewTexture("sprites/Leopold/Leopold.png");
             Texture.LoadTextureFromFile();
             Width = Texture.TextureWidth;
             Height = Texture.TextureHeight;

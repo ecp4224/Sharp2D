@@ -103,10 +103,10 @@ namespace Sharp2D.Game.Sprites
         public Animation ParentAnimation { get; internal set; }
 
         [JsonIgnore]
-        private Origin type;
+        private Placement type;
 
         [JsonIgnore]
-        private Origin parent_type;
+        private Placement parent_type;
 
         [JsonIgnore]
         private bool type_set = false;
@@ -115,7 +115,7 @@ namespace Sharp2D.Game.Sprites
         private bool parent_type_set = false;
 
         [JsonIgnore]
-        public Origin OriginType
+        public Placement OriginType
         {
             get
             {
@@ -127,7 +127,7 @@ namespace Sharp2D.Game.Sprites
                     }
                     else
                     {
-                        type = Origin.Center;
+                        type = Placement.Center;
                     }
 
                     type_set = true;
@@ -141,7 +141,7 @@ namespace Sharp2D.Game.Sprites
         internal bool setup_ran = false;
 
         [JsonIgnore]
-        public Origin ParentOriginType
+        public Placement ParentOriginType
         {
             get
             {
@@ -153,7 +153,7 @@ namespace Sharp2D.Game.Sprites
                     }
                     else
                     {
-                        parent_type = Origin.Center;
+                        parent_type = Placement.Center;
                     }
 
                     parent_type_set = true;
@@ -352,24 +352,24 @@ namespace Sharp2D.Game.Sprites
             return this;
         }
 
-        private static Origin ParseStringToOrigin(string origin_type)
+        private static Placement ParseStringToOrigin(string origin_type)
         {
-            Origin type;
-            Type ot = typeof(Origin);
+            Placement type;
+            Type ot = typeof(Placement);
 
             if (origin_type.Contains("|"))
             {
-                Origin f, s;
+                Placement f, s;
                 string[] array = origin_type.Split('|');
 
-                Enum.TryParse<Origin>(array[0], true, out f);
-                Enum.TryParse<Origin>(array[1], true, out s);
+                Enum.TryParse<Placement>(array[0], true, out f);
+                Enum.TryParse<Placement>(array[1], true, out s);
 
                 type = f | s;
             }
             else
             {
-                Enum.TryParse<Origin>(origin_type, true, out type);
+                Enum.TryParse<Placement>(origin_type, true, out type);
             }
 
             return type;

@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\SpriteBuilder.cs" />
     <Compile Include="Core\Graphics\Camera.cs" />
     <Compile Include="Core\Interfaces\IMoveable2d.cs" />
     <Compile Include="Core\Interfaces\IMoveable3d.cs" />
@@ -65,13 +66,13 @@
     <Compile Include="Common\OnCollisionEventArgs.cs" />
     <Compile Include="Core\EngineSettings.cs" />
     <Compile Include="Core\GlobalSettings.cs" />
-    <Compile Include="Common\Input.cs" />
+    <Compile Include="Game\Input.cs" />
     <Compile Include="Core\SaveableSettings.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="Common\MathUtils.cs" />
     <Compile Include="Common\Hitbox.cs" />
     <Compile Include="Core\Interfaces\ICollidable.cs" />
-    <Compile Include="Core\Origin.cs" />
+    <Compile Include="Core\Placement.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Core\TexCoords.cs" />
     <Compile Include="Game\Drawables\IDrawable.cs" />

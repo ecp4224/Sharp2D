@@ -1,6 +1,5 @@
 ﻿using OpenTK.Input;
-using Sharp2D.Core.Graphics;
-using Sharp2D.Game.Sprites;
+using Sharp2D;
 
 namespace TestGame
 {

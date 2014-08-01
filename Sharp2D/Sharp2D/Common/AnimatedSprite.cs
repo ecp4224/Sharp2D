@@ -275,39 +275,39 @@ namespace Sharp2D
             float defaultx = X + (Width / 2f) - (ChildAnimationPlaying.Width / 2f);
             float defaulty = Y - (Height / 2f) + (ChildAnimationPlaying.Height / 2f);
 
-            Origin porigin = ChildAnimationPlaying.ParentOriginType;
-            if ((porigin & Origin.Left) != 0)
+            Placement porigin = ChildAnimationPlaying.ParentOriginType;
+            if ((porigin & Placement.Left) != 0)
             {
                 defaultx -= (Width / 2f);
             }
-            if ((porigin & Origin.Right) != 0)
+            if ((porigin & Placement.Right) != 0)
             {
                 defaultx += Width / 2f;
             }
-            if ((porigin & Origin.Top) != 0)
+            if ((porigin & Placement.Top) != 0)
             {
                 defaulty -= Height / 2f;
             }
-            if ((porigin & Origin.Bottom) != 0)
+            if ((porigin & Placement.Bottom) != 0)
             {
                 defaulty += (Height / 2f);
             }
 
             float xadd = 0f, yadd = 0f;
-            Origin origin = ChildAnimationPlaying.OriginType;
-            if ((origin & Origin.Left) != 0)
+            Placement origin = ChildAnimationPlaying.OriginType;
+            if ((origin & Placement.Left) != 0)
             {
                 xadd = -(ChildAnimationPlaying.Width / 2f);
             }
-            if ((origin & Origin.Right) != 0)
+            if ((origin & Placement.Right) != 0)
             {
                 xadd = ChildAnimationPlaying.Width / 2f;
             }
-            if ((origin & Origin.Top) != 0)
+            if ((origin & Placement.Top) != 0)
             {
                 yadd = ChildAnimationPlaying.Height / 2f;
             }
-            if ((origin & Origin.Bottom) != 0)
+            if ((origin & Placement.Bottom) != 0)
             {
                 yadd = -(ChildAnimationPlaying.Height / 2f);
             }

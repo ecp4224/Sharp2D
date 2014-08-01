@@ -1,13 +1,12 @@
 ﻿using System;
-using Sharp2D.Core.Graphics;
-using Sharp2D.Core.Logic;
-using Sharp2D.Core.Settings;
-using Sharp2D.Core.Utils;
 using System.Drawing;
 using System.Threading;
 using Sharp2D.Game.Worlds;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Sharp2D;
+using Sharp2D.Game;
+using Sharp2D.Core.Interfaces;
 
 namespace TestGame
 {
@@ -49,7 +48,7 @@ namespace TestGame
                     wat.X = rand.Next(600 - 400) + 400;
                     wat.Y = rand.Next(700 - 500) + 580;
                     wat.Layer = (float)rand.NextDouble();
-                    wat.FlipState = Sharp2D.Game.Sprites.FlipState.Horizontal;
+                    wat.FlipState = FlipState.Horizontal;
 
                     world.AddSprite(wat);
 

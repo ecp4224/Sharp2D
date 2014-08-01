@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Sharp2D.Core
 {
     [Flags]
-    public enum Origin
+    public enum Placement
     {
         Center = 0,
         Bottom = 1,

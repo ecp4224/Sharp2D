@@ -5,7 +5,7 @@ using System.Linq;
 using OpenTK.Input;
 using Sharp2D.Core;
 
-namespace Sharp2D
+namespace Sharp2D.Game
 {
     public static class Input
     {
