@@ -65,6 +65,11 @@ namespace Sharp2D.Game.Worlds
 
         public virtual void AddSprite(Sprite s)
         {
+            if (DefaultJob == null)
+            {
+                Logger.Warn("Attempted to add Sprite " + s + " to default job, but no default job found!");
+            }
+
             if (DefaultJob != null)
             {
                 DefaultJob.AddSprite(s);

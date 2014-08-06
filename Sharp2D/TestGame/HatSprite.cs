@@ -3,7 +3,7 @@ using Sharp2D;
 
 namespace TestGame
 {
-    public class HatSprite : AnimatedSprite
+    public class HatSprite : ModuleSprite
     {
         public override string Name
         {
@@ -16,6 +16,8 @@ namespace TestGame
             Texture.LoadTextureFromFile();
             Width = Texture.TextureWidth;
             Height = Texture.TextureHeight;
+
+            AttachModule<AnimationModule>();
         }
 
         protected override void BeforeDraw()
@@ -27,6 +29,10 @@ namespace TestGame
         }
 
         protected override void OnDisplay()
+        {
+        }
+
+        protected override void OnLoad()
         {
         }
     }

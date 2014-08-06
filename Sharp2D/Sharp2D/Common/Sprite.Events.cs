@@ -8,20 +8,32 @@ namespace Sharp2D
 {
     public partial class Sprite
     {
-        public event EventHandler OnSpriteMoved;
+        public event EventHandler Moved;
+        public event EventHandler Disposed;
+        public event EventHandler Displayed;
+        public event EventHandler Loaded;
+        public event EventHandler Unloaded;
+        public event EventHandler Drawn;
     }
 
-    public sealed class OnSpriteMoved : EventArgs
+    public class SpriteEvent : EventArgs
+    {
+        public Sprite Sprite { get; private set; }
+
+        public SpriteEvent(Sprite sprite)
+        {
+            this.Sprite = sprite;
+        }
+    }
+
+    public sealed class OnSpriteMoved : SpriteEvent
     {
         public float OldX { get; private set; }
 
         public float OldY { get; private set; }
 
-        public Sprite Sprite { get; private set; }
-
-        public OnSpriteMoved(Sprite sprite, float OldX, float OldY)
+        public OnSpriteMoved(Sprite sprite, float OldX, float OldY) : base(sprite)
         {
-            this.Sprite = sprite;
             this.OldX = OldX;
             this.OldY = OldY;
         }

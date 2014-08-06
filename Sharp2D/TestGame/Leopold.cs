@@ -20,6 +20,8 @@ namespace TestGame
             Texture.LoadTextureFromFile();
             Width = Texture.TextureWidth;
             Height = Texture.TextureHeight;
+
+            AttachModule<AnimationModule>();
         }
 
         protected override void BeforeDraw()

@@ -40,17 +40,18 @@ namespace TestGame
 
                 Random rand = new Random();
 
-                Screen.Camera.Z = 150f;
-                int TEST = 0;
+                Screen.Camera.Z = 100f;
+                int TEST = 1;
                 for (int i = 0; i < TEST; i++)
                 {
                     TestSprite wat = new TestSprite();
                     wat.X = rand.Next(600 - 400) + 400;
                     wat.Y = rand.Next(700 - 500) + 580;
-                    wat.Layer = (float)rand.NextDouble();
-                    wat.FlipState = FlipState.Horizontal;
+                    wat.Layer = (float)i / (float)TEST;
 
                     world.AddSprite(wat);
+
+                    wat.GetFirstModule<AnimationModule>().Animations[0]["hat"].Play();
 
                     Screen.Camera.Y = wat.Y - 55;
                     Screen.Camera.X = -wat.X;
@@ -58,7 +59,7 @@ namespace TestGame
 
                 Light light2 = new Light(456, 500, 1f, 50f, LightType.DynamicPointLight);
                 Light light = new Light(456, 680, 1f, 50f, LightType.DynamicPointLight);
-                Screen.Camera.X = -456;
+                Screen.Camera.X = -406;
                 Screen.Camera.Y = 680;
                 light2.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));
                 light.Color = Color.FromArgb(rand.Next(255), rand.Next(255), rand.Next(255));

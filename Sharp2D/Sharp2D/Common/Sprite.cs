@@ -30,12 +30,17 @@ namespace Sharp2D
         /// <summary>
         /// Whether or not this Sprite has loaded
         /// </summary>
-        public bool Loaded { get; private set; }
+        public bool IsLoaded { get; private set; }
+
+        /// <summary>
+        /// The name of this sprite.
+        /// </summary>
+        public abstract string Name { get; }
         
         /// <summary>
         /// Whether or not this Sprite is visible
         /// </summary>
-        public bool Visible { get; set; }
+        public bool IsVisible { get; set; }
 
         /// <summary>
         /// <para>This determines how this sprite is cached by the rendering system.</para>
@@ -46,6 +51,11 @@ namespace Sharp2D
 
         private Texture _texture;
         private Shader _shader;
+
+        public override string ToString()
+        {
+            return "Sharp2D_Sprite_" + Name;
+        }
         
         /// <summary>
         /// The <see cref="SpriteRenderJob"/>'s this Sprite belongs to.
@@ -364,7 +374,7 @@ namespace Sharp2D
         /// </summary>
         public void Load()
         {
-            Visible = true;
+            IsVisible = true;
 
             OnLoad();
             if (TexCoords == null && Texture != null)
@@ -373,7 +383,10 @@ namespace Sharp2D
             }
             else if (Texture == null)
                 throw new InvalidOperationException("This sprite has no texture! A sprite MUST have a texture!");
-            Loaded = true;
+            IsLoaded = true;
+
+            if (Loaded != null)
+                Loaded(this, new SpriteEvent(this));
         }
 
         /// <summary>
@@ -382,7 +395,10 @@ namespace Sharp2D
         public void Unload()
         {
             OnUnload();
-            Loaded = false;
+            IsLoaded = false;
+
+            if (Unloaded != null)
+                Unloaded(this, new SpriteEvent(this));
         }
 
         /// <summary>
@@ -390,9 +406,12 @@ namespace Sharp2D
         /// </summary>
         public void Dispose()
         {
-            if (Loaded)
+            if (IsLoaded)
                 Unload();
             OnDispose();
+
+            if (Disposed != null)
+                Disposed(this, new SpriteEvent(this));
         }
 
         /// <summary>
@@ -403,6 +422,9 @@ namespace Sharp2D
             OnDisplay();
             if (Texture != null && Texture.ID == -1)
                 Texture.Create();
+
+            if (Displayed != null)
+                Displayed(this, new SpriteEvent(this));
         }
 
         /// <summary>
@@ -411,6 +433,9 @@ namespace Sharp2D
         public void PrepareDraw()
         {
             BeforeDraw();
+
+            if (Drawn != null)
+                Drawn(this, new SpriteEvent(this));
         }
 
         /// <summary>

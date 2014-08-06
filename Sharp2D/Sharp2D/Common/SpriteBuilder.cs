@@ -141,6 +141,11 @@ namespace Sharp2D.Common
         protected override void OnDisplay()
         {
         }
+
+        public override string Name
+        {
+            get { return "wat"; }
+        }
     }
 
     public class SpriteBuilder : Builder

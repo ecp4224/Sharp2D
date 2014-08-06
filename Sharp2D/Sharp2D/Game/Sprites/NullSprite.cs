@@ -39,5 +39,10 @@ namespace Sharp2D.Game.Sprites
         {
             throw new InvalidOperationException("This sprite can't be displayed, it's null!");
         }
+
+        public override string Name
+        {
+            get { return "null"; }
+        }
     }
 }

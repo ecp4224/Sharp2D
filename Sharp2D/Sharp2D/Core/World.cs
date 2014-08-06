@@ -71,6 +71,8 @@ namespace Sharp2D.Core
             Screen.LogicContainer = this;
             Screen.RenderJobContainer = this;
             Displaying = true;
+
+            while (!used) { System.Threading.Thread.Sleep(50); }
         }
 
         public void Load()

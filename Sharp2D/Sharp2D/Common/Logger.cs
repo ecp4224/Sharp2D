@@ -65,5 +65,13 @@ namespace Sharp2D
             Console.CursorLeft = ox;
             Console.CursorTop = oy;
         }
+
+        public static void PrintStackTrace()
+        {
+            Logger.Error("========= StackTrace =========");
+            System.Diagnostics.StackTrace t = new System.Diagnostics.StackTrace();
+            Logger.Error(t.ToString());
+            Logger.Error("==============================");
+        }
     }
 }

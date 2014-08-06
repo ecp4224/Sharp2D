@@ -6,7 +6,7 @@ using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D
 {
-    public abstract class PhysicsSprite : AnimatedSprite, ICollidable
+    public abstract class PhysicsSprite : ModuleSprite, ICollidable
     {
         public event EventHandler OnCollision;
         public override float X
@@ -83,7 +83,6 @@ namespace Sharp2D
         protected override void OnLoad()
         {
             Hitbox.AddCollidable(this);
-            base.OnLoad();
 
             _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
             if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }

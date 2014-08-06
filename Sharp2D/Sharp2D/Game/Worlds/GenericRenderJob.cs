@@ -187,7 +187,7 @@ namespace Sharp2D.Game.Worlds
 
             Batch.ForEach(delegate(Sprite sprite)
             {
-                if (!sprite.IsOffScreen && sprite.Visible)
+                if (!sprite.IsOffScreen && sprite.IsVisible)
                 {
                     CullLights(sprite);
                     if (sprite.Texture != null && sprite.Texture.HasAlpha)
@@ -593,7 +593,7 @@ namespace Sharp2D.Game.Worlds
     {
         public OpenGL3Camera()
         {
-            Z = 100f;
+            Z = 1f;
         }
 
         public override bool IsOutsideCamera(float X, float Y, float Width, float Height)

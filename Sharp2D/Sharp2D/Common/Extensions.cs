@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -16,6 +17,45 @@ namespace Sharp2D
         {
             T temp = (T)obj;
             return EqualityComparer<T>.Default.Equals(temp, default(T));
+        }
+
+        public static void Notify(this object obj)
+        {
+            Monitor.Enter(obj);
+            try
+            {
+                Monitor.Pulse(obj);
+            }
+            finally
+            {
+                Monitor.Exit(obj);
+            }
+        }
+
+        public static void NotifyAll(this object obj)
+        {
+            Monitor.Enter(obj);
+            try
+            {
+                Monitor.PulseAll(obj);
+            }
+            finally
+            {
+                Monitor.Exit(obj);
+            }
+        }
+
+        public static void Wait(this object obj)
+        {
+            Monitor.Enter(obj);
+            try
+            {
+                Monitor.Wait(obj);
+            }
+            finally
+            {
+                Monitor.Exit(obj);
+            }
         }
 
         public static List<Vector2> AsVector2List(this List<IMoveable2d> obj)

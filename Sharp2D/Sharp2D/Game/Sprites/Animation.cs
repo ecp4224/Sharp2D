@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sharp2D;
 using Sharp2D.Core;
 
 namespace Sharp2D.Game.Sprites
@@ -47,9 +48,9 @@ namespace Sharp2D.Game.Sprites
             {
                 if (Owner != null)
                 {
-                    foreach (string name in Owner.Animations.Animations.Keys)
+                    foreach (string name in ModuleOwner.Animations.Animations.Keys)
                     {
-                        if (Owner.Animations[name] == this)
+                        if (ModuleOwner.Animations[name] == this)
                             return name;
                     }
                 }
@@ -173,7 +174,7 @@ namespace Sharp2D.Game.Sprites
             {
                 if (inherit_from != null && !string.IsNullOrWhiteSpace(inherit_from))
                 {
-                    return Owner.Animations[inherit_from].Animations;
+                    return ModuleOwner.Animations[inherit_from].Animations;
                 }
                 return null;
             }
@@ -186,7 +187,7 @@ namespace Sharp2D.Game.Sprites
             {
                 if (inherit_from != null && !string.IsNullOrWhiteSpace(inherit_from))
                 {
-                    return Owner.Animations[inherit_from];
+                    return ModuleOwner.Animations[inherit_from];
                 }
                 return null;
             }
@@ -218,9 +219,9 @@ namespace Sharp2D.Game.Sprites
             get
             {
                 if (Owner == null) { Console.WriteLine("Owner is null"); }
-                if (Owner.Animations == null) { Console.WriteLine("Animations are null"); }
+                if (ModuleOwner.Animations == null) { Console.WriteLine("Animations are null"); }
                 if (width == -1)
-                    return Owner.Animations.width;
+                    return ModuleOwner.Animations.width;
                 return width;
             }
         }
@@ -231,13 +232,22 @@ namespace Sharp2D.Game.Sprites
             get
             {
                 if (height == -1)
-                    return Owner.Animations.height;
+                    return ModuleOwner.Animations.height;
                 return height;
             }
         }
 
         [JsonIgnore]
-        public AnimatedSprite Owner { get; internal set; }
+        public AnimationModule ModuleOwner { get; internal set; }
+
+        [JsonIgnore]
+        public Sprite Owner
+        {
+            get
+            {
+                return ModuleOwner.Owner;
+            }
+        }
 
         [JsonIgnore]
         private int _step = -1;
@@ -267,46 +277,46 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                return _play && Owner.CurrentlyPlayingAnimation == this;
+                return _play && ModuleOwner.CurrentlyPlayingAnimation == this;
             }
             set
             {
                 if (Owner == null) //This is a empty animation
                 {
-                    if (ParentAnimation.Owner.ChildAnimationPlaying != null)
+                    if (ParentAnimation.ModuleOwner.ChildAnimationPlaying != null)
                     {
                         if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
                         {
                             Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
-                            w.RemoveSprite(ParentAnimation.Owner.ChildAnimationPlaying.Owner);
+                            w.RemoveSprite(ParentAnimation.ModuleOwner.ChildAnimationPlaying.Owner);
                         }
                     }
-                    ParentAnimation.Owner.ChildAnimationPlaying = null;
+                    ParentAnimation.ModuleOwner.ChildAnimationPlaying = null;
                 }
-                else if (value && Owner.CurrentlyPlayingAnimation != this)
+                else if (value && ModuleOwner.CurrentlyPlayingAnimation != this)
                 {
-                    Owner.CurrentlyPlayingAnimation = this;
+                    ModuleOwner.CurrentlyPlayingAnimation = this;
                     Owner.Width = Width;
                     Owner.Height = Height;
-                    Owner.Visible = true;
+                    Owner.IsVisible = true;
                     if (ParentAnimation != null)
                     {
-                        if (ParentAnimation.Owner.ChildAnimationPlaying != null)
+                        if (ParentAnimation.ModuleOwner.ChildAnimationPlaying != null)
                         {
                             if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
                             {
                                 Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
-                                w.RemoveSprite(ParentAnimation.Owner.ChildAnimationPlaying.Owner);
+                                w.RemoveSprite(ParentAnimation.ModuleOwner.ChildAnimationPlaying.Owner);
                             }
                         }
-                        ParentAnimation.Owner.ChildAnimationPlaying = this;
+                        ParentAnimation.ModuleOwner.ChildAnimationPlaying = this;
                         if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
                         {
                             Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
                             if (!w.Sprites.Contains(Owner))
                                 w.AddSprite(Owner);
                         }
-                        ParentAnimation.Owner.AlignChildAnimation();
+                        ParentAnimation.ModuleOwner.AlignChildAnimation();
                     }
                 }
                 _play = value;
@@ -327,7 +337,7 @@ namespace Sharp2D.Game.Sprites
                 float y = 0f;
                 for (int i = 0; i < Row; i++)
                 {
-                    y += Owner.Animations[i].Height;
+                    y += ModuleOwner.Animations[i].Height;
                 }
                 y = Owner.Texture.TextureHeight - y;
 

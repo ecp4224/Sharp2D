@@ -174,5 +174,10 @@ namespace Sharp2D.Game.Sprites
         {
             return new CollisionResult {Intersecting = false, WillIntersect = false, TranslationVector = new Vector2()};
         }
+
+        public override string Name
+        {
+            get { return "Tile #" + ID; }
+        }
     }
 }

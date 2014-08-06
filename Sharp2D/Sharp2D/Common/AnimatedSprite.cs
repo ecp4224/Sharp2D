@@ -14,6 +14,7 @@ using Sharp2D.Game.Sprites;
 
 namespace Sharp2D
 {
+    [Obsolete("AnimatedSprite has been moved to AnimationModule. Use a ModuleSprite and attach a AnimationModule!", true)]
     public abstract class AnimatedSprite : Sprite, ILogical
     {
         public Animation CurrentlyPlayingAnimation { get; internal set; }
@@ -24,8 +25,6 @@ namespace Sharp2D
         public AnimationHolder Animations { get; private set; }
 
         public AnimatedSprite Parent { get; private set; }
-
-        public abstract string Name { get; }
 
         public virtual string AnimationConfigPath
         {
@@ -57,8 +56,8 @@ namespace Sharp2D
 
                 foreach (AnimatedSprite child in children)
                 {
-                    if (child is NullAnimatedSprite) //Empty animation?
-                        continue;
+                    //if (child is NullAnimatedSprite) //Empty animation?
+                    //    continue;
 
                     child.X += dif;
                 }
@@ -79,8 +78,8 @@ namespace Sharp2D
 
                 foreach (AnimatedSprite child in children)
                 {
-                    if (child is NullAnimatedSprite) //Empty animation?
-                        continue;
+                    //if (child is NullAnimatedSprite) //Empty animation?
+                    //    continue;
 
                     child.Y += dif;
                 }
@@ -155,7 +154,7 @@ namespace Sharp2D
             {
 
                 Animations = JsonConvert.DeserializeObject<AnimationHolder>(json);
-                Animations[0].Owner = this;
+                //Animations[0].Owner = this;
                 Width = Animations[0].Width;
                 Height = Animations[0].Height;
 
@@ -196,7 +195,7 @@ namespace Sharp2D
 
             Assembly assembly = Assembly.GetEntryAssembly();
 
-            ani.Owner = this;
+            //ani.Owner = this;
 
             if (ani.Animations == null)
                 return temp;
@@ -231,7 +230,7 @@ namespace Sharp2D
 
                 if (!child_animation.IsEmpty)
                 {
-                    AnimatedSprite sprite;
+                    /*AnimatedSprite sprite;
                     Type st = assembly.GetType(child_animation.SpriteFullName); //Get the type for the FullSpriteName
                     if (st == null)
                     {
@@ -246,17 +245,17 @@ namespace Sharp2D
                     child_animation.Owner = sprite; //Set the owner of the "hat" animation to the newly created sprite
                     sprite.Animations = child_animation.Animations; //Set the animations for the hat sprite to the children animations of the "hat" animation.
                     sprite.Parent = this; //Set the parent of the hat sprite to this
-                    sprite.Visible = false; //Make sure this sprite isn't visible by default
+                    sprite.IsVisible = false; //Make sure this sprite isn't visible by default
                     temp.Add(sprite); //Add the "hat" sprite as a children of this sprite
 
                     sprite.SetupChildren(sprite.Animations); //Setup the children of "hat" animation, and put all of it's children in a list
 
                     //Nevermind, don't do that
-                    //temp.AddRange(temp2); //Add all of children of the "hat" sprite as our children as well.
+                    //temp.AddRange(temp2); //Add all of children of the "hat" sprite as our children as well.*/
                 }
                 else
                 {
-                    temp.Add(new NullAnimatedSprite()); //This is an empty animation, fill it with a null sprite
+                    //temp.Add(new NullAnimatedSprite()); //This is an empty animation, fill it with a null sprite
                 }
             }
 
@@ -267,7 +266,7 @@ namespace Sharp2D
 
         public void AlignChildAnimation()
         {
-            if (ChildAnimationPlaying == null)
+            /*if (ChildAnimationPlaying == null)
                 return;
             AnimatedSprite sprite = ChildAnimationPlaying.Owner;
 
@@ -320,124 +319,7 @@ namespace Sharp2D
             sprite.X += ChildAnimationPlaying.XOffset;
             sprite.Y += ChildAnimationPlaying.YOffset;
 
-            sprite.AlignChildAnimation();
-        }
-    }
-
-    public class BasicAnimatedSprite : AnimatedSprite
-    {
-        public BasicAnimatedSprite(string path)
-        {
-            Texture = Texture.NewTexture(path);
-            Texture.LoadTextureFromFile();
-            Width = Texture.TextureWidth;
-            Height = Texture.TextureHeight;
-        }
-
-        public override string Name
-        {
-            get { return "basic_sprite"; }
-        }
-
-        protected override void BeforeDraw()
-        {
-        }
-
-        protected override void OnUnload()
-        {
-        }
-
-        protected override void OnDisplay()
-        {
-        }
-    }
-
-    public class AnimationHolder
-    {
-        [JsonProperty(PropertyName="width")]
-        internal int width;
-
-        [JsonProperty(PropertyName="height")]
-        internal int height;
-
-        [JsonProperty(PropertyName = "animations")]
-        private Dictionary<string, Animation> _animations = new Dictionary<string, Animation>();
-
-        public int Rows
-        {
-            get
-            {
-                return _animations.Keys.Count;
-            }
-        }
-
-        public Animation this[int index]
-        {
-            get
-            {
-                foreach (string name in _animations.Keys)
-                {
-                    if (_animations[name].Row == index)
-                        return _animations[name];
-                }
-                return null;
-            }
-        }
-
-        public Animation this[string name]
-        {
-            get
-            {
-                return _animations[name];
-            }
-        }
-
-        public static void Combind(AnimationHolder inherited, ref AnimationHolder @override)
-        {
-            var temp = new Dictionary<string,Animation>();
-            foreach (string key in inherited._animations.Keys)
-            {
-                temp.Add(key, (Animation)inherited._animations[key].Clone());
-            }
-
-            foreach (string key in @override._animations.Keys)
-            {
-                if (temp.ContainsKey(key))
-                {
-                    Animation inherited_animation = temp[key];
-                    Animation override_animation = @override._animations[key];
-
-                    Animation.Combind(inherited_animation, ref override_animation);
-
-                    temp.Remove(key);
-                    temp.Add(key, override_animation);
-                }
-                else
-                {
-                    temp.Add(key, @override._animations[key]);
-                }
-            }
-
-            @override._animations = temp;
-        }
-
-        internal Dictionary<string, Animation> Animations
-        {
-            get
-            {
-                return _animations;
-            }
-            set
-            {
-                _animations = value;
-            }
-        }
-
-        internal void Dispose()
-        {
-            if (_animations != null) //todo temp workaround
-                _animations.Clear();
-            _animations = null;
+            sprite.AlignChildAnimation();*/
         }
     }
 }

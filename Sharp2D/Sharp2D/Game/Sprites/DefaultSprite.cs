@@ -53,5 +53,10 @@ namespace Sharp2D.Game.Sprites
                 Displayed(this, new EventArgs());
             }
         }
+
+        public override string Name
+        {
+            get { return "DefaultSprite"; }
+        }
     }
 }

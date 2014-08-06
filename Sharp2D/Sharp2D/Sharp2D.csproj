@@ -51,8 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\AnimationModule.cs" />
+    <Compile Include="Common\ModuleSprite.cs" />
     <Compile Include="Common\SpriteBuilder.cs" />
     <Compile Include="Core\Graphics\Camera.cs" />
+    <Compile Include="Core\Interfaces\IModule.cs" />
     <Compile Include="Core\Interfaces\IMoveable2d.cs" />
     <Compile Include="Core\Interfaces\IMoveable3d.cs" />
     <Compile Include="Core\Graphics\Shaders\AttributeHolder.cs" />
@@ -79,7 +82,6 @@
     <Compile Include="Game\Drawables\DrawableRenderJob.cs" />
     <Compile Include="Common\AnimatedSprite.cs" />
     <Compile Include="Game\Sprites\Animation.cs" />
-    <Compile Include="Game\Sprites\NullAnimatedSprite.cs" />
     <Compile Include="Game\Sprites\DefaultSprite.cs" />
     <Compile Include="Game\Sprites\NullSprite.cs" />
     <Compile Include="Game\Sprites\OpenGL1Camera.cs" />
