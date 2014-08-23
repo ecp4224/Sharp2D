@@ -61,6 +61,14 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        public override bool HasAlpha
+        {
+            get
+            {
+                return TileHasAlpha;
+            }
+        }
+
         public bool HasProperty(string key)
         {
             return TileSet.TileProperties.ContainsKey(ID) && TileSet.TileProperties[ID].ContainsKey(key);

@@ -327,7 +327,10 @@ namespace Sharp2D
             }
         }
 
-        public float Z
+        /// <summary>
+        /// The Z coordinate of this Sprite in the currently displaying world
+        /// </summary>
+        public virtual float Z
         {
             get
             {
@@ -355,6 +358,22 @@ namespace Sharp2D
             }
         }
 
+        /// <summary>
+        /// Determines how this Sprite will be drawn and how this Sprite will be placed.
+        /// </summary>
+        public virtual SpaceType SpacePlacement
+        {
+            get
+            {
+                return space;
+            }
+            set
+            {
+                space = value;
+            }
+        }
+
+        private SpaceType space = SpaceType.World;
         private float z = 0.1f;
         /// <summary>
         /// The Layer this Sprite lives on in the currently displaying world. Note: Some <see cref="SpriteRenderJob"/>'s don't implement this variable
@@ -487,6 +506,30 @@ namespace Sharp2D
             _children.Add(ToAttach);
             ToAttach.Parents.Add(this);
         }
+
+        /// <summary>
+        /// Whether or not this Sprite object contains alpha
+        /// </summary>
+        public virtual bool HasAlpha
+        {
+            get
+            {
+                return Texture.HasAlpha;
+            }
+        }
+    }
+
+    public enum SpaceType
+    {
+        /// <summary>
+        /// Screen Space means no lights will affect the sprite, and it will be drawn in screen space (where 0,0 is the top left of the screen)
+        /// </summary>
+        Screen,
+
+        /// <summary>
+        /// World Space means all lights will affect the sprite, and it will be drawn in world space (where 0,0 is the world origin)
+        /// </summary>
+        World
     }
 
     [Flags]

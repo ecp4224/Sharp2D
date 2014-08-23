@@ -93,6 +93,7 @@
     <Compile Include="Common\Layer.cs" />
     <Compile Include="Common\TiledObject.cs" />
     <Compile Include="Common\TileSet.cs" />
+    <Compile Include="Game\Worlds\DrawPasses.cs" />
     <Compile Include="Game\Worlds\GenericCamera.cs" />
     <Compile Include="Core\Interfaces\IRenderJob.cs" />
     <Compile Include="Core\Interfaces\IRenderJobContainer.cs" />
