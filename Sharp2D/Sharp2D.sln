@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharp2D", "Sharp2D\Sharp2D.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimationPreview", "AnimationPreview\AnimationPreview.csproj", "{ABD03942-145C-47CF-866D-53D83624A817}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fireflies", "Fireflies\Fireflies.csproj", "{3F0503A8-75F1-4B01-A135-10379306914E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{ABD03942-145C-47CF-866D-53D83624A817}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABD03942-145C-47CF-866D-53D83624A817}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABD03942-145C-47CF-866D-53D83624A817}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F0503A8-75F1-4B01-A135-10379306914E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F0503A8-75F1-4B01-A135-10379306914E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F0503A8-75F1-4B01-A135-10379306914E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F0503A8-75F1-4B01-A135-10379306914E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
