@@ -191,6 +191,23 @@ namespace Sharp2D
             }
         }
 
+        /// <summary>
+        /// If true, this sprite will always be drawn, regardless if it's on screen or not. Otherwise the sprite will be clipped if IsOffScreen returns true.
+        /// </summary>
+        public bool NeverClip
+        {
+            get
+            {
+                return _neverclip;
+            }
+            set
+            {
+                _neverclip = value;
+            }
+        }
+
+        private bool _neverclip = false;
+
         public TexCoords TexCoords;
         private float _rot;
 
@@ -261,7 +278,7 @@ namespace Sharp2D
         {
             get
             {
-                return Screen.Camera.IsOutsideCamera(X, Y, Width, Height);
+                return !_neverclip && Screen.Camera.IsOutsideCamera(X, Y, Width, Height);
             }
         }
 

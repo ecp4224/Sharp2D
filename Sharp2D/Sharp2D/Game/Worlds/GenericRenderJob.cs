@@ -161,11 +161,13 @@ namespace Sharp2D.Game.Worlds
         {
             foreach (Light light in parent.dynamicLights)
             {
+                if (light.Intensity == 0 || light.Radius == 0)
+                    continue;
                 float Y = light.Y + 18f;
-                float xmin = light.X - (light.Radius);
-                float xmax = light.X + (light.Radius);
-                float ymin = Y - (light.Radius);
-                float ymax = Y + (light.Radius);
+                float xmin = light.X - (light.Radius) - 8;
+                float xmax = light.X + (light.Radius) + 8;
+                float ymin = Y - (light.Radius) - 8;
+                float ymax = Y + (light.Radius) + 8;
                 if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
                 {
                     sprite.dynamicLights.Add(light);
@@ -175,6 +177,8 @@ namespace Sharp2D.Game.Worlds
             {
                 foreach (Light light in parent.lights)
                 {
+                    if (light.Intensity == 0 || light.Radius == 0)
+                        continue;
                     float Y = light.Y + 18f;
                     float xmin = light.X - (light.Radius);
                     float xmax = light.X + (light.Radius);

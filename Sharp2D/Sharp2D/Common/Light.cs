@@ -128,6 +128,16 @@ namespace Sharp2D
 
         public Light(float X, float Y, LightType LightType) : this(X, Y, 1f, 50f, LightType) { } //TODO Make good defaults for this
 
+        public virtual void Load()
+        {
+
+        }
+
+        public virtual void Unload()
+        {
+
+        }
+
 
         private List<IAttachable> _children = new List<IAttachable>();
         private List<IAttachable> _parents = new List<IAttachable>();

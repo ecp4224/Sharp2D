@@ -170,6 +170,7 @@ namespace Sharp2D.Game.Worlds
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+            //GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
         }
 
         public override void SetupBatch(ref DrawBatch batch)

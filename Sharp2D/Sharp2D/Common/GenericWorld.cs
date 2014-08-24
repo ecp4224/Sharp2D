@@ -187,6 +187,7 @@ namespace Sharp2D
             }
 
             light.World = this;
+            light.Load();
         }
 
         [Obsolete("StaticLights cant move and DynamicLights are dynamic")]
