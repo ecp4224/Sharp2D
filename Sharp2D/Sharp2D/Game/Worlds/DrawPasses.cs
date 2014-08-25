@@ -46,6 +46,7 @@ namespace Sharp2D.Game.Worlds
             if ((sprite.FlipState & FlipState.Horizontal) != 0)
                 Width = -Width;
 
+            ambiantShader.Uniforms.SetUniform(sprite.Scale, ambiantShader.Uniforms["spriteScale"]);
             ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), ambiantShader.Uniforms["spritePos"]);
             float tsize = sprite.TexCoords.SquardSize;
             ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), ambiantShader.Uniforms["texCoordPosAndScale"]);
@@ -129,6 +130,7 @@ namespace Sharp2D.Game.Worlds
             if ((sprite.FlipState & FlipState.Horizontal) != 0)
                 Width = -Width;
 
+            lightShader.Uniforms.SetUniform(sprite.Scale, lightShader.Uniforms["spriteScale"]);
             lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), lightShader.Uniforms["spritePos"]);
             float tsize = sprite.TexCoords.SquardSize;
             lightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), lightShader.Uniforms["texCoordPosAndScale"]);
@@ -236,6 +238,7 @@ namespace Sharp2D.Game.Worlds
             if ((sprite.FlipState & FlipState.Horizontal) != 0)
                 Width = -Width;
 
+            alphaLightShader.Uniforms.SetUniform(sprite.Scale, alphaLightShader.Uniforms["spriteScale"]);
             alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, Width, Height), alphaLightShader.Uniforms["spritePos"]);
             float tsize = sprite.TexCoords.SquardSize;
             alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), alphaLightShader.Uniforms["texCoordPosAndScale"]);

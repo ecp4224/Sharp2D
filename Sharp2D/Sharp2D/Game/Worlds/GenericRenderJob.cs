@@ -159,6 +159,13 @@ namespace Sharp2D.Game.Worlds
 
         private void CullLights(Sprite sprite)
         {
+            if (sprite.IgnoreLights)
+            {
+                sprite.dynamicLights.Clear();
+                sprite.Lights.Clear();
+                return;
+            }
+
             foreach (Light light in parent.dynamicLights)
             {
                 if (light.Intensity == 0 || light.Radius == 0)

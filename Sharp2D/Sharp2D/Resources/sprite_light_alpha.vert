@@ -2,6 +2,7 @@
 
 uniform float screenRatioFix;
 uniform float spriteDepth;
+uniform float spriteScale;
 uniform vec4 spritePos;
 uniform vec4 texCoordPosAndScale;
 uniform vec3 camPosAndScale;
@@ -18,7 +19,7 @@ out vec2 fragtexcoord; // output texcoord for fragment shader.. this is where we
 void main(){
 
 	vec2 preCamPlace;
-	preCamPlace = spritePos.xy + (posattrib*spritePos.zw); // sprite to world coords
+	preCamPlace = (spritePos.xy) + (spriteScale*posattrib*spritePos.zw); // sprite to world coords
 	
 	pixpos = preCamPlace; // world coords of pixel
 	preCamPlace += camPosAndScale.xy; // now world to camera coords

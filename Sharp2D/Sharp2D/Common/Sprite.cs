@@ -312,7 +312,28 @@ namespace Sharp2D
             }
         }
 
+        private float _scale = 1f;
+        /// <summary>
+        /// The uniform scale/size of this sprite.
+        /// </summary>
+        public virtual float Scale
+        {
+            get
+            {
+                return _scale;
+            }
+            set
+            {
+                _scale = value;
+            }
+        }
+
         public virtual FlipState FlipState { get; set; }
+        
+        /// <summary>
+        /// If set to true, then this sprite will ignore ALL lights in the world.
+        /// </summary>
+        public virtual bool IgnoreLights { get; set; }
 
         /// <summary>
         /// The Y coordinate of this Sprite in the currently displaying world
