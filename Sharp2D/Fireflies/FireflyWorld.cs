@@ -19,6 +19,11 @@ namespace Fireflies
         {
             base.OnDisplay();
 
+            Sprite moon = Sprite.FromImage("sprites/moon.png");
+            moon.X = (3.5f * 16f) + (moon.Width / 2f);
+            moon.Y = (7.5f * 16f) + (moon.Height / 2f) + 3f;
+            AddSprite(moon);
+
             BackgroundSprite sprite = new BackgroundSprite();
             sprite.X = sprite.Width / 2f;
             sprite.Y = sprite.Height / 2f;

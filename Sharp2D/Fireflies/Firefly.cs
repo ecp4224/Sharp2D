@@ -27,6 +27,12 @@ namespace Fireflies
 
         public void Update()
         {
+            if (OpenTK.Input.Keyboard.GetState().IsKeyDown(OpenTK.Input.Key.Escape))
+            {
+                Screen.TerminateScreen();
+                return;
+            }
+
             Lighting();
             Movement();
         }
@@ -36,7 +42,7 @@ namespace Fireflies
             tick += 0.8;
             Y = real_y + (float)(Math.Cos(tick * (1f / 8f)) * height);
 
-            X += direction * ((speed * (1 / (16 - (Radius + 1)))) + (float)Math.Sin(tick * (1 / random.Next(4, 8))) * 4f);
+            X += direction * ((speed * (1 / (10 - (Radius + 1)))) + (float)Math.Sin(tick * (1 / random.Next(4, 8))) * 4f);
         }
 
         private void Lighting()
@@ -86,7 +92,7 @@ namespace Fireflies
             Intensity = 0f;
             Color = Color.Gold;
 
-            Radius = random.Next(10, 16);
+            Radius = random.Next(4, 10);
         }
 
         //Code taken from: https://code.google.com/p/replicaisland/source/browse/trunk/src/com/replica/replicaisland/Lerp.java?r=5

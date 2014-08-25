@@ -9,12 +9,21 @@ namespace Fireflies
 {
     class Program
     {
+        static WMPLib.WindowsMediaPlayer wplayer = new WMPLib.WindowsMediaPlayer();
         public static void Main(string[] args)
         {
             Console.Write("How many should I make? ");
             FireflyWorld.FIREFLY_COUNT = int.Parse(Console.ReadLine());
 
-            Screen.DisplayScreenAsync();
+            ScreenSettings settings = new ScreenSettings();
+            settings.Fullscreen = true;
+
+            Screen.DisplayScreenAsync(settings);
+
+            wplayer.URL = "bg.mp3";
+            wplayer.settings.volume = 100;
+            wplayer.controls.play();
+            wplayer.settings.setMode("loop", true);
 
             FireflyWorld world = new FireflyWorld();
             world.Load();
