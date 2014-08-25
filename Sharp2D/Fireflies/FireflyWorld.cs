@@ -10,6 +10,7 @@ namespace Fireflies
     public class FireflyWorld : GenericWorld
     {
         public static int FIREFLY_COUNT = 100;
+        public const int CLOUD_COUNT = 100;
         public override string Name
         {
             get { return "worlds/fireflys.json"; }
@@ -22,6 +23,7 @@ namespace Fireflies
             Sprite moon = Sprite.FromImage("sprites/moon.png");
             moon.X = (3.5f * 16f) + (moon.Width / 2f);
             moon.Y = (7.5f * 16f) + (moon.Height / 2f) + 3f;
+            moon.IgnoreLights = true;
             AddSprite(moon);
 
             BackgroundSprite sprite = new BackgroundSprite();
@@ -41,6 +43,17 @@ namespace Fireflies
                 AddLogical(fly);
 
                 AddLight(fly);
+            }
+
+            for (int i = 0; i < CLOUD_COUNT; i++)
+            {
+                Cloud c = new Cloud();
+
+                c.X = rand.Next(-10, 50) * 16f;
+                c.Y = 8f * 16f;
+                c.IgnoreLights = true;
+
+                AddSprite(c);
             }
         }
     }
