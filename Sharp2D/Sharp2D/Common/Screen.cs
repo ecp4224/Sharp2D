@@ -308,8 +308,22 @@ namespace Sharp2D
             }
         }
 
+        public static void GoFullscreen()
+        {
+
+            window.WindowBorder = WindowBorder.Hidden;
+
+            DisplayDevice.Default.ChangeResolution(window.Width, window.Height, DisplayDevice.Default.BitsPerPixel, DisplayDevice.Default.RefreshRate);
+
+            window.WindowState = WindowState.Maximized;
+        }
+
         private static void _draw()
         {
+            if (Settings.Fullscreen && window.WindowState != WindowState.Maximized)
+            {
+                GoFullscreen();
+            }
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(0f, 0f, 0f, 1f);
 

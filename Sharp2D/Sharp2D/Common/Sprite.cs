@@ -534,6 +534,63 @@ namespace Sharp2D
                 return Texture.HasAlpha;
             }
         }
+
+        public static Sprite FromImage(string ImagePath)
+        {
+            return new SimpleSprite(ImagePath);
+        }
+    }
+
+    public class SimpleSprite : Sprite
+    {
+        private string image_path;
+        public string ImagePath
+        {
+            get
+            {
+                return image_path;
+            }
+            set
+            {
+                image_path = value;
+                Texture = Texture.NewTexture(image_path);
+                if (!Texture.Loaded)
+                    Texture.LoadTextureFromFile();
+
+                Width = Texture.TextureWidth;
+                Height = Texture.TextureHeight;
+            }
+        }
+
+        public SimpleSprite(string ImagePath)
+        {
+            this.ImagePath = ImagePath;
+        }
+
+        public override string Name
+        {
+            get { return "simple_sprite@" + image_path; }
+        }
+
+        protected override void BeforeDraw()
+        {
+        }
+
+        protected override void OnLoad()
+        {
+        }
+
+        protected override void OnUnload()
+        {
+        }
+
+        protected override void OnDispose()
+        {
+        }
+
+        protected override void OnDisplay()
+        {
+        }
     }
 
     public enum SpaceType
