@@ -29,9 +29,7 @@ namespace Fireflies
             Width = Texture.TextureWidth;
             Height = Texture.TextureHeight;
 
-            NeverClip = true;
-
-            speed = (float)random.NextDouble();
+            speed = (float)Math.Min(random.NextDouble() * (1.0 / random.NextDouble()), 2.5);
         }
 
         public void Update()
@@ -57,10 +55,15 @@ namespace Fireflies
             startX = random.Next(-10, 1);
             Y -= ((1f / speed) * 2f);
 
+            Y += random.Next(-20, 20);
+
             Scale = speed;
+            this.speed = (float)Math.Min(speed, 0.5);
 
             if (random.NextDouble() < 0.4)
                 FlipState = Sharp2D.FlipState.Horizontal;
+
+            NeverClip = true;
         }
 
         protected override void OnUnload()
