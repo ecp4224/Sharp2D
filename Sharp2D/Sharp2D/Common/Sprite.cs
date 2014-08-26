@@ -17,7 +17,7 @@ namespace Sharp2D
     /// <para>A Sprite is an object that can be drawn by a <see cref="SpriteRenderJob"/>.</para>
     /// <para>A Sprite is a quad that can any width or height, but ALWAYS has a texture</para>
     /// </summary>
-    public abstract partial class Sprite : IDisposable, IAttachable, IMoveable2d, IMoveable3d
+    public abstract partial class Sprite : IDisposable, IAttachable, IMoveable2d, IMoveable3d, IComparable<Sprite>
     {
         ~Sprite()
         {
@@ -559,6 +559,20 @@ namespace Sharp2D
         public static Sprite FromImage(string ImagePath)
         {
             return new SimpleSprite(ImagePath);
+        }
+
+        public int CompareTo(Sprite other)
+        {
+            if (Layer == other.Layer)
+            {
+                if (Texture == null)
+                    return -1; //This should be drawn first
+                else if (other.Texture == null)
+                    return 1; //This should be drawn after other
+                else
+                    return Texture.ID - other.Texture.ID;
+            }
+            return (int)(Layer - other.Layer);
         }
     }
 

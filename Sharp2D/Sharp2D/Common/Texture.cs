@@ -23,6 +23,9 @@ namespace Sharp2D
 
             Texture texture = new Texture();
             texture.Name = resource;
+
+            cache.Add(resource, texture);
+
             return texture;
         }
 
@@ -178,14 +181,15 @@ namespace Sharp2D
         private static int currentBind;
         public void Bind()
         {
-            Screen.ValidateOpenGLSafe("Texture.Bind");
-
             if (currentBind == ID)
+            {
                 return;
+            }
 
             if (!Created)
                 return;
 
+            Screen.ValidateOpenGLSafe("Texture.Bind");
             GL.BindTexture(TextureTarget.Texture2D, ID);
             currentBind = ID;
         }

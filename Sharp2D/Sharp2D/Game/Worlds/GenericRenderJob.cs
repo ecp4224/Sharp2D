@@ -107,7 +107,7 @@ namespace Sharp2D.Game.Worlds
         {
             if (type == 2)
             {
-                alphaSprites.Sort((x, y) => (int)(x.Layer - y.Layer));
+                alphaSprites.Sort();
             }
         }
     }
