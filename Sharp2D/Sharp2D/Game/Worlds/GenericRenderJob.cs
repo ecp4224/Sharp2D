@@ -252,16 +252,16 @@ namespace Sharp2D.Game.Worlds
             {
                 if (!layer.IsTileLayer)
                     continue;
-                float ex = cx + (cull_width + (3f * 16f));
+                float ex = cx + (cull_width + (3f * parent.TileWidth));
                 float ey = cy + cull_height;
                 float sx = cx - cull_width;
                 float sy = cy - cull_height;
 
-                int s_i_x = Math.Max((int)(sx / 16f), 0);
-                int s_i_y = Math.Max((int)Math.Ceiling((sy - 8f) / 16f), 0);
+                int s_i_x = Math.Max((int)(sx / parent.TileWidth), 0);
+                int s_i_y = Math.Max((int)Math.Ceiling((sy - 8f) / parent.TileHeight), 0);
 
-                int e_i_x = Math.Max((int)(ex / 16f), 0);
-                int e_i_y = Math.Max((int)Math.Ceiling((ey - 8f) / 16f), 0);
+                int e_i_x = Math.Max((int)(ex / parent.TileWidth), 0);
+                int e_i_y = Math.Max((int)Math.Ceiling((ey - 8f) / parent.TileHeight), 0);
 
 
                 for (int x = s_i_x; x <= e_i_x; x++)
