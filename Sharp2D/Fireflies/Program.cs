@@ -16,8 +16,8 @@ namespace Fireflies
             FireflyWorld.FIREFLY_COUNT = int.Parse(Console.ReadLine());
 
             ScreenSettings settings = new ScreenSettings();
-            settings.Fullscreen = true;
-            settings.WindowSize = new System.Drawing.Rectangle(0, 0, 1920, 1080);
+            //settings.Fullscreen = true;
+           // settings.WindowSize = new System.Drawing.Rectangle(0, 0, 1920, 1080);
 
             Screen.DisplayScreenAsync(settings);
 
@@ -28,6 +28,9 @@ namespace Fireflies
 
             FireflyWorld world = new FireflyWorld();
             world.Load();
+
+            GlobalSettings.EngineSettings.ShowConsole = true;
+            GlobalSettings.EngineSettings.WriteLog = true;
 
             world.AmbientBrightness = 0.1f;
 

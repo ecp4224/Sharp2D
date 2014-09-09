@@ -171,12 +171,8 @@ namespace Sharp2D
             IsRunning = false;
             if (DisplayThread != null)
             {
-                DisplayThread.Interrupt();
-                if (Settings.UseOpenTKLoop)
-                {
-                    window.Close();
-                }
-                DisplayThread.Join();
+                window.Close();
+                Environment.Exit(0);
             }
         }
 
@@ -207,11 +203,16 @@ namespace Sharp2D
             GlobalSettings.ScreenSettings = Settings;
             GlobalSettings.EngineSettings = new EngineSettings();
 
+            GlobalSettings.EngineSettings.ShowConsole = false;
+            GlobalSettings.EngineSettings.WriteLog = false;
+
             window = new GameWindow((int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
             window.Visible = true;
             window.Title = Settings.WindowTitle;
             window.VSync = Settings.VSync ? VSyncMode.On : VSyncMode.Off;
             window.WindowBorder = WindowBorder.Fixed;
+
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
             GL.ClearColor(0f, 0f, 0f, 1f);
             GL.ClearDepth(1.0);
@@ -220,6 +221,11 @@ namespace Sharp2D
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+        }
+
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            Logger.SaveLog();
         }
 
         static void window_UpdateFrame(object sender, FrameEventArgs e)
@@ -344,6 +350,8 @@ namespace Sharp2D
                 renders.PreFetch();
                 foreach (IRenderJob job in renders.RenderJobs)
                 {
+                    if (!IsRunning) break;
+
                     try
                     {
                         job.PerformJob();
@@ -366,6 +374,8 @@ namespace Sharp2D
                 logics.PreFetch();
                 foreach (ILogical logic in logics.LogicalList) 
                 {
+                    if (!IsRunning) break;
+
                     try
                     {
                         logic.Update();

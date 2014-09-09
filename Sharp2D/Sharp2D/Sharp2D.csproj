@@ -63,12 +63,13 @@
     <Compile Include="Core\Graphics\Shaders\Source.cs" />
     <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />
     <Compile Include="Core\Interfaces\IAttachable.cs" />
+    <Compile Include="Core\ParallelStringWriter.cs" />
     <Compile Include="Core\World.cs" />
     <Compile Include="Core\Network\Client.cs" />
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Common\OnCollisionEventArgs.cs" />
     <Compile Include="Core\EngineSettings.cs" />
-    <Compile Include="Core\GlobalSettings.cs" />
+    <Compile Include="Common\GlobalSettings.cs" />
     <Compile Include="Game\Input.cs" />
     <Compile Include="Core\SaveableSettings.cs" />
     <Compile Include="Common\Logger.cs" />

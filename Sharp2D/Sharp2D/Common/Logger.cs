@@ -3,11 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using Sharp2D.Core;
 
 namespace Sharp2D
 {
     public class Logger
     {
+        private static TextWriter currentWriter;
+        internal static void Redirect(bool value)
+        {
+            if (value)
+            {
+                currentWriter = new ParallelStringWriter(Console.Out);
+                Console.SetOut(currentWriter);
+            }
+            else
+            {
+                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                standardOutput.AutoFlush = true;
+                Console.SetOut(standardOutput);
+
+                currentWriter = standardOutput;
+            }
+        }
+
+        internal static void SaveLog()
+        {
+            if (GlobalSettings.EngineSettings.WriteLog && currentWriter is ParallelStringWriter)
+            {
+                string file = "log." + DateTime.Now.ToString("o").Replace(':', '.') + ".txt";
+                foreach (var c in Path.GetInvalidFileNameChars())
+                {
+                    file.Replace(c, '.');
+                }
+
+                string contents = currentWriter.ToString();
+
+                File.WriteAllText(file, contents);
+            }
+        }
+
         public static void Warn(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
