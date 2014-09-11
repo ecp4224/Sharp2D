@@ -150,7 +150,6 @@ namespace Sharp2D
 
         public static void DisplayScreenAsync(ScreenSettings settings)
         {
-            _curProcess = Process.GetCurrentProcess();
             Settings = settings;
             DisplayThread = new Thread(() => DisplayScreen(settings)) {Name = "Display Thread"};
             //DisplayThread.Priority = ThreadPriority.Highest;
@@ -169,6 +168,7 @@ namespace Sharp2D
             Settings = settings;
 
             IsRunning = true;
+            _curProcess = Process.GetCurrentProcess();
             _prepare();
             if (!Settings.UseOpenTKLoop)
                 _gameLoop();
