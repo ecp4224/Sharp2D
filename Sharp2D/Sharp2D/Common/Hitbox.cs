@@ -12,9 +12,9 @@ namespace Sharp2D
 {
     public sealed class Hitbox
     {
-        private static List<ICollidable> _collidableCache = new List<ICollidable>();
-        private static List<ICollidable> toRemove = new List<ICollidable>();
-        private static List<ICollidable> toAdd = new List<ICollidable>();
+        private static readonly List<ICollidable> _collidableCache = new List<ICollidable>();
+        private static readonly List<ICollidable> toRemove = new List<ICollidable>();
+        private static readonly List<ICollidable> toAdd = new List<ICollidable>();
 
         private static bool looping = false;
         private static object cache_lock = new object();

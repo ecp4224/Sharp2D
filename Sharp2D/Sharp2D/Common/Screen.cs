@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using Sharp2D.Core;
 using Sharp2D.Core.Graphics;
@@ -13,19 +10,22 @@ using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D
 {
-    public class Screen : GameWindow
+    public class Screen
     {
-        public static ScreenSettings DEFAULT_SETTINGS { 
+        public static ScreenSettings DefaultSettings { 
             get 
             {
-                ScreenSettings settings = new ScreenSettings(null);
-                settings.LogicTickRate = 40; //25 ticks/second
-                settings.MaxSkippedFrames = 5; //Skip a max of 5 draw frames
-                settings.GameSize = new System.Drawing.Rectangle(0, 0, 1280, 720); //720p
+                var settings = new ScreenSettings(null)
+                {
+                    LogicTickRate = 40,
+                    MaxSkippedFrames = 5,
+                    GameSize = new System.Drawing.Rectangle(0, 0, 1280, 720)
+                };
                 settings.WindowSize = settings.GameSize;
                 settings.Fullscreen = false;
                 settings.VSync = false;
-                settings.Camera = new Sharp2D.Game.Worlds.GenericCamera() {
+                settings.Camera = new Game.Worlds.GenericCamera
+                {
                     Z = 100f
                 };
                 settings.WindowTitle = "Sharp2D";
@@ -54,9 +54,9 @@ namespace Sharp2D
 
         public static ScreenSettings Settings { get; private set; }
 
-        public static double FPS { get; private set; }
+        public static double Fps { get; private set; }
 
-        public static double UPS { get; private set; }
+        public static double Ups { get; private set; }
 
         public static int TickCount
         {
@@ -86,14 +86,14 @@ namespace Sharp2D
         {
             set
             {
-                lock (logic_lock)
+                lock (LogicLock)
                 {
-                    logics = value;
+                    _logics = value;
                 }
             }
             get
             {
-                return logics;
+                return _logics;
             }
         }
 
@@ -101,47 +101,53 @@ namespace Sharp2D
         {
             set
             {
-                lock (job_lock)
+                lock (JobLock)
                 {
-                    renders = value;
+                    _renders = value;
                 }
             }
             get
             {
-                return renders;
+                return _renders;
             }
         }
 
-        private static int _tickAtStart;
-        private static Stack<Action> invokes = new Stack<Action>();
-        private static ILogicContainer logics;
-        private static IRenderJobContainer renders;
-        private static GameWindow window;
+        public static bool Focused
+        {
+            get { return _window != null && _window.Focused; }
+        }
 
-        private static object job_lock = new object();
-        private static object logic_lock = new object();
+        private static int _tickAtStart;
+        private static readonly Stack<Action> Invokes = new Stack<Action>();
+        private static ILogicContainer _logics;
+        private static IRenderJobContainer _renders;
+        private static GameWindow _window;
+
+        private static readonly object JobLock = new object();
+        private static readonly object LogicLock = new object();
 
         public static void DisplayScreenAsync()
         {
-            Settings = DEFAULT_SETTINGS;
-            DisplayThread = new Thread(new ThreadStart(DisplayScreen));
-            DisplayThread.Priority = ThreadPriority.Highest;
-            DisplayThread.Name = "Display Thread";
+            Settings = DefaultSettings;
+            DisplayThread = new Thread(DisplayScreen)
+            {
+                Priority = ThreadPriority.Highest,
+                Name = "Display Thread"
+            };
             DisplayThread.Start();
         }
 
         public static void DisplayScreenAsync(ScreenSettings settings)
         {
             Settings = settings;
-            DisplayThread = new Thread(new ThreadStart(delegate { DisplayScreen(settings); }));
+            DisplayThread = new Thread(() => DisplayScreen(settings)) {Name = "Display Thread"};
             //DisplayThread.Priority = ThreadPriority.Highest;
-            DisplayThread.Name = "Display Thread";
             DisplayThread.Start();
         }
 
         public static void DisplayScreen()
         {
-            DisplayScreen(DEFAULT_SETTINGS);
+            DisplayScreen(DefaultSettings);
         }
 
         public static void DisplayScreen(ScreenSettings settings)
@@ -160,9 +166,9 @@ namespace Sharp2D
 
         public static void Invoke(Action action)
         {
-            lock (job_lock)
+            lock (JobLock)
             {
-                invokes.Push(action);
+                Invokes.Push(action);
             }
         }
 
@@ -171,7 +177,7 @@ namespace Sharp2D
             IsRunning = false;
             if (DisplayThread != null)
             {
-                window.Close();
+                _window.Close();
                 Environment.Exit(0);
             }
         }
@@ -206,11 +212,13 @@ namespace Sharp2D
             GlobalSettings.EngineSettings.ShowConsole = false;
             GlobalSettings.EngineSettings.WriteLog = false;
 
-            window = new GameWindow((int)Settings.WindowSize.Width, (int)Settings.WindowSize.Height);
-            window.Visible = true;
-            window.Title = Settings.WindowTitle;
-            window.VSync = Settings.VSync ? VSyncMode.On : VSyncMode.Off;
-            window.WindowBorder = WindowBorder.Fixed;
+            _window = new GameWindow(Settings.WindowSize.Width, Settings.WindowSize.Height)
+            {
+                Visible = true,
+                Title = Settings.WindowTitle,
+                VSync = Settings.VSync ? VSyncMode.On : VSyncMode.Off,
+                WindowBorder = WindowBorder.Fixed
+            };
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
@@ -230,27 +238,27 @@ namespace Sharp2D
 
         static void window_UpdateFrame(object sender, FrameEventArgs e)
         {
-            window.Title = Settings.WindowTitle + "  FPS: " + FPS + "  UPS: " + UPS;
+            _window.Title = Settings.WindowTitle + "  FPS: " + Fps + "  UPS: " + Ups;
             _logicTick();
-            UPS = window.UpdateFrequency;
+            Ups = _window.UpdateFrequency;
         }
 
         static void window_RenderFrame(object sender, FrameEventArgs e)
         {
             _draw();
-            window.SwapBuffers();
-            FPS = window.RenderFrequency;
+            _window.SwapBuffers();
+            Fps = _window.RenderFrequency;
         }
 
         private static void _openTKStart()
         {
-            window.RenderFrame += window_RenderFrame;
-            window.UpdateFrame += window_UpdateFrame;
+            _window.RenderFrame += window_RenderFrame;
+            _window.UpdateFrame += window_UpdateFrame;
 
             if (Settings.MaxFPS == -1)
-                window.Run(1000 / Settings.LogicTickRate);
+                _window.Run(1000.0 / Settings.LogicTickRate);
             else
-                window.Run(1000 / Settings.LogicTickRate, Settings.MaxFPS);
+                _window.Run(1000.0 / Settings.LogicTickRate, Settings.MaxFPS);
         }
 
         private static void _gameLoop()
@@ -265,14 +273,14 @@ namespace Sharp2D
             int loop = 0;
             int ntick = TickCount;
             long ms = TickCount;
-            while (IsRunning && !window.IsExiting)
+            while (IsRunning && !_window.IsExiting)
             {
-                window.Title = Settings.WindowTitle + "  FPS: " + FPS + "  UPS: " + UPS;
+                _window.Title = Settings.WindowTitle + "  FPS: " + Fps + "  UPS: " + Ups;
                 cur = now;
                 now = TickCount;
                 delta = (now - cur) / 100f;
 
-                window.ProcessEvents();
+                _window.ProcessEvents();
                 
                 loop = 0;
                 while (TickCount > ntick && loop < Settings.MaxSkippedFrames)
@@ -282,22 +290,20 @@ namespace Sharp2D
                     ntick += SkipTicks;
                     loop++;
                     updates++;
-                    if (TickCount - ms >= 1000)
-                    {
-                        UPS = updates;
-                        updates = 0;
-                        ms = TickCount;
-                    }
+                    if (TickCount - ms < 1000) continue;
+                    Ups = updates;
+                    updates = 0;
+                    ms = TickCount;
                 }
 
                 _draw();
                 try
                 {
-                    window.SwapBuffers();
+                    _window.SwapBuffers();
                 }
                 catch { }
 
-                if (window.IsExiting)
+                if (_window.IsExiting)
                 {
                     IsRunning = false;
                     break;
@@ -308,7 +314,7 @@ namespace Sharp2D
                 if (fpsCount == 100)
                 {
                     fpsCount = 0;
-                    FPS = (1000f / fpsTime);
+                    Fps = (1000f / fpsTime);
                     fpsTime = 0;
                 }
             }
@@ -317,16 +323,16 @@ namespace Sharp2D
         public static void GoFullscreen()
         {
 
-            window.WindowBorder = WindowBorder.Hidden;
+            _window.WindowBorder = WindowBorder.Hidden;
 
-            DisplayDevice.Default.ChangeResolution(window.Width, window.Height, DisplayDevice.Default.BitsPerPixel, DisplayDevice.Default.RefreshRate);
+            DisplayDevice.Default.ChangeResolution(_window.Width, _window.Height, DisplayDevice.Default.BitsPerPixel, DisplayDevice.Default.RefreshRate);
 
-            window.WindowState = WindowState.Maximized;
+            _window.WindowState = WindowState.Maximized;
         }
 
         private static void _draw()
         {
-            if (Settings.Fullscreen && window.WindowState != WindowState.Maximized)
+            if (Settings.Fullscreen && _window.WindowState != WindowState.Maximized)
             {
                 GoFullscreen();
             }
@@ -335,23 +341,21 @@ namespace Sharp2D
 
             Settings.Camera.BeforeRender();
 
-            if (renders == null) return;
+            if (_renders == null) return;
 
-            lock (job_lock)
+            lock (JobLock)
             {
-                while (invokes.Count > 0)
+                while (Invokes.Count > 0)
                 {
-                    if (invokes.Peek() == null)
-                        invokes.Pop();
+                    if (Invokes.Peek() == null)
+                        Invokes.Pop();
                     else
-                        invokes.Pop().Invoke();
+                        Invokes.Pop().Invoke();
                 }
 
-                renders.PreFetch();
-                foreach (IRenderJob job in renders.RenderJobs)
+                _renders.PreFetch();
+                foreach (IRenderJob job in _renders.RenderJobs.TakeWhile(job => IsRunning))
                 {
-                    if (!IsRunning) break;
-
                     try
                     {
                         job.PerformJob();
@@ -361,21 +365,19 @@ namespace Sharp2D
                         Logger.CaughtException(e);
                     }
                 }
-                renders.PostFetch();
+                _renders.PostFetch();
             }
         }
 
         private static void _logicTick()
         {
-            if (logics == null) return;
+            if (_logics == null) return;
 
-            lock (logic_lock)
+            lock (LogicLock)
             {
-                logics.PreFetch();
-                foreach (ILogical logic in logics.LogicalList) 
+                _logics.PreFetch();
+                foreach (ILogical logic in _logics.LogicalList.TakeWhile(logic => IsRunning))
                 {
-                    if (!IsRunning) break;
-
                     try
                     {
                         logic.Update();
@@ -385,7 +387,7 @@ namespace Sharp2D
                         Logger.CaughtException(e);
                     }
                 }
-                logics.PostFetch();
+                _logics.PostFetch();
             }
         }
     }

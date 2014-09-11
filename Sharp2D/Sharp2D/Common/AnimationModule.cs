@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.IO;
-using System.Net;
 using System.Reflection;
 using Sharp2D.Core;
 using Sharp2D.Core.Interfaces;
@@ -16,14 +11,14 @@ namespace Sharp2D
 {
     public class AnimationModule : IModule
     {
-        public static readonly AnimationModule EMPTY = new AnimationModule("empty"); //Blank module
+        public static readonly AnimationModule Empty = new AnimationModule("empty"); //Blank module
 
-        private Sprite sprite; 
+        private Sprite _sprite; 
         
         public Animation CurrentlyPlayingAnimation { get; internal set; }
         public Animation ChildAnimationPlaying { get; internal set; }
 
-        private long LastTick;
+        private long _lastTick;
 
         public AnimationHolder Animations { get; private set; }
 
@@ -33,13 +28,13 @@ namespace Sharp2D
 
         public string JsonResourcePath { get; private set; }
 
-        private List<AnimationModule> children = new List<AnimationModule>();
+        private List<AnimationModule> _children = new List<AnimationModule>();
 
-        private bool defaultConstruct = false;
+        private readonly bool _defaultConstruct;
 
         public AnimationModule()
         {
-            defaultConstruct = true;
+            _defaultConstruct = true;
         }
 
         public AnimationModule(string Name) : this("animations/" + Name + ".conf", Name + ".conf") { }
@@ -55,13 +50,13 @@ namespace Sharp2D
             if (Owner != null)
                 throw new InvalidOperationException("This module has already been initialized!");
 
-            if (defaultConstruct)
+            if (_defaultConstruct)
             {
-                this.AnimationConfigPath = "animations/" + sprite.Name + ".conf";
-                this.JsonResourcePath = sprite.Name + ".conf";
+                AnimationConfigPath = "animations/" + sprite.Name + ".conf";
+                JsonResourcePath = sprite.Name + ".conf";
             }
 
-            this.sprite = sprite;
+            _sprite = sprite;
 
             sprite.Loaded += sprite_Loaded;
             if (sprite.IsLoaded)
@@ -70,37 +65,35 @@ namespace Sharp2D
 
         public void OnUpdate()
         {
-            if (CurrentlyPlayingAnimation != null)
-            {
-                if (LastTick == 0)
-                    LastTick = Screen.TickCount;
+            if (CurrentlyPlayingAnimation == null) return;
+            if (_lastTick == 0)
+                _lastTick = Screen.TickCount;
 
-                if (LastTick + CurrentlyPlayingAnimation.Speed <= Screen.TickCount)
+            if (_lastTick + CurrentlyPlayingAnimation.Speed <= Screen.TickCount)
+            {
+                _lastTick = Screen.TickCount;
+                if (CurrentlyPlayingAnimation.Playing)
                 {
-                    LastTick = Screen.TickCount;
-                    if (CurrentlyPlayingAnimation.Playing)
-                    {
-                        if (!CurrentlyPlayingAnimation.Reverse)
-                            CurrentlyPlayingAnimation.CurrentStep++;
-                        else
-                            CurrentlyPlayingAnimation.CurrentStep--;
-                    }
+                    if (!CurrentlyPlayingAnimation.Reverse)
+                        CurrentlyPlayingAnimation.CurrentStep++;
+                    else
+                        CurrentlyPlayingAnimation.CurrentStep--;
                 }
-                Owner.TexCoords = CurrentlyPlayingAnimation.CurrentTexCoords;
             }
+            Owner.TexCoords = CurrentlyPlayingAnimation.CurrentTexCoords;
         }
 
         void sprite_Loaded(object sender, EventArgs e)
         {
             if (Parent == null && Animations == null) //Only load json if we have no parent and if we haven't already loaded the json
-                LoadJSON();
+                LoadJson();
 
             this.NotifyAll();
         }
 
-        private void LoadJSON()
+        private void LoadJson()
         {
-            string json = null;
+            string json;
             if (File.Exists(AnimationConfigPath))
             {
                 json = File.ReadAllText(AnimationConfigPath);
@@ -112,7 +105,7 @@ namespace Sharp2D
                 Stream stream = asm.GetManifestResourceStream(JsonResourcePath);
                 if (stream == null)
                     return;
-                StreamReader reader = new StreamReader(stream);
+                var reader = new StreamReader(stream);
                 json = reader.ReadToEnd();
 
                 reader.Close();
@@ -122,33 +115,30 @@ namespace Sharp2D
                 stream.Dispose();
             }
 
-            if (json != null)
-            {
+            if (json == null) return;
+            Animations = JsonConvert.DeserializeObject<AnimationHolder>(json);
+            Animations[0].ModuleOwner = this;
+            _sprite.Width = Animations[0].Width;
+            _sprite.Height = Animations[0].Height;
 
-                Animations = JsonConvert.DeserializeObject<AnimationHolder>(json);
-                Animations[0].ModuleOwner = this;
-                sprite.Width = Animations[0].Width;
-                sprite.Height = Animations[0].Height;
+            _children = SetupChildren(Animations);
 
-                children = SetupChildren(Animations);
-
-                Animations[0].Playing = true;
-            }
+            Animations[0].Playing = true;
         }
 
         public void ClearAnimations()
         {
             Animations = null;
-            foreach (AnimationModule ani in children)
+            foreach (AnimationModule ani in _children)
             {
                 ani.ClearAnimations();
             }
-            children.Clear();
+            _children.Clear();
         }
 
         private List<AnimationModule> SetupChildren(AnimationHolder animations)
         {
-            List<AnimationModule> temp = new List<AnimationModule>();
+            var temp = new List<AnimationModule>();
             foreach (string key in animations.Animations.Keys) //To follow this, let's assume this is the "walking left" animation
             {
                 Animation ani = animations.Animations[key];
@@ -161,7 +151,7 @@ namespace Sharp2D
 
         private List<AnimationModule> Setup(ref Animation ani, List<Animation> inheritStack = null)
         {
-            List<AnimationModule> temp = new List<AnimationModule>();
+            var temp = new List<AnimationModule>();
 
             if (ani.setup_ran)
                 return temp;
@@ -182,9 +172,9 @@ namespace Sharp2D
                     throw new InvalidOperationException("Loop inheritance detected!");
                 if (!ani.InheritedAnimationOwner.setup_ran) //If the inherited animation hasn't been setup yet
                 {
-                    Animation inherit_owner = ani.InheritedAnimationOwner;
+                    Animation inheritOwner = ani.InheritedAnimationOwner;
                     inheritStack.Add(ani); //Add ourself to the stack
-                    Setup(ref inherit_owner, inheritStack); //Setup the inherited animation
+                    Setup(ref inheritOwner, inheritStack); //Setup the inherited animation
                     inheritStack.Remove(ani); //Remove ourself from the stack
                 }
                 AnimationHolder t = ani.Animations;
@@ -207,42 +197,42 @@ namespace Sharp2D
                 if (!child_animation.IsEmpty)
                 {
                     ModuleSprite sprite;
-                    AnimationModule sprite_module;
+                    AnimationModule spriteModule;
                     Type st = assembly.GetType(child_animation.SpriteFullName); //Get the type for the FullSpriteName
                     if (st == null)
                     {
                         //Assume it's a file path if no type was found
                         sprite = new BasicAnimatedSprite(child_animation.SpriteFullName);
-                        sprite_module = new AnimationModule("basic_sprite");
-                        sprite.AttachModule(sprite_module);
+                        spriteModule = new AnimationModule("basic_sprite");
+                        sprite.AttachModule(spriteModule);
                     }
                     else
                     {
                         sprite = (ModuleSprite)Activator.CreateInstance(st); //Create a new instance of the child sprite
 
                         if (sprite.ModuleExists<AnimationModule>())
-                            sprite_module = sprite.GetModules<AnimationModule>()[0]; //There can only ever bee one animation module
+                            spriteModule = sprite.GetModules<AnimationModule>()[0]; //There can only ever bee one animation module
                         else
                         {
-                            sprite_module = new AnimationModule(sprite.ToString());
-                            sprite.AttachModule(sprite_module);
+                            spriteModule = new AnimationModule(sprite.ToString());
+                            sprite.AttachModule(spriteModule);
                         }
                     }
 
-                    child_animation.ModuleOwner = sprite_module; //Set the owner of the "hat" animation to the newly created sprite
-                    sprite_module.Animations = child_animation.Animations; //Set the animations for the hat sprite to the children animations of the "hat" animation.
+                    child_animation.ModuleOwner = spriteModule; //Set the owner of the "hat" animation to the newly created sprite
+                    spriteModule.Animations = child_animation.Animations; //Set the animations for the hat sprite to the children animations of the "hat" animation.
                     Owner.Attach(sprite);
                     sprite.IsVisible = false; //Make sure this sprite isn't visible by default
-                    temp.Add(sprite_module); //Add the "hat" sprite as a children of this sprite
+                    temp.Add(spriteModule); //Add the "hat" sprite as a children of this sprite
 
-                    sprite_module.SetupChildren(sprite_module.Animations); //Setup the children of "hat" animation, and put all of it's children in a list
+                    spriteModule.SetupChildren(spriteModule.Animations); //Setup the children of "hat" animation, and put all of it's children in a list
 
                     //Nevermind, don't do that
                     //temp.AddRange(temp2); //Add all of children of the "hat" sprite as our children as well.
                 }
                 else
                 {
-                    temp.Add(EMPTY); //This is an empty animation, fill it with a unused module
+                    temp.Add(Empty); //This is an empty animation, fill it with a unused module
                 }
             }
 
@@ -256,7 +246,7 @@ namespace Sharp2D
             if (ChildAnimationPlaying == null)
                 return;
             Sprite sprite = ChildAnimationPlaying.Owner;
-            AnimationModule sprite_module = ChildAnimationPlaying.ModuleOwner;
+            AnimationModule spriteModule = ChildAnimationPlaying.ModuleOwner;
 
             float X = Owner.X, Y = Owner.Y, Width = Owner.Width, Height = Owner.Height;
 
@@ -309,12 +299,12 @@ namespace Sharp2D
             sprite.X += ChildAnimationPlaying.XOffset;
             sprite.Y += ChildAnimationPlaying.YOffset;
 
-            sprite_module.AlignChildAnimation();
+            spriteModule.AlignChildAnimation();
         }
 
         public Sprite Owner
         {
-            get { return sprite; }
+            get { return _sprite; }
         }
 
         public string ModuleName
@@ -332,7 +322,7 @@ namespace Sharp2D
         {
             if (Animations != null)
                 Animations.Dispose();
-            children.Clear();
+            _children.Clear();
         }
     }
 
@@ -451,7 +441,7 @@ namespace Sharp2D
 
         internal void Dispose()
         {
-            if (_animations != null) //todo temp workaround
+            if (_animations != null)
                 _animations.Clear();
             _animations = null;
         }

@@ -1,57 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
-using OpenTK;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
-using System.Drawing;
 
 namespace Sharp2D.Game.Worlds
 {
     public class DrawBatch : SpriteBatch
     {
-        public List<Sprite> alphaSprites = new List<Sprite>();
-        public int type;
-        private int drawCount;
+        public List<Sprite> AlphaSprites = new List<Sprite>();
+        public int Type;
+        private int _drawCount;
         public int DrawCount
         {
-            get
-            {
-                if (type == 0)
-                    return Count;
-                else
-                    return drawCount;
+            get {
+                return Type == 0 ? Count : _drawCount;
             }
         }
 
         public override int Count
         {
-            get
-            {
-                if (type != 2)
-                {
-                    return base.Count;
-                }
-                else
-                {
-                    return alphaSprites.Count;
-                }
+            get {
+                return Type != 2 ? base.Count : AlphaSprites.Count;
             }
         }
 
         public override void ForEach(Action<Shader, Texture, Sprite> callBack)
         {
-            if (type != 2)
+            if (Type != 2)
             {
                 base.ForEach(callBack);
             }
             else
             {
-                foreach (Sprite sprite in alphaSprites)
+                foreach (var sprite in AlphaSprites)
                 {
                     callBack(sprite.Shader, sprite.Texture, sprite);
                 }
@@ -60,13 +44,13 @@ namespace Sharp2D.Game.Worlds
 
         public override void ForEach(Action<Sprite> callBack)
         {
-            if (type != 2)
+            if (Type != 2)
             {
                 base.ForEach(callBack);
             }
             else
             {
-                foreach (Sprite sprite in alphaSprites)
+                foreach (var sprite in AlphaSprites)
                 {
                     callBack(sprite);
                 }
@@ -75,86 +59,87 @@ namespace Sharp2D.Game.Worlds
 
         public override void Add(Sprite sprite)
         {
-            if (type != 2)
+            if (Type != 2)
             {
                 base.Add(sprite);
             }
             else
             {
-                alphaSprites.Add(sprite);
+                AlphaSprites.Add(sprite);
                 Order();
             }
-            if (type == 1)
-                drawCount += sprite.Lights.Count;
+            if (Type == 1)
+                _drawCount += sprite.Lights.Count;
             else
-                drawCount += sprite.Lights.Count + 1;
+                _drawCount += sprite.Lights.Count + 1;
         }
 
         public override void Remove(Sprite sprite)
         {
-            if (type != 2)
+            if (Type != 2)
             {
                 base.Remove(sprite);
             }
             else
             {
-                alphaSprites.Remove(sprite);
+                AlphaSprites.Remove(sprite);
                 Order();
             }
         }
 
         private void Order()
         {
-            if (type == 2)
+            if (Type == 2)
             {
-                alphaSprites.Sort();
+                AlphaSprites.Sort();
             }
         }
     }
     public class GenericRenderJob : SpriteRenderJob
     {
         
-        internal object render_lock = new object();
+        internal object RenderLock = new object();
 
-        public const int POS_LOCATION = 0;
-        public const int TEXCOORD_LOCATION = 1;
+        public const int PosLocation = 0;
+        public const int TexcoordLocation = 1;
 
-        private int vao_id;
-        private int vbo_id;
-        private int tri_id;
-        private bool gen;
+        private int _vaoId;
+        private int _vboId;
+        private int _triId;
+        private bool _gen;
 
-        private float[] quad_points = new float[] 
+        private readonly float[] _quadPoints =
         {
             -0.5f, -0.5f, 0.0f, 0.0f,   0.5f, -0.5f, 1.0f, 0.0f,   0.5f, 0.5f, 1.0f, 1.0f,   -0.5f, 0.5f, 0.0f, 1.0f
         };
-        private uint[] rectangleindicies = new uint[] 
+        private readonly uint[] _rectangleindicies =
         {
             0, 1, 2, 0, 2, 3
         };
-        private GenericWorld parent;
+        private readonly GenericWorld _parent;
 
         public GenericWorld ParentWorld
         {
             get
             {
-                return parent;
+                return _parent;
             }
         }
 
-        private static readonly DrawPass[] DEFAULT_PASSES = new DrawPass[] {
+        private static readonly DrawPass[] DefaultPasses =
+        {
             new DrawNoAlpha(),
             new DrawNoAlphaLight(),
             new DrawAlpha()
         };
 
-        private bool passes_dirty = true;
-        private List<DrawPass> DrawPasses = new List<DrawPass>(DEFAULT_PASSES.ToList<DrawPass>());
+        private bool _passesDirty = true;
+        private readonly List<DrawPass> _drawPasses = new List<DrawPass>(DefaultPasses.ToList());
 
         public GenericRenderJob(GenericWorld parent)
         {
             Screen.Camera = new OpenGL3Camera();
-            this.parent = parent;
+            _parent = parent;
         }
 
         private void CullLights(Sprite sprite)
@@ -166,7 +151,7 @@ namespace Sharp2D.Game.Worlds
                 return;
             }
 
-            foreach (Light light in parent.dynamicLights)
+            foreach (Light light in _parent.dynamicLights)
             {
                 if (light.Intensity == 0 || light.Radius == 0)
                     continue;
@@ -180,93 +165,86 @@ namespace Sharp2D.Game.Worlds
                     sprite.dynamicLights.Add(light);
                 }
             }
-            if (!sprite.IsStatic)
+            if (sprite.IsStatic) return;
+            foreach (Light light in _parent.lights)
             {
-                foreach (Light light in parent.lights)
+                if (light.Intensity == 0 || light.Radius == 0)
+                    continue;
+                float Y = light.Y + 18f;
+                float xmin = light.X - (light.Radius);
+                float xmax = light.X + (light.Radius);
+                float ymin = Y - (light.Radius);
+                float ymax = Y + (light.Radius);
+                if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
                 {
-                    if (light.Intensity == 0 || light.Radius == 0)
-                        continue;
-                    float Y = light.Y + 18f;
-                    float xmin = light.X - (light.Radius);
-                    float xmax = light.X + (light.Radius);
-                    float ymin = Y - (light.Radius);
-                    float ymax = Y + (light.Radius);
-                    if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
-                    {
-                        sprite.Lights.Add(light);
-                    }
+                    sprite.Lights.Add(light);
                 }
             }
         }
 
         public void RegisterDrawPass(DrawPass pass)
         {
-            lock (render_lock)
+            lock (RenderLock)
             {
-                if (!DrawPasses.Contains(pass))
+                if (!_drawPasses.Contains(pass))
                 {
-                    DrawPasses.Add(pass);
-                    passes_dirty = true;
+                    _drawPasses.Add(pass);
+                    _passesDirty = true;
                 }
             }
         }
 
         DrawBatch[] CreateCulledBatches()
         {
-            DrawBatch[] batches = new DrawBatch[DrawPasses.Count];
+            var batches = new DrawBatch[_drawPasses.Count];
             for (int i = 0; i < batches.Length; i++)
             {
                 batches[i] = new DrawBatch();
                 DrawBatch batch = batches[i];
-                DrawPass pass = DrawPasses[i];
+                DrawPass pass = _drawPasses[i];
 
                 pass.SetupBatch(ref batch);
             }
 
             Batch.ForEach(delegate(Sprite sprite)
             {
-                if (!sprite.IsOffScreen && sprite.IsVisible)
+                if (sprite.IsOffScreen || !sprite.IsVisible) return;
+                CullLights(sprite);
+                for (int i = 0; i < batches.Length; i++)
                 {
-                    CullLights(sprite);
-                    for (int i = 0; i < batches.Length; i++)
-                    {
-                        if (DrawPasses[i].MeetsRequirements(sprite))
-                            batches[i].Add(sprite);
-                    }
+                    if (_drawPasses[i].MeetsRequirements(sprite))
+                        batches[i].Add(sprite);
                 }
             });
-
-            float width = Screen.Settings.GameSize.Width;
-            float height = Screen.Settings.GameSize.Height;
 
             float cx = -Screen.Camera.X;
             float cy = Screen.Camera.Y;
 
-            float cull_width = 380f * (Screen.Camera.Z / 100f);
-            float cull_height = 256f * (Screen.Camera.Z / 100f);
-            cull_width *= (Screen.Settings.GameSize.Width / 1024);
-            cull_height *= (Screen.Settings.GameSize.Height / 720);
-            cull_width /= 2f;
-            cull_height /= 2f;
-            foreach (Layer layer in parent.Layers)
+            float cullWidth = 380f * (Screen.Camera.Z / 100f);
+            float cullHeight = 256f * (Screen.Camera.Z / 100f);
+            cullWidth *= (Screen.Settings.GameSize.Width / 1024f);
+            cullHeight *= (Screen.Settings.GameSize.Height / 720f);
+            cullWidth /= 2f;
+            cullHeight /= 2f;
+            foreach (Layer layer in _parent.Layers)
             {
                 if (!layer.IsTileLayer)
                     continue;
-                float ex = cx + (cull_width + (3f * parent.TileWidth));
-                float ey = cy + cull_height;
-                float sx = cx - cull_width;
-                float sy = cy - cull_height;
+                float ex = cx + (cullWidth + (3f * _parent.TileWidth));
+                float ey = cy + cullHeight;
+                float sx = cx - cullWidth;
+                float sy = cy - cullHeight;
 
-                int s_i_x = Math.Max((int)(sx / parent.TileWidth), 0);
-                int s_i_y = Math.Max((int)Math.Ceiling((sy - 8f) / parent.TileHeight), 0);
+                int sIx = Math.Max((int)(sx / _parent.TileWidth), 0);
+                int sIy = Math.Max((int)Math.Ceiling((sy - 8f) / _parent.TileHeight), 0);
 
-                int e_i_x = Math.Max((int)(ex / parent.TileWidth), 0);
-                int e_i_y = Math.Max((int)Math.Ceiling((ey - 8f) / parent.TileHeight), 0);
+                int eIx = Math.Max((int)(ex / _parent.TileWidth), 0);
+                int eIy = Math.Max((int)Math.Ceiling((ey - 8f) / _parent.TileHeight), 0);
 
 
-                for (int x = s_i_x; x <= e_i_x; x++)
+                for (int x = sIx; x <= eIx; x++)
                 {
-                    for (int y = s_i_y; y < e_i_y; y++)
+                    for (int y = sIy; y < eIy; y++)
                     {
                         TileSprite sprite = layer[x, y];
                         if (sprite == null)
@@ -275,7 +253,7 @@ namespace Sharp2D.Game.Worlds
                         CullLights(sprite);
                         for (int i = 0; i < batches.Length; i++)
                         {
-                            if (DrawPasses[i].MeetsRequirements(sprite))
+                            if (_drawPasses[i].MeetsRequirements(sprite))
                                 batches[i].Add(sprite);
                         }
                     }
@@ -287,23 +265,22 @@ namespace Sharp2D.Game.Worlds
 
         public override void PerformJob()
         {
-            lock (render_lock)
+            lock (RenderLock)
             {
-                if (!gen)
+                if (!_gen)
                 {
-                    gen = true;
+                    _gen = true;
                     OnFirstRun();
                 }
 
-                if (passes_dirty)
+                if (_passesDirty)
                 {
-                    DrawPasses.Sort();
-                    foreach (DrawPass pass in DrawPasses)
+                    _drawPasses.Sort();
+                    foreach (DrawPass pass in _drawPasses.Where(pass => !pass.Initialized))
                     {
-                        if (!pass.Initialized)
-                            pass.Init(this);
+                        pass.Init(this);
                     }
-                    passes_dirty = false;
+                    _passesDirty = false;
                 }
 
                 DrawBatch[] batches = CreateCulledBatches();
@@ -311,7 +288,7 @@ namespace Sharp2D.Game.Worlds
                 for (int i = 0; i < batches.Length; i++)
                 {
                     DrawBatch batch = batches[i];
-                    DrawPass pass = DrawPasses[i];
+                    DrawPass pass = _drawPasses[i];
 
                     pass.PrepareForDraw();
 
@@ -321,8 +298,6 @@ namespace Sharp2D.Game.Worlds
 
                     batch.Clear();
                 }
-
-                batches = null;
             }
         }
 
@@ -331,19 +306,19 @@ namespace Sharp2D.Game.Worlds
             Screen.ValidateOpenGLSafe("CreateVBOs");
 
 
-            GL.GenVertexArrays(1, out vao_id);
+            GL.GenVertexArrays(1, out _vaoId);
 
-            GL.BindVertexArray(vao_id);
+            GL.BindVertexArray(_vaoId);
 
-            vbo_id = GL.GenBuffer();
-            tri_id = GL.GenBuffer();
+            _vboId = GL.GenBuffer();
+            _triId = GL.GenBuffer();
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_id);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vboId);
             unsafe
             {
-                fixed (float* data = quad_points)
+                fixed (float* data = _quadPoints)
                 {
-                    fixed (uint* tdata = rectangleindicies)
+                    fixed (uint* tdata = _rectangleindicies)
                     {
                         IntPtr point = (IntPtr)data;
                         IntPtr tpoint = (IntPtr)tdata;
@@ -352,13 +327,13 @@ namespace Sharp2D.Game.Worlds
 
                         GL.BufferData(BufferTarget.ArrayBuffer, size, point, BufferUsageHint.StaticDraw); //TODO Maybe don't use static draw
 
-                        GL.EnableVertexAttribArray(POS_LOCATION);
-                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(POS_LOCATION, 2, OpenTK.Graphics.ES20.All.Float, false, 4 * sizeof(float), new IntPtr(0));
+                        GL.EnableVertexAttribArray(PosLocation);
+                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(PosLocation, 2, OpenTK.Graphics.ES20.All.Float, false, 4 * sizeof(float), new IntPtr(0));
 
-                        GL.EnableVertexAttribArray(TEXCOORD_LOCATION);
-                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(TEXCOORD_LOCATION, 2, OpenTK.Graphics.ES20.All.Float, false, 4 * sizeof(float), new IntPtr(2 * sizeof(float)));
+                        GL.EnableVertexAttribArray(TexcoordLocation);
+                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(TexcoordLocation, 2, OpenTK.Graphics.ES20.All.Float, false, 4 * sizeof(float), new IntPtr(2 * sizeof(float)));
 
-                        GL.BindBuffer(BufferTarget.ElementArrayBuffer, tri_id);
+                        GL.BindBuffer(BufferTarget.ElementArrayBuffer, _triId);
                         GL.BufferData(BufferTarget.ElementArrayBuffer, tsize, tpoint, BufferUsageHint.StaticDraw); //TODO Maybe don't use static draw
                     }
                 }
@@ -403,30 +378,20 @@ namespace Sharp2D.Game.Worlds
 
         public abstract int Order { get; }
 
-        private GenericRenderJob parent;
-
         internal void Init(GenericRenderJob parent)
         {
-            this.parent = parent;
+            ParentJob = parent;
             OnInit();
             Initialized = true;
         }
 
         public bool Initialized { get; private set; }
 
-        public GenericRenderJob ParentJob
-        {
-            get
-            {
-                return parent;
-            }
-        }
+        public GenericRenderJob ParentJob { get; private set; }
 
         public int CompareTo(DrawPass pass)
         {
-            if (pass == null) return 1;
-
-            return Order.CompareTo(pass.Order);
+            return pass == null ? 1 : Order.CompareTo(pass.Order);
         }
     }
 }

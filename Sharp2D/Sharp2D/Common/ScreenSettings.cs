@@ -133,7 +133,7 @@ namespace Sharp2D
             MaxFPS = orginal.MaxFPS;
         }
 
-        public ScreenSettings() : this(Screen.DEFAULT_SETTINGS) { }
+        public ScreenSettings() : this(Screen.DefaultSettings) { }
 
         protected override void OnLoad() { }
 

@@ -162,7 +162,7 @@ namespace TestGame
         public void Update()
         {
             Screen.Camera.X -= 2;
-            Logger.WriteAt(0, 0, "FPS: " + Screen.FPS);
+            Logger.WriteAt(0, 0, "FPS: " + Screen.Fps);
         }
 
         public void Dispose()

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using System.Drawing;
 using Sharp2D.Game.Worlds;
@@ -72,7 +68,7 @@ namespace Sharp2D
         public void InvokeWithRenderLock(Action action)
         {
             Screen.ValidateOpenGLUnsafe("InvokeWithRenderLock");
-            lock (job.render_lock)
+            lock (job.RenderLock)
             {
                 action();
             }
@@ -95,31 +91,29 @@ namespace Sharp2D
                 TiledObject[] objects = layer.Objects;
                 foreach (TiledObject obj in objects)
                 {
-                    if (obj.RawType.ToLower() == "light")
+                    if (obj.RawType.ToLower() != "light") continue;
+                    float x = obj.X;
+                    float y = obj.Y;
+                    float radius = Math.Max(obj.Width, obj.Height);
+                    x = x + (radius / 2f);
+                    y = y + (radius / 2f);
+
+                    float intense = 1f;
+                    Color color = Color.White;
+                    if (obj.Properties != null)
                     {
-                        float x = obj.X;
-                        float y = obj.Y;
-                        float radius = Math.Max(obj.Width, obj.Height);
-                        x = x + (radius / 2f);
-                        y = y + (radius / 2f);
-
-                        float intense = 1f;
-                        Color color = Color.White;
-                        if (obj.Properties != null)
+                        if (obj.Properties.ContainsKey("brightness"))
                         {
-                            if (obj.Properties.ContainsKey("brightness"))
-                            {
-                                float.TryParse(obj.Properties["brightness"], out intense);
-                            }
-                            if (obj.Properties.ContainsKey("color"))
-                            {
-                                color = Color.FromName(obj.Properties["color"]);
-                            }
+                            float.TryParse(obj.Properties["brightness"], out intense);
                         }
-
-                        Light light = new Light(x, y, intense, radius, color, LightType.StaticPointLight);
-                        AddLight(light);
+                        if (obj.Properties.ContainsKey("color"))
+                        {
+                            color = Color.FromName(obj.Properties["color"]);
+                        }
                     }
+
+                    var light = new Light(x, y, intense, radius, color, LightType.StaticPointLight);
+                    AddLight(light);
                 }
             }
         }
@@ -132,37 +126,34 @@ namespace Sharp2D
 
             if (job.Batch.Count > 0)
             {
-                job.Batch.ForEach(delegate(Sprite s)
-                {
-                    UpdateSpriteLights(s);
-                });
+                job.Batch.ForEach(UpdateSpriteLights);
             }
         }
 
         public Light AddLight(float X, float Y, LightType LightType)
         {
-            Light light = new Light(X, Y, LightType);
+            var light = new Light(X, Y, LightType);
             AddLight(light);
             return light;
         }
 
         public Light AddLight(float X, float Y, float Intensity, LightType LightType)
         {
-            Light light = new Light(X, Y, Intensity, LightType);
+            var light = new Light(X, Y, Intensity, LightType);
             AddLight(light);
             return light;
         }
 
         public Light AddLight(float X, float Y, float Intensity, float Radius, LightType LightType)
         {
-            Light light = new Light(X, Y, Intensity, Radius, LightType);
+            var light = new Light(X, Y, Intensity, Radius, LightType);
             AddLight(light);
             return light;
         }
 
         public Light AddLight(float X, float Y, float Intensity, float Radius, Color color, LightType LightType)
         {
-            Light light = new Light(X, Y, Intensity, Radius, color, LightType);
+            var light = new Light(X, Y, Intensity, Radius, color, LightType);
             AddLight(light);
             return light;
         }
@@ -270,12 +261,10 @@ namespace Sharp2D
         {
             base.RemoveSprite(s);
 
-            if (s.IsStatic)
+            if (!s.IsStatic) return;
+            lock (s.light_lock)
             {
-                lock (s.light_lock)
-                {
-                    s.Lights.Clear();
-                }
+                s.Lights.Clear();
             }
         }
 
