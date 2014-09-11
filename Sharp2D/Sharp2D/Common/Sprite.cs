@@ -64,20 +64,17 @@ namespace Sharp2D
         {
             get
             {
-                World current = CurrentWorld;
-                if (current is Game.Worlds.SpriteWorld)
+                var world = CurrentWorld;
+                if (world == null) return new List<SpriteRenderJob>();
+                var toReturn = new List<SpriteRenderJob>();
+                List<SpriteRenderJob> jobs = world.SpriteRenderJobs;
+                foreach (SpriteRenderJob job in jobs)
                 {
-                    List<SpriteRenderJob> toReturn = new List<SpriteRenderJob>();
-                    List<SpriteRenderJob> jobs = ((Game.Worlds.SpriteWorld)current).SpriteRenderJobs;
-                    foreach (SpriteRenderJob job in jobs)
-                    {
-                        if (job.HasSprite(this))
-                            toReturn.Add(job);
-                    }
-
-                    return toReturn;
+                    if (job.HasSprite(this))
+                        toReturn.Add(job);
                 }
-                return new List<SpriteRenderJob>();
+
+                return toReturn;
             }
         }
 
