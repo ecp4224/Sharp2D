@@ -112,7 +112,7 @@ namespace Sharp2D
             }
         }
 
-        public static bool Focused
+        public static bool IsFocused
         {
             get { return _window != null && _window.Focused; }
         }
