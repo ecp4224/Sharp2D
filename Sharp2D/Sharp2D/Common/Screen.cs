@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -117,6 +119,12 @@ namespace Sharp2D
             get { return _window != null && _window.Focused; }
         }
 
+        public static Process CurrentProcess
+        {
+            get { return _curProcess; }
+        }
+
+        private static Process _curProcess;
         private static int _tickAtStart;
         private static readonly Stack<Action> Invokes = new Stack<Action>();
         private static ILogicContainer _logics;
@@ -125,6 +133,9 @@ namespace Sharp2D
 
         private static readonly object JobLock = new object();
         private static readonly object LogicLock = new object();
+
+        [DllImport("User32.dll")]
+        public static extern Int32 SetForegroundWindow(int hWnd);
 
         public static void DisplayScreenAsync()
         {
@@ -139,6 +150,7 @@ namespace Sharp2D
 
         public static void DisplayScreenAsync(ScreenSettings settings)
         {
+            _curProcess = Process.GetCurrentProcess();
             Settings = settings;
             DisplayThread = new Thread(() => DisplayScreen(settings)) {Name = "Display Thread"};
             //DisplayThread.Priority = ThreadPriority.Highest;
@@ -162,6 +174,16 @@ namespace Sharp2D
                 _gameLoop();
             else
                 _openTKStart();
+        }
+
+        public static void RequestFocus()
+        {
+            if (!IsInOpenGLThread())
+            {
+                Invoke(RequestFocus);
+                return;
+            }
+            SetForegroundWindow(CurrentProcess.MainWindowHandle.ToInt32());
         }
 
         public static void Invoke(Action action)
@@ -202,6 +224,11 @@ namespace Sharp2D
                 else
                     throw new InvalidOperationException("The method \"" + MethodName + "\" must be invoked OUTSIDE an OpenGL safe thread!");
             }
+        }
+
+        public static bool IsInOpenGLThread()
+        {
+            return DisplayThread != null && DisplayThread == Thread.CurrentThread;
         }
 
         private static void _prepare()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Sharp2D;
 
@@ -30,8 +31,8 @@ namespace Fireflies
             FireflyWorld world = new FireflyWorld();
             world.Load();
 
-            GlobalSettings.EngineSettings.ShowConsole = true;
-            GlobalSettings.EngineSettings.WriteLog = true;
+            //GlobalSettings.EngineSettings.ShowConsole = true;
+            //GlobalSettings.EngineSettings.WriteLog = true;
 
             world.AmbientBrightness = 0.1f;
 
