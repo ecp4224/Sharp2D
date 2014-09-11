@@ -171,8 +171,8 @@ namespace Sharp2D
         /// The position of this Sprite in the currently displaying world represented as a <see cref="Vector2"/>
         /// </summary>
         public Vector2 Position { get { return new Vector2(X, Y); } }
-        internal readonly List<World> _worlds = new List<World>();
-        public IList<World> ContainingWorlds
+        internal readonly List<SpriteWorld> _worlds = new List<SpriteWorld>();
+        public IList<SpriteWorld> ContainingWorlds
         {
             get
             {
@@ -183,7 +183,7 @@ namespace Sharp2D
         /// <summary>
         /// Get the world the sprite is currently in. This world is the current World being displayed on the screen. To get all the Worlds this sprite is in, use ContainingWorlds
         /// </summary>
-        public World CurrentWorld
+        public SpriteWorld CurrentWorld
         {
             get
             {

@@ -37,7 +37,7 @@ namespace Sharp2D.Game.Worlds
         {
             get
             {
-                List<Sprite> sprites = new List<Sprite>();
+                var sprites = new List<Sprite>();
                 List<SpriteRenderJob> jobs = SpriteRenderJobs;
                 foreach (SpriteRenderJob job in jobs)
                 {
@@ -59,8 +59,9 @@ namespace Sharp2D.Game.Worlds
             s._worlds.Add(this);
             s.OnAddedToWorld(this);
 
-            if (s is ILogical)
-                AddLogical((ILogical)s);
+            var logical = s as ILogical;
+            if (logical != null)
+                AddLogical(logical);
         }
 
         public virtual void AddSprite(Sprite s)
@@ -76,8 +77,9 @@ namespace Sharp2D.Game.Worlds
                 s._worlds.Add(this);
                 s.OnAddedToWorld(this);
             }
-            if (s is ILogical)
-                AddLogical((ILogical)s);
+            var logical = s as ILogical;
+            if (logical != null)
+                AddLogical(logical);
         }
 
         public virtual void RemoveSprite(Sprite s)
@@ -91,8 +93,9 @@ namespace Sharp2D.Game.Worlds
             s._worlds.Remove(this);
             s.OnRemovedFromWorld(this);
 
-            if (s is ILogical)
-                RemoveLogical((ILogical)s);
+            var logical = s as ILogical;
+            if (logical != null)
+                RemoveLogical(logical);
         }
     }
 }
