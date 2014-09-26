@@ -124,6 +124,11 @@ namespace Sharp2D
             get { return _curProcess; }
         }
 
+        public static GameWindow NativeWindow
+        {
+            get { return _window; }
+        }
+
         private static Process _curProcess;
         private static int _tickAtStart;
         private static readonly Stack<Action> Invokes = new Stack<Action>();

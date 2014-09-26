@@ -49,6 +49,7 @@
     <Compile Include="Cloud.cs" />
     <Compile Include="Firefly.cs" />
     <Compile Include="FireflyWorld.cs" />
+    <Compile Include="MouseLight.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

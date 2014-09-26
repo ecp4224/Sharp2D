@@ -31,7 +31,7 @@ namespace Fireflies
             FireflyWorld world = new FireflyWorld();
             world.Load();
 
-            //GlobalSettings.EngineSettings.ShowConsole = true;
+            GlobalSettings.EngineSettings.ShowConsole = true;
             //GlobalSettings.EngineSettings.WriteLog = true;
 
             world.AmbientBrightness = 0.1f;
@@ -41,6 +41,10 @@ namespace Fireflies
             Screen.Camera.Z = 200;
             Screen.Camera.Y = 18 * 16f;
             Screen.Camera.X = -(24 * 16f);
+
+            //MouseLight light = new MouseLight();
+            //world.AddLogical(light);
+            //world.AddLight(light.Light);
         }
     }
 }
