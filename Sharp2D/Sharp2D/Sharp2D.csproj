@@ -109,6 +109,7 @@
     <Compile Include="Common\GenericWorld.cs" />
     <Compile Include="Game\Worlds\ILightWorld.cs" />
     <Compile Include="Common\Light.cs" />
+    <Compile Include="Game\Worlds\SpriteChunkWorld.cs" />
     <Compile Include="Game\Worlds\SpriteWorld.cs" />
     <Compile Include="Game\Sprites\LogicalSprite.cs" />
     <Compile Include="Common\Sprite.cs" />

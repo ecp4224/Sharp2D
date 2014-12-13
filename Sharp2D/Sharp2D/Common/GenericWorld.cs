@@ -7,7 +7,7 @@ using Sharp2D.Game.Sprites;
 
 namespace Sharp2D
 {
-    public abstract class GenericWorld : TiledWorld, ILightWorld
+    public abstract class GenericWorld : SpriteChunkWorld, ILightWorld
     {
         private float _brightness;
         internal Vector3 AmbientShaderColor;

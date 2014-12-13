@@ -8,12 +8,12 @@ namespace Sharp2D
 {
     public partial class Sprite
     {
-        public event EventHandler Moved;
-        public event EventHandler Disposed;
-        public event EventHandler Displayed;
-        public event EventHandler Loaded;
-        public event EventHandler Unloaded;
-        public event EventHandler Drawn;
+        public event EventHandler<OnSpriteMoved> Moved;
+        public event EventHandler<SpriteEvent> Disposed;
+        public event EventHandler<SpriteEvent> Displayed;
+        public event EventHandler<SpriteEvent> Loaded;
+        public event EventHandler<SpriteEvent> Unloaded;
+        public event EventHandler<SpriteEvent> Drawn;
     }
 
     public class SpriteEvent : EventArgs

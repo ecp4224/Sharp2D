@@ -178,7 +178,7 @@ namespace Sharp2D.Game.Worlds
 
         protected override void OnUnload()
         {
-            //TODO Unload something..
+            
         }
 
         protected override void OnDispose()
