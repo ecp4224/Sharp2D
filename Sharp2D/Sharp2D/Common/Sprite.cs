@@ -278,7 +278,7 @@ namespace Sharp2D
         {
             get
             {
-                return !_neverclip && Screen.Camera.IsOutsideCamera(X, Y, Width, Height);
+                return !_neverclip && Screen.Camera.IsOutsideCamera(X, Y, Width, Height, Scale);
             }
         }
 

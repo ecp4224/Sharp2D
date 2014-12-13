@@ -38,7 +38,7 @@ namespace Fireflies
 
             world.Display();
 
-            Screen.Camera.Z = 200;
+            Screen.Camera.Z = 150;
             Screen.Camera.Y = 18 * 16f;
             Screen.Camera.X = -(24 * 16f);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
@@ -209,6 +210,7 @@ namespace Sharp2D.Game.Worlds
             Batch.ForEach(delegate(Sprite sprite)
             {
                 if (sprite.IsOffScreen || !sprite.IsVisible) return;
+                CullLights(sprite);
                 for (int i = 0; i < batches.Length; i++)
                 {
                     if (_drawPasses[i].MeetsRequirements(sprite))
@@ -249,6 +251,7 @@ namespace Sharp2D.Game.Worlds
                         if (sprite == null)
                             continue;
 
+                        CullLights(sprite);
                         for (int i = 0; i < batches.Length; i++)
                         {
                             if (_drawPasses[i].MeetsRequirements(sprite))
@@ -258,79 +261,7 @@ namespace Sharp2D.Game.Worlds
                 }
             }
 
-            CullLights();
-
             return batches;
-        }
-
-        private void CullLights()
-        {
-            foreach (var light in _parent.lights)
-            {
-                if (light.Intensity == 0 || light.Radius == 0)
-                    continue;
-                float Y = light.Y + 18f;
-                float xmin = light.X - (light.Radius) - 8;
-                float xmax = light.X + (light.Radius) + 8;
-                float ymin = Y - (light.Radius) - 8;
-                float ymax = Y + (light.Radius) + 8;
-                var chunklist = _parent.GetChunksAtLocation(light.X, light.Y, light.Radius * 2f, light.Radius * 2f);
-
-                foreach (var list in chunklist)
-                {
-
-                    foreach (Sprite sprite in list)
-                    {
-                        if (sprite.IgnoreLights || sprite.IsStatic)
-                        {
-                            if (sprite.IgnoreLights)
-                            {
-                                sprite.dynamicLights.Clear();
-                                sprite.Lights.Clear();
-                            }
-                            continue;
-                        }
-
-                        if (sprite.X + (sprite.Width/2f) >= xmin && sprite.X - (sprite.Width/2f) <= xmax &&
-                            sprite.Y + (sprite.Height/2f) >= ymin && sprite.Y - (sprite.Height/2f) <= ymax)
-                        {
-                            sprite.Lights.Add(light);
-                        }
-                    }
-                }
-            }
-
-            foreach (var light in _parent.dynamicLights)
-            {
-                if (light.Intensity == 0 || light.Radius == 0)
-                    continue;
-                float Y = light.Y + 18f;
-                float xmin = light.X - (light.Radius) - 8;
-                float xmax = light.X + (light.Radius) + 8;
-                float ymin = Y - (light.Radius) - 8;
-                float ymax = Y + (light.Radius) + 8;
-                var chunkList = _parent.GetChunksAtLocation(light.X, light.Y, light.Radius * 2f, light.Radius * 2f);
-
-                if (chunkList.Count == 0 || chunkList.All(c => c.Count == 0))
-                {
-                    Console.WriteLine("hi");
-                }
-
-
-                foreach (List<Sprite> list in chunkList)
-                {
-                    foreach (Sprite sprite in list)
-                    {
-                        if (sprite.IgnoreLights) continue;
-
-                        if (sprite.X + (sprite.Width/2f) >= xmin && sprite.X - (sprite.Width/2f) <= xmax &&
-                            sprite.Y + (sprite.Height/2f) >= ymin && sprite.Y - (sprite.Height/2f) <= ymax)
-                        {
-                            sprite.dynamicLights.Add(light);
-                        }
-                    }
-                }
-            }
         }
 
         public override void PerformJob()
@@ -375,6 +306,11 @@ namespace Sharp2D.Game.Worlds
         {
             Screen.ValidateOpenGLSafe("CreateVBOs");
 
+
+            GL.GenVertexArrays(1, out _vaoId);
+
+            GL.BindVertexArray(_vaoId);
+
             _vboId = GL.GenBuffer();
             _triId = GL.GenBuffer();
 
@@ -413,17 +349,23 @@ namespace Sharp2D.Game.Worlds
             Z = 1f;
         }
 
-        public override bool IsOutsideCamera(float X, float Y, float Width, float Height)
+        public override bool IsOutsideCamera(float X, float Y, float Width, float Height, float Scale)
         {
             Y = -Y;
-            float temp = Screen.Camera.Z / 100f;
-            float temp2 = 7f / temp;
-            float temp3 = 64f * temp;
-            return
-                (X + Width) + Screen.Camera.X < -temp3 - (Screen.Settings.GameSize.Width / temp2) ||
-                Screen.Camera.X + (X + Width) > temp3 + (Screen.Settings.GameSize.Width / temp2) ||
-                (Y + Height) + Screen.Camera.Y < -temp3 - (Screen.Settings.GameSize.Height / temp2) ||
-                Screen.Camera.Y + (Y + Height) > temp3 + (Screen.Settings.GameSize.Height / temp2);
+
+            var aspect = Screen.Settings.WindowAspectRatio;
+            var tempPos = new Vector2(X, Y);
+            var tempSize = new Vector2(Width, Height);
+
+            tempPos = tempPos + (tempSize * Scale);
+
+            tempPos += new Vector2(this.X, this.Y);
+            tempPos *= (1f/this.Z);
+
+            tempPos.X /= (aspect.X/aspect.Y);
+
+            return tempPos.X < 0 || tempPos.X > 1 ||
+                   tempPos.Y < 0 || tempPos.Y > 1;
         }
     }
 

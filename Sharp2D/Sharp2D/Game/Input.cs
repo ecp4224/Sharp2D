@@ -100,7 +100,7 @@ namespace Sharp2D.Game
         {
             var state = OpenTK.Input.Mouse.GetState();
 
-            
+            return new Point(state.X, state.Y);
         }
     }
 }

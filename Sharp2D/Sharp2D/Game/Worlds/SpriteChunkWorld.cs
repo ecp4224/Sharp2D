@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,10 +10,10 @@ namespace Sharp2D.Game.Worlds
 {
     public abstract class SpriteChunkWorld : TiledWorld
     {
-        public const float ChunkSize = 64f; 
+        public const float ChunkSize = 256f; 
 
-        private readonly List<Sprite> offScreenSpriteChunkData = new List<Sprite>();
-        private List<Sprite>[,] spriteChunkData;
+        private readonly List<Sprite> _offScreenSpriteChunkData = new List<Sprite>();
+        private List<Sprite>[,] _spriteChunkData;
 
         public int XChunkCount { get; private set; }
         public int YChunkCount { get; private set; }
@@ -21,21 +22,21 @@ namespace Sharp2D.Game.Worlds
         {
             base.OnLoad();
 
-            int xChunkSize = (int) Math.Ceiling(PixelWidth/ChunkSize);
-            int yChunkSize = (int) Math.Ceiling(PixelHeight/ChunkSize);
+            var xChunkSize = (int) Math.Ceiling(PixelWidth/ChunkSize);
+            var yChunkSize = (int) Math.Ceiling(PixelHeight/ChunkSize);
 
             XChunkCount = xChunkSize;
             YChunkCount = yChunkSize;
 
-            spriteChunkData = new List<Sprite>[xChunkSize,yChunkSize];
+            _spriteChunkData = new List<Sprite>[xChunkSize,yChunkSize];
         }
 
         protected override void OnDispose()
         {
             base.OnDispose();
 
-            offScreenSpriteChunkData.Clear();
-            spriteChunkData = null;
+            _offScreenSpriteChunkData.Clear();
+            _spriteChunkData = null;
         }
 
         /// <summary>
@@ -58,15 +59,15 @@ namespace Sharp2D.Game.Worlds
                 {
                     if (x >= XChunkCount || y >= YChunkCount || x < 0 || y < 0)
                     {
-                        chunks.Add(offScreenSpriteChunkData);
+                        chunks.Add(_offScreenSpriteChunkData);
                         break;
                     }
 
-                    if (spriteChunkData[x, y] != null) chunks.Add(spriteChunkData[x, y]);
+                    if (_spriteChunkData[x, y] != null) chunks.Add(_spriteChunkData[x, y]);
                     else
                     {
-                        spriteChunkData[x, y] = new List<Sprite>();
-                        chunks.Add(spriteChunkData[x, y]);
+                        _spriteChunkData[x, y] = new List<Sprite>();
+                        chunks.Add(_spriteChunkData[x, y]);
                     }
 
                 }
@@ -92,15 +93,15 @@ namespace Sharp2D.Game.Worlds
                 {
                     if (x >= XChunkCount || y >= YChunkCount || x < 0 || y < 0)
                     {
-                        chunks.Add(offScreenSpriteChunkData);
+                        chunks.Add(_offScreenSpriteChunkData);
                         break;
                     }
 
-                    if (spriteChunkData[x, y] != null) chunks.Add(spriteChunkData[x, y]);
+                    if (_spriteChunkData[x, y] != null) chunks.Add(_spriteChunkData[x, y]);
                     else
                     {
-                        spriteChunkData[x, y] = new List<Sprite>();
-                        chunks.Add(spriteChunkData[x, y]);
+                        _spriteChunkData[x, y] = new List<Sprite>();
+                        chunks.Add(_spriteChunkData[x, y]);
                     }
 
                 }
@@ -189,12 +190,21 @@ namespace Sharp2D.Game.Worlds
             var s = eventArgs.Sprite;
             if (InSameChunks(s.X, s.Y, s.Width, s.Height, eventArgs.OldX, eventArgs.OldY, s.Width, s.Height)) return;
 
-            var chunks = GetChunksAtLocation(eventArgs.OldX, eventArgs.OldY, s.Width, s.Height);
-            chunks.ForEach(c => c.Remove(s));
+            var old_chunks = GetChunksAtLocation(eventArgs.OldX, eventArgs.OldY, s.Width, s.Height);
+            //chunks.ForEach(c => c.Remove(s));
 
-            chunks = GetChunksForSprite(s);
-            
-            chunks.ForEach(c => c.Add(s));
+            var new_chunks = GetChunksForSprite(s);
+
+            foreach (var c in new_chunks.Where(c => !old_chunks.Contains(c)))
+            {
+                c.Add(s); //Add the sprite
+            }
+
+            foreach (var c in old_chunks.Where(c => !new_chunks.Contains(c)))
+            {
+                c.Remove(s); //Remove the sprite from the old chunk
+            }
+            //chunks.ForEach(c => c.Add(s));
         }
     }
 }

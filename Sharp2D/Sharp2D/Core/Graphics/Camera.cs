@@ -152,7 +152,7 @@ namespace Sharp2D.Core.Graphics
         /// <param name="Width">The width of the quad</param>
         /// <param name="Height">The height of the quad</param>
         /// <returns>True if the quad is outside the camera's bounds, otherwise false.</returns>
-        public abstract bool IsOutsideCamera(float X, float Y, float Width, float Height);
+        public abstract bool IsOutsideCamera(float X, float Y, float Width, float Height, float Scale);
     }
 
     public enum PanType
