@@ -116,9 +116,12 @@ namespace Sharp2D
             }
             set
             {
+                float ox = X, oy = Y;
                 X = value.X;
                 Y = value.Y;
                 Z = value.Z;
+
+                if (Moved != null) Moved(this, new OnSpriteMoved(this, ox, oy));
             }
         }
 
@@ -279,6 +282,8 @@ namespace Sharp2D
             }
         }
 
+        private bool staticWarn = false;
+
         /// <summary>
         /// The X coordinate of this Sprite in the currently displaying world
         /// </summary>
@@ -294,6 +299,7 @@ namespace Sharp2D
 
                 float ox = location.X;
                 location.X = value;
+                if (Moved != null) Moved(this, new OnSpriteMoved(this, ox, Y));
 
                 foreach (IAttachable attached in _children)
                 {
@@ -302,6 +308,11 @@ namespace Sharp2D
 
                 if (IsStatic)
                 {
+                    if (!staticWarn)
+                    {
+                        Logger.Warn("The static sprite " + Name + " has been moved! This may cause unwanted results!");
+                        staticWarn = true;
+                    }
                     World w = CurrentWorld;
                     if (ox != value && CurrentWorld is ILightWorld)
                         ((ILightWorld)w).UpdateSpriteLights(this);
@@ -348,6 +359,8 @@ namespace Sharp2D
                 float oy = location.Y;
                 location.Y = value;
 
+                if (Moved != null) Moved(this, new OnSpriteMoved(this, X, oy));
+
                 foreach (IAttachable attached in _children)
                 {
                     attached.Y += dif;
@@ -355,6 +368,11 @@ namespace Sharp2D
 
                 if (IsStatic)
                 {
+                    if (!staticWarn)
+                    {
+                        Logger.Warn("The static sprite " + Name + " has been moved! This may cause unwanted results!");
+                        staticWarn = true;
+                    }
                     World w = CurrentWorld;
                     if (oy != value && CurrentWorld is ILightWorld)
                         ((ILightWorld)w).UpdateSpriteLights(this);
@@ -386,6 +404,11 @@ namespace Sharp2D
 
                 if (IsStatic)
                 {
+                    if (!staticWarn)
+                    {
+                        Logger.Warn("The static sprite " + Name + " has been moved! This may cause unwanted results!");
+                        staticWarn = true;
+                    }
                     World w = CurrentWorld;
                     if (oy != value && CurrentWorld is ILightWorld)
                         ((ILightWorld)w).UpdateSpriteLights(this);

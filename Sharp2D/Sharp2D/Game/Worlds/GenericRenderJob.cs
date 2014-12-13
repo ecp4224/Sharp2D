@@ -209,7 +209,6 @@ namespace Sharp2D.Game.Worlds
             Batch.ForEach(delegate(Sprite sprite)
             {
                 if (sprite.IsOffScreen || !sprite.IsVisible) return;
-                CullLights(sprite);
                 for (int i = 0; i < batches.Length; i++)
                 {
                     if (_drawPasses[i].MeetsRequirements(sprite))
@@ -250,7 +249,6 @@ namespace Sharp2D.Game.Worlds
                         if (sprite == null)
                             continue;
 
-                        CullLights(sprite);
                         for (int i = 0; i < batches.Length; i++)
                         {
                             if (_drawPasses[i].MeetsRequirements(sprite))
@@ -260,7 +258,79 @@ namespace Sharp2D.Game.Worlds
                 }
             }
 
+            CullLights();
+
             return batches;
+        }
+
+        private void CullLights()
+        {
+            foreach (var light in _parent.lights)
+            {
+                if (light.Intensity == 0 || light.Radius == 0)
+                    continue;
+                float Y = light.Y + 18f;
+                float xmin = light.X - (light.Radius) - 8;
+                float xmax = light.X + (light.Radius) + 8;
+                float ymin = Y - (light.Radius) - 8;
+                float ymax = Y + (light.Radius) + 8;
+                var chunklist = _parent.GetChunksAtLocation(light.X, light.Y, light.Radius * 2f, light.Radius * 2f);
+
+                foreach (var list in chunklist)
+                {
+
+                    foreach (Sprite sprite in list)
+                    {
+                        if (sprite.IgnoreLights || sprite.IsStatic)
+                        {
+                            if (sprite.IgnoreLights)
+                            {
+                                sprite.dynamicLights.Clear();
+                                sprite.Lights.Clear();
+                            }
+                            continue;
+                        }
+
+                        if (sprite.X + (sprite.Width/2f) >= xmin && sprite.X - (sprite.Width/2f) <= xmax &&
+                            sprite.Y + (sprite.Height/2f) >= ymin && sprite.Y - (sprite.Height/2f) <= ymax)
+                        {
+                            sprite.Lights.Add(light);
+                        }
+                    }
+                }
+            }
+
+            foreach (var light in _parent.dynamicLights)
+            {
+                if (light.Intensity == 0 || light.Radius == 0)
+                    continue;
+                float Y = light.Y + 18f;
+                float xmin = light.X - (light.Radius) - 8;
+                float xmax = light.X + (light.Radius) + 8;
+                float ymin = Y - (light.Radius) - 8;
+                float ymax = Y + (light.Radius) + 8;
+                var chunkList = _parent.GetChunksAtLocation(light.X, light.Y, light.Radius * 2f, light.Radius * 2f);
+
+                if (chunkList.Count == 0 || chunkList.All(c => c.Count == 0))
+                {
+                    Console.WriteLine("hi");
+                }
+
+
+                foreach (List<Sprite> list in chunkList)
+                {
+                    foreach (Sprite sprite in list)
+                    {
+                        if (sprite.IgnoreLights) continue;
+
+                        if (sprite.X + (sprite.Width/2f) >= xmin && sprite.X - (sprite.Width/2f) <= xmax &&
+                            sprite.Y + (sprite.Height/2f) >= ymin && sprite.Y - (sprite.Height/2f) <= ymax)
+                        {
+                            sprite.dynamicLights.Add(light);
+                        }
+                    }
+                }
+            }
         }
 
         public override void PerformJob()
@@ -304,11 +374,6 @@ namespace Sharp2D.Game.Worlds
         protected void OnFirstRun()
         {
             Screen.ValidateOpenGLSafe("CreateVBOs");
-
-
-            GL.GenVertexArrays(1, out _vaoId);
-
-            GL.BindVertexArray(_vaoId);
 
             _vboId = GL.GenBuffer();
             _triId = GL.GenBuffer();

@@ -12,7 +12,7 @@ using Sharp2D.Game.Worlds;
 
 namespace Sharp2D.Game.Sprites
 {
-    public class TileSprite : Sprite, ICollidable
+    public sealed class TileSprite : Sprite, ICollidable
     {
         public TiledWorld World { get; private set; }
         public int ID { get; private set; }
@@ -40,8 +40,7 @@ namespace Sharp2D.Game.Sprites
 
             Layer = 1;
 
-            //Y = -(parentLayer.Height - Y);
-            //Y = parentLayer.Height - Y;
+            IsStatic = !(parent.TileProperties.ContainsKey(ID) && parent.TileProperties[ID].ContainsKey("static") && parent.TileProperties[ID]["static"].ToLower() == "true");
 
             _setTexCoords();
 

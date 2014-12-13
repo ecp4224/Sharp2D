@@ -68,8 +68,8 @@ namespace Sharp2D.Game.Worlds
             _ambiantShader = new Shader("Sharp2D.Resources.sprite_amb.vert", "Sharp2D.Resources.sprite_amb.frag");
             _ambiantShader.LoadAll();
             _ambiantShader.CompileAll();
-            GL.BindAttribLocation(_ambiantShader.ProgramID, GenericRenderJob.PosLocation, "posattrib");
-            GL.BindAttribLocation(_ambiantShader.ProgramID, GenericRenderJob.TexcoordLocation, "tcattrib");
+            //GL.BindAttribLocation(_ambiantShader.ProgramID, GenericRenderJob.PosLocation, "posattrib");
+            //GL.BindAttribLocation(_ambiantShader.ProgramID, GenericRenderJob.TexcoordLocation, "tcattrib");
             _ambiantShader.LinkAll();
         }
 
@@ -179,8 +179,8 @@ namespace Sharp2D.Game.Worlds
 
             _lightShader.LoadAll();
             _lightShader.CompileAll();
-            GL.BindAttribLocation(_lightShader.ProgramID, GenericRenderJob.PosLocation, "posattrib");
-            GL.BindAttribLocation(_lightShader.ProgramID, GenericRenderJob.TexcoordLocation, "tcattrib");
+            //GL.BindAttribLocation(_lightShader.ProgramID, GenericRenderJob.PosLocation, "posattrib");
+            //GL.BindAttribLocation(_lightShader.ProgramID, GenericRenderJob.TexcoordLocation, "tcattrib");
             _lightShader.LinkAll();
         }
 
@@ -333,8 +333,8 @@ namespace Sharp2D.Game.Worlds
             _alphaLightShader = new Shader("Sharp2D.Resources.sprite_light_alpha.vert", "Sharp2D.Resources.sprite_light_alpha.frag");
             _alphaLightShader.LoadAll();
             _alphaLightShader.CompileAll();
-            GL.BindAttribLocation(_alphaLightShader.ProgramID, GenericRenderJob.PosLocation, "posattrib");
-            GL.BindAttribLocation(_alphaLightShader.ProgramID, GenericRenderJob.TexcoordLocation, "tcattrib");
+            //GL.BindAttribLocation(_alphaLightShader.ProgramID, GenericRenderJob.PosLocation, "posattrib");
+            //GL.BindAttribLocation(_alphaLightShader.ProgramID, GenericRenderJob.TexcoordLocation, "tcattrib");
             _alphaLightShader.LinkAll();
         }
 
