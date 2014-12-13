@@ -26,17 +26,13 @@ namespace Sharp2D.Core.Graphics.Shaders
             get
             {
                 int id;
-                if (locations.ContainsKey(var))
-                {
-                    id = locations[var];
-                }
-                else
-                {
-                    id = GL.GetUniformLocation(program_id, var);
-                    if (id == -1)
-                        throw new System.IO.FileNotFoundException("The variable was not found!", var);
-                    locations.Add(var, id);
-                }
+                bool found = locations.TryGetValue(var, out id);
+                if (found) return id;
+                
+                id = GL.GetUniformLocation(program_id, var);
+                if (id == -1)
+                    throw new System.IO.FileNotFoundException("The variable was not found!", var);
+                locations.Add(var, id);
 
                 return id;
             }

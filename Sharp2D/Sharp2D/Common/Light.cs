@@ -10,7 +10,7 @@ using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D
 {
-    public class Light : IAttachable
+    public class Light : IAttachable, IMoveable2d
     {
         internal Vector3 ShaderColor;
         private Color _color;
@@ -64,6 +64,8 @@ namespace Sharp2D
                 if (IsStatic)
                     throw new InvalidOperationException("Static lights cannot be moved!");
 
+                float ox = x;
+
                 float dif = value - x;
 
                 x = value;
@@ -72,6 +74,8 @@ namespace Sharp2D
                 {
                     attach.X += dif;
                 }
+
+                if (Moved != null) Moved(this, new OnMoveableMoved(this, ox, Y));
             }
         }
         public float Y
@@ -85,6 +89,8 @@ namespace Sharp2D
                 if (IsStatic)
                     throw new InvalidOperationException("Static lights cannot be moved!");
 
+                float oy = y;
+
                 float dif = value - y;
 
                 y = value;
@@ -93,8 +99,38 @@ namespace Sharp2D
                 {
                     attach.Y += dif;
                 }
+
+                if (Moved != null) Moved(this, new OnMoveableMoved(this, X, oy));
             }
         }
+
+        public float Width
+        {
+            get { return Radius*2; }
+            set { Radius = value/2f; }
+        }
+
+        public float Height
+        {
+            get { return Radius * 2; }
+            set { Radius = value / 2f; }
+        }
+
+        public event EventHandler<OnMoveableMoved> Moved;
+
+        public Vector2 Vector2d
+        {
+            get
+            {
+                return new Vector2(X, Y);
+            }
+            set
+            {
+                X = value.X;
+                Y = value.Y;
+            }
+        }
+
         public float Intensity
         {
             get

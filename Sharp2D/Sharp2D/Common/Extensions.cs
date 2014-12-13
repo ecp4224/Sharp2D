@@ -60,12 +60,8 @@ namespace Sharp2D
 
         public static List<Vector2> AsVector2List(this List<IMoveable2d> obj)
         {
-            List<Vector2> toReturn = new List<Vector2>(obj.Count);
-            
-            foreach (IMoveable2d s in obj)
-            {
-                toReturn.Add(s.Vector2d);
-            }
+            var toReturn = new List<Vector2>(obj.Count);
+            toReturn.AddRange(obj.Select(s => s.Vector2d));
 
             return toReturn;
         }

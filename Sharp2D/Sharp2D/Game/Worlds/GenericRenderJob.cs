@@ -67,7 +67,6 @@ namespace Sharp2D.Game.Worlds
             else
             {
                 AlphaSprites.Add(sprite);
-                Order();
             }
             if (Type == 1)
                 _drawCount += sprite.Lights.Count;
@@ -86,6 +85,11 @@ namespace Sharp2D.Game.Worlds
                 AlphaSprites.Remove(sprite);
                 Order();
             }
+        }
+
+        public void PrepareForDraw()
+        {
+            if (Type == 2) Order();
         }
 
         private void Order()
@@ -152,16 +156,22 @@ namespace Sharp2D.Game.Worlds
                 return;
             }
 
+            float sx = sprite.X;
+            float sy = sprite.Y;
+            float sw = sprite.Width;
+            float sh = sprite.Height;
+
             foreach (Light light in _parent.dynamicLights)
             {
                 if (light.Intensity == 0 || light.Radius == 0)
                     continue;
+
                 float Y = light.Y + 18f;
                 float xmin = light.X - (light.Radius) - 8;
                 float xmax = light.X + (light.Radius) + 8;
                 float ymin = Y - (light.Radius) - 8;
                 float ymax = Y + (light.Radius) + 8;
-                if (sprite.X + (sprite.Width / 2f) >= xmin && sprite.X - (sprite.Width / 2f) <= xmax && sprite.Y + (sprite.Height / 2f) >= ymin && sprite.Y - (sprite.Height / 2f) <= ymax)
+                if (sx + (sw / 2f) >= xmin && sx - (sw / 2f) <= xmax && sy + (sh / 2f) >= ymin && sy - (sh / 2f) <= ymax)
                 {
                     sprite.dynamicLights.Add(light);
                 }
@@ -171,6 +181,7 @@ namespace Sharp2D.Game.Worlds
             {
                 if (light.Intensity == 0 || light.Radius == 0)
                     continue;
+
                 float Y = light.Y + 18f;
                 float xmin = light.X - (light.Radius);
                 float xmax = light.X + (light.Radius);
@@ -291,13 +302,14 @@ namespace Sharp2D.Game.Worlds
                     DrawBatch batch = batches[i];
                     DrawPass pass = _drawPasses[i];
 
+                    batch.PrepareForDraw();
                     pass.PrepareForDraw();
 
                     batch.ForEach(pass.DrawSprite);
 
                     pass.PostDraw();
 
-                    batch.Clear();
+                    batch.Dispose();
                 }
             }
         }

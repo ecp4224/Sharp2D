@@ -13,7 +13,7 @@ namespace Sharp2D.Core.Graphics
     public abstract class Camera
     {
 
-        private List<IMoveable2d> toFollow = new List<IMoveable2d>();
+        private readonly List<IMoveable2d> _toFollow = new List<IMoveable2d>();
 
         private bool moving = false;
         private PanType type;
@@ -81,9 +81,9 @@ namespace Sharp2D.Core.Graphics
                         break;
                 }
             }
-            else if (toFollow.Count > 0)
+            else if (_toFollow.Count > 0)
             {
-                Vector2 center = MathUtils.CenterOf(toFollow.AsVector2List());
+                Vector2 center = MathUtils.CenterOf(_toFollow.AsVector2List());
                 X = -center.X;
                 Y = center.Y;
             }
@@ -95,7 +95,7 @@ namespace Sharp2D.Core.Graphics
         /// <param name="moveable">The moveable object to follow</param>
         public void Follow2d(IMoveable2d moveable)
         {
-            toFollow.Add(moveable);
+            _toFollow.Add(moveable);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Sharp2D.Core.Graphics
         /// <param name="moveable"></param>
         public void StopFollowing2d(IMoveable2d moveable)
         {
-            toFollow.Remove(moveable);
+            _toFollow.Remove(moveable);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Sharp2D.Core.Graphics
         /// </summary>
         public void ClearFollowing()
         {
-            toFollow.Clear();
+            _toFollow.Clear();
         }
 
         /// <summary>

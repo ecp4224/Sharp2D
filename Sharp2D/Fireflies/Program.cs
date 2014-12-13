@@ -16,8 +16,7 @@ namespace Fireflies
             Console.Write("How many should I make? ");
             FireflyWorld.FIREFLY_COUNT = int.Parse(Console.ReadLine());
 
-            ScreenSettings settings = new ScreenSettings();
-            settings.UseOpenTKLoop = true;
+            var settings = new ScreenSettings {UseOpenTKLoop = true};
             //settings.Fullscreen = true;
             //settings.WindowSize = new System.Drawing.Rectangle(0, 0, 1920, 1080);
 
@@ -28,7 +27,7 @@ namespace Fireflies
             wplayer.controls.play();
             wplayer.settings.setMode("loop", true);
 
-            FireflyWorld world = new FireflyWorld();
+            var world = new FireflyWorld();
             world.Load();
 
             GlobalSettings.EngineSettings.ShowConsole = true;
@@ -38,7 +37,7 @@ namespace Fireflies
 
             world.Display();
 
-            Screen.Camera.Z = 150;
+            Screen.Camera.Z = 200;
             Screen.Camera.Y = 18 * 16f;
             Screen.Camera.X = -(24 * 16f);
 

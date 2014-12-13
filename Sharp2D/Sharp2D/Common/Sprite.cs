@@ -17,7 +17,7 @@ namespace Sharp2D
     /// <para>A Sprite is an object that can be drawn by a <see cref="SpriteRenderJob"/>.</para>
     /// <para>A Sprite is a quad that can any width or height, but ALWAYS has a texture</para>
     /// </summary>
-    public abstract partial class Sprite : IDisposable, IAttachable, IMoveable2d, IMoveable3d, IComparable<Sprite>
+    public abstract partial class Sprite : IDisposable, IAttachable, IMoveable3d, IComparable<Sprite>
     {
         ~Sprite()
         {
@@ -121,7 +121,7 @@ namespace Sharp2D
                 Y = value.Y;
                 Z = value.Z;
 
-                if (Moved != null) Moved(this, new OnSpriteMoved(this, ox, oy));
+                if (Moved != null) Moved(this, new OnMoveableMoved(this, ox, oy));
             }
         }
 
@@ -299,7 +299,7 @@ namespace Sharp2D
 
                 float ox = location.X;
                 location.X = value;
-                if (Moved != null) Moved(this, new OnSpriteMoved(this, ox, Y));
+                if (Moved != null) Moved(this, new OnMoveableMoved(this, ox, Y));
 
                 foreach (IAttachable attached in _children)
                 {
@@ -359,7 +359,7 @@ namespace Sharp2D
                 float oy = location.Y;
                 location.Y = value;
 
-                if (Moved != null) Moved(this, new OnSpriteMoved(this, X, oy));
+                if (Moved != null) Moved(this, new OnMoveableMoved(this, X, oy));
 
                 foreach (IAttachable attached in _children)
                 {

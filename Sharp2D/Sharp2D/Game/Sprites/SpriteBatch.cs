@@ -95,7 +95,7 @@ namespace Sharp2D.Game.Sprites
 
         public virtual void Dispose()
         {
-            group.Clear();
+            Clear();
             _cache.Clear();
         }
 

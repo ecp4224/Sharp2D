@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using OpenTK;
 using System.Drawing;
+using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Worlds;
 using Sharp2D.Game.Sprites;
 
 namespace Sharp2D
 {
-    public abstract class GenericWorld : SpriteChunkWorld, ILightWorld
+    public abstract class GenericWorld : TiledWorld, ILightWorld
     {
         private float _brightness;
         internal Vector3 AmbientShaderColor;
@@ -199,6 +200,8 @@ namespace Sharp2D
                 _cullSpritesForLights(light);
             });*/
         }
+
+        
 
         private void _cullSpritesForLights(Light light)
         {
