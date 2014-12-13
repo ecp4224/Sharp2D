@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using OpenTK.Input;
@@ -88,6 +89,18 @@ namespace Sharp2D.Game
                 Logger.Warn("Invalid button name specified: \"" + buttonName + "\".");
                 return false;
             }
+        }
+
+        public MouseState GetState()
+        {
+            return OpenTK.Input.Mouse.GetState();
+        }
+
+        public System.Drawing.Point GetMousePosition()
+        {
+            var state = OpenTK.Input.Mouse.GetState();
+
+            
         }
     }
 }

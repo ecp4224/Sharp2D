@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Sharp2D
 {
-    public class Texture
+    public class Texture : ICloneable
     {
         private static Dictionary<string, Texture> cache = new Dictionary<string, Texture>();
 
@@ -73,9 +73,10 @@ namespace Sharp2D
             Assembly extender = Assembly.GetEntryAssembly();
             Assembly sharp2d = this.GetType().Assembly;
 
-            Stream stream = extender.GetManifestResourceStream(Name);
+            Stream stream = extender.GetManifestResourceStream(Name) ?? sharp2d.GetManifestResourceStream(Name);
+
             if (stream == null)
-                stream = sharp2d.GetManifestResourceStream(Name);
+                throw new FileNotFoundException("Could not find resource " + Name);
 
             Bitmap = new Bitmap(stream, false);
 
@@ -178,10 +179,10 @@ namespace Sharp2D
             return false;
         }
 
-        private static int currentBind;
+        private static int _currentBind;
         public void Bind()
         {
-            if (currentBind == ID)
+            if (_currentBind == ID)
             {
                 return;
             }
@@ -191,11 +192,14 @@ namespace Sharp2D
 
             Screen.ValidateOpenGLSafe("Texture.Bind");
             GL.BindTexture(TextureTarget.Texture2D, ID);
-            currentBind = ID;
+            _currentBind = ID;
         }
 
         public void ClearTexture()
         {
+            if (!Loaded)
+                throw new InvalidOperationException("Cannot clear a null texture!");
+
             using (var g = System.Drawing.Graphics.FromImage(Bitmap))
             {
                 g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
@@ -210,6 +214,29 @@ namespace Sharp2D
         {
             Bitmap = new Bitmap(Width, Height);
             ValidateSize();
+        }
+
+        public Texture Clone()
+        {
+            var texture = new Texture
+            {
+                Name = Name,
+                Bitmap = new Bitmap(Bitmap),
+                MagFilter = MagFilter,
+                MinFilter = MinFilter,
+                HasAlpha = HasAlpha,
+                ImageHeight = ImageHeight,
+                ImageWidth = ImageWidth,
+                TextureWidth = TextureWidth,
+                TextureHeight = TextureHeight
+            };
+
+            return texture;
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
     }
 }

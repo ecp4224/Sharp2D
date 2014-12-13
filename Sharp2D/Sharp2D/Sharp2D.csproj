@@ -44,6 +44,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,7 +54,9 @@
   <ItemGroup>
     <Compile Include="Common\AnimationModule.cs" />
     <Compile Include="Common\ModuleSprite.cs" />
+    <Compile Include="Common\Sprite.Helpers.cs" />
     <Compile Include="Common\SpriteBuilder.cs" />
+    <Compile Include="Common\Text.cs" />
     <Compile Include="Core\Graphics\Camera.cs" />
     <Compile Include="Core\Interfaces\IModule.cs" />
     <Compile Include="Core\Interfaces\IMoveable2d.cs" />

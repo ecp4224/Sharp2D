@@ -61,7 +61,7 @@ namespace Sharp2D.Core.Graphics.Shaders
                 else
                     throw new FileLoadException("Not a valid shader file!", f);
 
-                Source source = new Source(f, type);
+                var source = new Source(f, type);
 
                 _sources.Add(source);
             }
