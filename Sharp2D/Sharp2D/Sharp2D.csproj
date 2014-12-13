@@ -61,7 +61,6 @@
     <Compile Include="Core\Interfaces\IModule.cs" />
     <Compile Include="Core\Interfaces\IMoveable2d.cs" />
     <Compile Include="Core\Interfaces\IMoveable3d.cs" />
-    <Compile Include="Core\Graphics\Shaders\AttributeHolder.cs" />
     <Compile Include="Core\Graphics\Shaders\Shader.cs" />
     <Compile Include="Core\Graphics\Shaders\Source.cs" />
     <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />

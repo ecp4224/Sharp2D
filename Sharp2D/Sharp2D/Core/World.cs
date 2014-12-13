@@ -214,7 +214,7 @@ namespace Sharp2D.Core
             if (IsDisposing)
                 throw new InvalidOperationException("This world object is currently disposing, can not add logical item..");
 
-            DummyLogical logical = new DummyLogical(action);
+            var logical = new DummyLogical(action);
 
             if (!lFetch)
                 logics.Add(logical);
@@ -315,16 +315,16 @@ namespace Sharp2D.Core
 
     internal class DummyLogical : ILogical
     {
-        Action callback;
+        readonly Action _callback;
 
         public DummyLogical(Action callback)
         {
-            this.callback = callback;
+            _callback = callback;
         }
 
         public void Update()
         {
-            callback();
+            _callback();
         }
 
         public void Dispose()

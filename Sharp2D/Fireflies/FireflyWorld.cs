@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,8 +10,11 @@ namespace Fireflies
 {
     public class FireflyWorld : GenericWorld
     {
-        public static int FIREFLY_COUNT = 100;
-        public const int CLOUD_COUNT = 100;
+        public static int FireflyCount = 100;
+        public const int CloudCount = 100;
+        private Light _lightingLight;
+
+        private static readonly Random Rand = new Random();
         public override string Name
         {
             get { return "worlds/fireflys.json"; }
@@ -26,35 +30,102 @@ namespace Fireflies
             moon.IgnoreLights = true;
             AddSprite(moon);
 
-            BackgroundSprite sprite = new BackgroundSprite();
+            var sprite = new BackgroundSprite();
             sprite.X = sprite.Width / 2f;
             sprite.Y = sprite.Height / 2f;
             sprite.Layer = 1;
             AddSprite(sprite);
-
-            Random rand = new Random();
-            for (int i = 0; i < FIREFLY_COUNT; i++)
+            for (int i = 0; i < FireflyCount; i++)
             {
-                Firefly fly = new Firefly();
-
-                fly.X = rand.Next(4, 40) * 16f;
-                fly.Y = rand.Next(8, 25) * 16f;
+                var fly = new Firefly {X = Rand.Next(4, 40)*16f, Y = Rand.Next(8, 25)*16f};
 
                 AddLogical(fly);
 
                 AddLight(fly);
             }
 
-            for (int i = 0; i < CLOUD_COUNT; i++)
+            for (int i = 0; i < CloudCount; i++)
             {
-                Cloud c = new Cloud();
-
-                c.X = rand.Next(-10, 50) * 16f;
-                c.Y = 8f * 16f;
-                c.IgnoreLights = true;
+                var c = new Cloud {X = Rand.Next(-10, 50)*16f, Y = 8f*16f, IgnoreLights = true};
 
                 AddSprite(c);
             }
+
+            _lightingLight = new Light(this.PixelWidth / 2f, 0f, OriginalIntensity, 750f, Color.FromArgb(36, 42, 255), LightType.StaticPointLight)
+            {
+                Intensity = 0f
+            };
+
+            AddLight(_lightingLight);
+            AddLogical(Lighting);
+        }
+
+        private bool _started = false;
+        private int _count = 1;
+        private int _cur = 0;
+        private long _timeStarted;
+        private long _duration;
+        private long _wait = 2500;
+        private long _lastEnd = CurrentTimeMillis();
+        private const float OriginalIntensity = 20f;
+
+        private void Lighting()
+        {
+            if (CurrentTimeMillis() - _lastEnd >= _wait && Rand.NextDouble() > 0.95 && !_started)
+            {
+                _count = Rand.Next(1, 5);
+                _started = true;
+                _cur = 0;
+            }
+            else if (_started)
+            {
+                if (_cur < _count && _lightingLight.Intensity == 0f)
+                {
+                    _cur++;
+                    _duration = Rand.Next(50, 150);
+                    _timeStarted = CurrentTimeMillis();
+                    _lightingLight.Intensity = 0.001f;
+                }
+                else if (_lightingLight.Intensity > 0f)
+                {
+                    long curTime = CurrentTimeMillis();
+
+                    if (curTime <= _timeStarted + _duration)
+                    {
+                        long dif = curTime - _timeStarted;
+
+                        float percent = (dif/(float)_duration);
+
+                        _lightingLight.Intensity = OriginalIntensity*percent;
+                    }
+                    else if (_cur + 1 >= _count && curTime > _timeStarted + _duration)
+                    {
+                        long dif = curTime - (_timeStarted + _duration);
+
+                        float percent = (dif / (float)(_duration * 4));
+
+                        _lightingLight.Intensity = OriginalIntensity - (OriginalIntensity * percent);
+
+                        if (dif < _duration*4) return;
+                        _lightingLight.Intensity = 0f;
+                        _started = false;
+                        _wait = Rand.Next(500, 3500);
+                        _lastEnd = CurrentTimeMillis();
+                    }
+                    else if (_cur + 1 < _count && curTime > _timeStarted + _duration)
+                    {
+                        _lightingLight.Intensity = 0f;
+                    }
+                }
+            }
+        }
+
+        private static readonly DateTime Jan1St1970 = new DateTime
+    (1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        public static long CurrentTimeMillis()
+        {
+            return (long)(DateTime.UtcNow - Jan1St1970).TotalMilliseconds;
         }
     }
 }

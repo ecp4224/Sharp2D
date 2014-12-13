@@ -14,7 +14,7 @@ namespace Fireflies
         public static void Main(string[] args)
         {
             Console.Write("How many should I make? ");
-            FireflyWorld.FIREFLY_COUNT = int.Parse(Console.ReadLine());
+            FireflyWorld.FireflyCount = int.Parse(Console.ReadLine());
 
             var settings = new ScreenSettings {UseOpenTKLoop = true};
             //settings.Fullscreen = true;
@@ -31,7 +31,6 @@ namespace Fireflies
             world.Load();
 
             GlobalSettings.EngineSettings.ShowConsole = true;
-            //GlobalSettings.EngineSettings.WriteLog = true;
 
             world.AmbientBrightness = 0.1f;
 
@@ -40,10 +39,6 @@ namespace Fireflies
             Screen.Camera.Z = 200;
             Screen.Camera.Y = 18 * 16f;
             Screen.Camera.X = -(24 * 16f);
-
-            //MouseLight light = new MouseLight();
-            //world.AddLogical(light);
-            //world.AddLight(light.Light);
         }
     }
 }
