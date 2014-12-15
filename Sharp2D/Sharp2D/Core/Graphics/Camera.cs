@@ -15,12 +15,12 @@ namespace Sharp2D.Core.Graphics
 
         private readonly List<IMoveable2d> _toFollow = new List<IMoveable2d>();
 
-        private bool moving = false;
-        private PanType type;
-        private long started;
-        private long duration;
-        private Vector2 start;
-        private Vector2 end;
+        private bool _moving;
+        private PanType _type;
+        private long _started;
+        private long _duration;
+        private Vector2 _start;
+        private Vector2 _end;
 
         /// <summary>
         /// The X position of this Camera
@@ -42,41 +42,41 @@ namespace Sharp2D.Core.Graphics
         /// </summary>
         public virtual void BeforeRender()
         {
-            if (moving)
+            if (_moving)
             {
-                switch (type)
+                switch (_type)
                 {
                     case PanType.Linear:
-                        long time = Screen.TickCount - started;
+                        long time = Screen.TickCount - _started;
                         float percent;
-                        if (time > duration)
+                        if (time > _duration)
                         {
                             percent = 1f;
                         }
                         else
                         {
-                            percent = (float)time / (float)duration;
+                            percent = (float)time / (float)_duration;
                         }
-                        float x = start.X + ((end.X - start.X) * percent);
-                        float y = start.Y + ((end.Y - start.Y) * percent);
+                        float x = _start.X + ((_end.X - _start.X) * percent);
+                        float y = _start.Y + ((_end.Y - _start.Y) * percent);
                         X = x;
                         Y = y;
 
-                        if (x == end.X && y == end.Y)
+                        if (x == _end.X && y == _end.Y)
                         {
-                            moving = false;
+                            _moving = false;
                         }
                         break;
 
                     case PanType.Smooth:
-                        float newx = MathUtils.Ease(start.X, end.X, duration, Screen.TickCount - started);
-                        float newy = MathUtils.Ease(start.Y, end.Y, duration, Screen.TickCount - started);
+                        float newx = MathUtils.Ease(_start.X, _end.X, _duration, Screen.TickCount - _started);
+                        float newy = MathUtils.Ease(_start.Y, _end.Y, _duration, Screen.TickCount - _started);
 
                         X = newx;
                         Y = newy;
-                        if (newx == end.X && newy == end.Y)
+                        if (newx == _end.X && newy == _end.Y)
                         {
-                            moving = false;
+                            _moving = false;
                         }
                         break;
                 }
@@ -93,7 +93,7 @@ namespace Sharp2D.Core.Graphics
         /// Add this moveable object to the Camera's list of moveable objects to follow
         /// </summary>
         /// <param name="moveable">The moveable object to follow</param>
-        public void Follow2d(IMoveable2d moveable)
+        public void Follow2D(IMoveable2d moveable)
         {
             _toFollow.Add(moveable);
         }
@@ -102,7 +102,7 @@ namespace Sharp2D.Core.Graphics
         /// Remove this moveable object to the Camera's list of moveable objects to follow
         /// </summary>
         /// <param name="moveable"></param>
-        public void StopFollowing2d(IMoveable2d moveable)
+        public void StopFollowing2D(IMoveable2d moveable)
         {
             _toFollow.Remove(moveable);
         }
@@ -118,41 +118,53 @@ namespace Sharp2D.Core.Graphics
         /// <summary>
         /// Pan the camera to a point in the World.
         /// </summary>
-        /// <param name="Point">The location to pan to</param>
-        /// <param name="Type">The type of pan to do</param>
-        /// <param name="Duration">How long (in ms) the pan should last for</param>
-        public void PanTo(Vector2 Point, PanType Type, long Duration)
+        /// <param name="point">The location to pan to</param>
+        /// <param name="type">The type of pan to do</param>
+        /// <param name="duration">How long (in ms) the pan should last for</param>
+        public void PanTo(Vector2 point, PanType type, long duration)
         {
-            start = new Vector2(X, Y);
-            end = Point;
-            duration = Duration;
-            type = Type;
+            _start = new Vector2(X, Y);
+            _end = point;
+            this._duration = duration;
+            this._type = type;
 
-            moving = true;
-            started = Screen.TickCount;
+            _moving = true;
+            _started = Screen.TickCount;
         }
 
         /// <summary>
         /// Pan the camera to a point in the World.
         /// </summary>
-        /// <param name="X">The X location to pan to</param>
-        /// <param name="Y">The Y location to pan to</param>
-        /// <param name="Type">The type of pan to do</param>
-        /// <param name="Duration">How long (in ms) the pan should last for</param>
-        public void PanTo(float X, float Y, PanType Type, long Duration)
+        /// <param name="x">The X location to pan to</param>
+        /// <param name="y">The Y location to pan to</param>
+        /// <param name="type">The type of pan to do</param>
+        /// <param name="duration">How long (in ms) the pan should last for</param>
+        public void PanTo(float x, float y, PanType type, long duration)
         {
-            PanTo(new Vector2(X, Y), Type, Duration);
+            PanTo(new Vector2(x, y), type, duration);
+        }
+
+        /// <summary>
+        /// Test if this 2d moveable object is outside the bounds of the camera.
+        /// If this moveable object has a scale (ex: sprite), it will be ignored
+        /// </summary>
+        /// <param name="moveable">The moveable object to test</param>
+        /// <returns></returns>
+        public bool IsOutsideCamera(IMoveable2d moveable)
+        {
+            return IsOutsideCamera(moveable.X, moveable.Y, moveable.Width, moveable.Height);
         }
 
         /// <summary>
         /// Test if a quad is outside the bounds of the camera
         /// </summary>
-        /// <param name="X">The X position of the quad</param>
-        /// <param name="Y">The Y position of the quad</param>
-        /// <param name="Width">The width of the quad</param>
-        /// <param name="Height">The height of the quad</param>
+        /// <param name="x">The X position of the quad</param>
+        /// <param name="y">The Y position of the quad</param>
+        /// <param name="width">The width of the quad</param>
+        /// <param name="height">The height of the quad</param>
+        /// <param name="scale">The scale of this quad (if applicable). The default value of this parameter is 1</param>
         /// <returns>True if the quad is outside the camera's bounds, otherwise false.</returns>
-        public abstract bool IsOutsideCamera(float X, float Y, float Width, float Height, float Scale);
+        public abstract bool IsOutsideCamera(float x, float y, float width, float height, float scale = 1f);
     }
 
     public enum PanType

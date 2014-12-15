@@ -52,7 +52,7 @@ namespace Sharp2D
                 return new Vector2((x1 + x2) / 2f, (y1 + y2) / 2f);
             }
 
-            Vector2 center = new Vector2(0, 0);
+            var center = new Vector2(0, 0);
             
             float area = 0f;
             float a;

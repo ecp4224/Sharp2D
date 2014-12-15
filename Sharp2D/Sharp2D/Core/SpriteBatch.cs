@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
 
-namespace Sharp2D.Game.Sprites
+namespace Sharp2D.Core
 {
     public class ShaderGroup
     {
@@ -190,8 +186,7 @@ namespace Sharp2D.Game.Sprites
                 if (s.key == shader)
                     return s;
             }
-            ShaderGroup ss = new ShaderGroup();
-            ss.key = shader;
+            var ss = new ShaderGroup {key = shader};
             group.Add(ss);
             return ss;
         }

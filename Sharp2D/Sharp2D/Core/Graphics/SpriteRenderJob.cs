@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sharp2D.Core.Interfaces;
+using Sharp2D.Game.Sprites;
 
-namespace Sharp2D.Game.Sprites
+namespace Sharp2D.Core.Graphics
 {
     public abstract class SpriteRenderJob : IRenderJob
     {

@@ -15,7 +15,7 @@ namespace Sharp2D
     {
         public static bool IsDefaultForType<T>(this object obj)
         {
-            T temp = (T)obj;
+            var temp = (T)obj;
             return EqualityComparer<T>.Default.Equals(temp, default(T));
         }
 
@@ -68,12 +68,8 @@ namespace Sharp2D
 
         public static List<Vector3> AsVector3List(this List<IMoveable3d> obj)
         {
-            List<Vector3> toReturn = new List<Vector3>(obj.Count);
-
-            foreach (IMoveable3d s in obj)
-            {
-                toReturn.Add(s.Vector3d);
-            }
+            var toReturn = new List<Vector3>(obj.Count);
+            toReturn.AddRange(obj.Select(s => s.Vector3d));
 
             return toReturn;
         }

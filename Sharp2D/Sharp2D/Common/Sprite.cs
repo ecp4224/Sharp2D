@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using System.Drawing;
 using Sharp2D.Core;
+using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
 using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Sprites;

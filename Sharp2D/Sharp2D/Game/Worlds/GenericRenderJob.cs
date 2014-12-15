@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using Sharp2D.Core;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
@@ -361,13 +362,13 @@ namespace Sharp2D.Game.Worlds
             Z = 1f;
         }
 
-        public override bool IsOutsideCamera(float X, float Y, float Width, float Height, float Scale)
+        public override bool IsOutsideCamera(float x, float y, float width, float height, float Scale)
         {
-            Y = -Y;
+            y = -y;
 
             var aspect = Screen.Settings.WindowAspectRatio;
-            var tempPos = new Vector2(X, Y);
-            var tempSize = new Vector2(Width, Height);
+            var tempPos = new Vector2(x, y);
+            var tempSize = new Vector2(width, height);
 
             tempPos = tempPos + (tempSize * Scale);
 

@@ -10,21 +10,21 @@ namespace Sharp2D
 {
     public abstract class ModuleSprite : Sprite, ILogical
     {
-        private List<IModule> toRemove = new List<IModule>();
-        private List<IModule> toAdd = new List<IModule>();
-        private object m_lock = new object();
-        private bool looping = false;
-        private int tID;
+        private readonly List<IModule> _toRemove = new List<IModule>();
+        private readonly List<IModule> _toAdd = new List<IModule>();
+        private readonly object _mLock = new object();
+        private bool _looping = false;
+        private int _tId;
 
-        private List<IModule> _modules = new List<IModule>();
+        private readonly List<IModule> _modules = new List<IModule>();
         
         
         public virtual void Update()
         {
-            lock (m_lock)
+            lock (_mLock)
             {
-                looping = true;
-                tID = Thread.CurrentThread.ManagedThreadId;
+                _looping = true;
+                _tId = Thread.CurrentThread.ManagedThreadId;
                 
                 foreach (IModule m in _modules)
                 {
@@ -34,9 +34,9 @@ namespace Sharp2D
                         RemoveModule(m);
                 }
                 
-                looping = false;
+                _looping = false;
 
-                foreach (IModule m in toAdd)
+                foreach (IModule m in _toAdd)
                 {
                     _modules.Add(m);
 
@@ -44,22 +44,22 @@ namespace Sharp2D
 
                     Logger.Debug("Module " + m.ModuleName + " attached to " + ToString() + ".");
                 }
-                toAdd.Clear();
+                _toAdd.Clear();
 
-                foreach (IModule m in toRemove)
+                foreach (IModule m in _toRemove)
                 {
                     _modules.Remove(m);
                 }
 
-                toRemove.Clear();
+                _toRemove.Clear();
             }
         }
 
         protected override void OnDispose()
         {
-            if (looping)
+            if (_looping)
             {
-                if (Thread.CurrentThread.ManagedThreadId == tID)
+                if (Thread.CurrentThread.ManagedThreadId == _tId)
                 {
                     Logger.Error("The Update Thread is attempting to dispose a module sprite while updating its own modules!");
                     Logger.Error("The modules can't be disposed properly! It is recommended you debug why this is occuring!");
@@ -68,11 +68,11 @@ namespace Sharp2D
                 }
             }
 
-            lock (m_lock)
+            lock (_mLock)
             {
                 _modules.Clear();
-                toAdd.Clear();
-                toRemove.Clear();
+                _toAdd.Clear();
+                _toRemove.Clear();
             }
         }
 
@@ -102,7 +102,7 @@ namespace Sharp2D
                 return;
             }
 
-            if (!looping)
+            if (!_looping)
             {
                 _modules.Add(m);
 
@@ -111,15 +111,15 @@ namespace Sharp2D
                 Logger.Debug("Module " + m.ModuleName + " attached to " + ToString() + ".");
             }
             else
-                toAdd.Add(m);
+                _toAdd.Add(m);
         }
 
         public void RemoveModule(IModule m)
         {
-            if (!looping)
+            if (!_looping)
                 _modules.Remove(m);
             else
-                toRemove.Remove(m);
+                _toRemove.Remove(m);
         }
 
         public void RemoveModule<T>() where T : IModule
@@ -137,7 +137,7 @@ namespace Sharp2D
                 if (m is T) return true;
             }
 
-            foreach (IModule m in toAdd)
+            foreach (IModule m in _toAdd)
             {
                 if (m is T) return true;
             }
@@ -157,7 +157,7 @@ namespace Sharp2D
                 if (m.GetType() == T) return true;
             }
 
-            foreach (IModule m in toAdd)
+            foreach (IModule m in _toAdd)
             {
                 if (m.GetType() == T) return true;
             }
@@ -167,7 +167,7 @@ namespace Sharp2D
 
         public List<T> GetModules<T>() where T : IModule
         {
-            return _modules.OfType<T>().Concat<T>(toAdd.OfType<T>()).ToList<T>();
+            return _modules.OfType<T>().Concat<T>(_toAdd.OfType<T>()).ToList<T>();
         }
 
         public T GetFirstModule<T>() where T : IModule

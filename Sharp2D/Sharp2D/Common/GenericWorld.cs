@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OpenTK;
 using System.Drawing;
+using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Worlds;
 using Sharp2D.Game.Sprites;

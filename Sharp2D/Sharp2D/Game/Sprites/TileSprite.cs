@@ -111,7 +111,7 @@ namespace Sharp2D.Game.Sprites
         }
 
         private bool cached_alpha_answer;
-        private bool valid_alpha_answer = false;
+        private bool valid_alpha_answer;
         public bool TileHasAlpha
         {
             get
@@ -134,7 +134,7 @@ namespace Sharp2D.Game.Sprites
                 int height = TileSet.TileHeight;
 
 
-                Bitmap testBmp = new Bitmap(width, height);
+                var testBmp = new Bitmap(width, height);
                 using (Graphics g = Graphics.FromImage(testBmp))
                 {
                     g.DrawImage(Texture.Bitmap, new RectangleF(0, 0, width, height), new RectangleF(x, y, width, height), GraphicsUnit.Pixel);
