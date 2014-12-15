@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -117,7 +118,20 @@ namespace Sharp2D.Game.Worlds
 
         protected override void OnLoad()
         {
-            string text = System.IO.File.ReadAllText(Name);
+            if (!File.Exists(Name))
+            {
+                Width = 0;
+                Height = 0;
+                TileHeight = 0;
+                TileWidth = 0;
+                Version = -1;
+                Properties = new Dictionary<string, string>();
+                TileSets = new TileSet[0];
+                Layers = new Layer[0];
+                return;
+            }
+
+            string text = File.ReadAllText(Name);
             JObject obj = JObject.Parse(text);
             Height = (int)obj["height"];
             Width = (int)obj["width"];

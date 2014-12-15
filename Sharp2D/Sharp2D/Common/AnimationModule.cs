@@ -24,7 +24,7 @@ namespace Sharp2D
 
         public AnimationModule Parent { get; private set; }
 
-        public string AnimationConfigPath { get; private set; }
+        public string AnimationConfigPath { get; set; }
 
         public string JsonResourcePath { get; private set; }
 
@@ -202,9 +202,20 @@ namespace Sharp2D
                     if (st == null)
                     {
                         //Assume it's a file path if no type was found
-                        sprite = new BasicAnimatedSprite(child_animation.SpriteFullName);
-                        spriteModule = new AnimationModule("basic_sprite");
-                        sprite.AttachModule(spriteModule);
+                        try
+                        {
+                            sprite = new BasicAnimatedSprite(child_animation.SpriteFullName);
+                            spriteModule = new AnimationModule("basic_sprite");
+                            sprite.AttachModule(spriteModule);
+                        }
+                        catch
+                        {
+                            //If there was an error making this sprite
+                            //Just ignore it..
+                            ani.setup_ran = true;
+
+                            return temp;
+                        }
                     }
                     else
                     {

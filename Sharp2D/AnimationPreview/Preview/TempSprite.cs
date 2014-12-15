@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sharp2D.Game.Sprites.Animations;
-using Sharp2D.Core.Graphics;
+﻿using Sharp2D;
 
 namespace AnimationPreview.Preview
 {
-    public class TempSprite : AnimatedSprite
+    public class TempSprite : ModuleSprite
     {
         private string tex_path;
         private string sheet_path;
@@ -32,7 +26,7 @@ namespace AnimationPreview.Preview
         {
             get
             {
-                return AnimationConfigPath;
+                return GetFirstModule<AnimationModule>().AnimationConfigPath;
             }
             set
             {
@@ -40,13 +34,7 @@ namespace AnimationPreview.Preview
             }
         }
 
-        public override string AnimationConfigPath
-        {
-            get
-            {
-                return sheet_path;
-            }
-        }
+        public AnimationModule AnimationModule { get; private set; }
 
         public TempSprite()
         {
@@ -64,6 +52,12 @@ namespace AnimationPreview.Preview
 
         protected override void BeforeDraw()
         {
+        }
+
+        protected override void OnLoad()
+        {
+            AnimationModule = AttachModule<AnimationModule>();
+            AnimationModule.AnimationConfigPath = sheet_path;
         }
 
         protected override void OnUnload()
