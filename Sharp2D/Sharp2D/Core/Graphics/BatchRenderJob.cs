@@ -4,12 +4,12 @@ using Sharp2D.Game.Sprites;
 
 namespace Sharp2D.Core.Graphics
 {
-    public abstract class SpriteRenderJob : IRenderJob
+    public abstract class BatchRenderJob : IRenderJob
     {
         private static Type DefaultJob;
-        private static SpriteRenderJob DefaultJobObj;
+        private static BatchRenderJob DefaultJobObj;
 
-        public static SpriteRenderJob CreateDefaultJob()
+        public static BatchRenderJob CreateDefaultJob()
         {
             if (DefaultJobObj != null)
             {
@@ -21,7 +21,7 @@ namespace Sharp2D.Core.Graphics
                 throw new ArgumentException("No default job type or object set!");
             }
 
-            return (SpriteRenderJob)Activator.CreateInstance(DefaultJob);
+            return (BatchRenderJob)Activator.CreateInstance(DefaultJob);
         }
 
         public static void SetDefaultJob<T>()
@@ -34,7 +34,7 @@ namespace Sharp2D.Core.Graphics
             DefaultJob = t;
         }
 
-        public static void SetDefaultJob(SpriteRenderJob job)
+        public static void SetDefaultJob(BatchRenderJob job)
         {
             DefaultJobObj = job;
         }

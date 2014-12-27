@@ -44,7 +44,18 @@ namespace Sharp2D
 
         internal List<Light> lights = new List<Light>();
         internal List<Light> dynamicLights = new List<Light>();
-        private GenericRenderJob job;
+        private GenericSpriteRenderJob spriteJob;
+        private GuiRenderJob guiJob;
+
+        public GenericSpriteRenderJob SpriteRenderJob
+        {
+            get { return spriteJob; }
+        }
+
+        public GuiRenderJob GuiRenderJob
+        {
+            get { return guiJob; }
+        }
 
         public IList<Light> Lights
         {
@@ -58,7 +69,7 @@ namespace Sharp2D
         {
             get
             {
-                return job.Batch.Sprites;
+                return spriteJob.Batch.Sprites;
             }
         }
 
@@ -70,7 +81,7 @@ namespace Sharp2D
         public void InvokeWithRenderLock(Action action)
         {
             Screen.ValidateOpenGLUnsafe("InvokeWithRenderLock");
-            lock (job.RenderLock)
+            lock (GenericRenderJob.RenderLock)
             {
                 action();
             }
@@ -78,12 +89,13 @@ namespace Sharp2D
 
         protected override void OnLoad()
         {
-            job = new GenericRenderJob(this);
+            spriteJob = new GenericSpriteRenderJob(this);
+            guiJob = new GuiRenderJob(this);
 
             AmbientBrightness = 1f;
             AmbientColor = Color.White;
 
-            SpriteRenderJob.SetDefaultJob(job);
+            BatchRenderJob.SetDefaultJob(spriteJob);
 
             base.OnLoad();
 
@@ -124,11 +136,11 @@ namespace Sharp2D
         {
             base.OnDisplay();
 
-            DefaultJob = job;
+            DefaultJob = spriteJob;
 
-            if (job.Batch.Count > 0)
+            if (spriteJob.Batch.Count > 0)
             {
-                job.Batch.ForEach(UpdateSpriteLights);
+                spriteJob.Batch.ForEach(UpdateSpriteLights);
             }
         }
 
@@ -254,7 +266,7 @@ namespace Sharp2D
             UpdateSpriteLights(s);
         }
 
-        public override void AddSprite(Sprite s, SpriteRenderJob job)
+        public override void AddSprite(Sprite s, BatchRenderJob job)
         {
             base.AddSprite(s, job);
 

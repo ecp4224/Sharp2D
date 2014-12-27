@@ -201,6 +201,10 @@ namespace Sharp2D.Core
             return null;
         }
 
+        public virtual void PrepareForDraw()
+        {
+        }
+
         public virtual void Add(Sprite sprite)
         {
             lock (group_lock)

@@ -104,11 +104,13 @@
     <Compile Include="Common\GenericWorld.cs" />
     <Compile Include="Core\Interfaces\ILightWorld.cs" />
     <Compile Include="Common\Light.cs" />
+    <Compile Include="Game\Worlds\GenericSpriteRenderJob.cs" />
     <Compile Include="Game\Worlds\SpriteWorld.cs" />
     <Compile Include="Game\Sprites\LogicalSprite.cs" />
     <Compile Include="Common\Sprite.cs" />
-    <Compile Include="Core\Graphics\SpriteRenderJob.cs" />
+    <Compile Include="Core\Graphics\BatchRenderJob.cs" />
     <Compile Include="Game\Worlds\TiledWorld.cs" />
+    <Compile Include="Game\Worlds\UIRenderJob.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\ScreenSettings.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

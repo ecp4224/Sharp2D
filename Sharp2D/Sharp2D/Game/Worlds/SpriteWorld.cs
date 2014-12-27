@@ -12,8 +12,8 @@ namespace Sharp2D.Game.Worlds
 {
     public abstract class SpriteWorld : World
     {
-        private SpriteRenderJob _defaultJob;
-        public virtual SpriteRenderJob DefaultJob
+        private BatchRenderJob _defaultJob;
+        public virtual BatchRenderJob DefaultJob
         {
             get { return _defaultJob;  }
             set
@@ -26,11 +26,11 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        public virtual List<SpriteRenderJob> SpriteRenderJobs
+        public virtual List<BatchRenderJob> SpriteRenderJobs
         {
             get
             {
-                return base.jobs.OfType<SpriteRenderJob>().ToList<SpriteRenderJob>();
+                return base.jobs.OfType<BatchRenderJob>().ToList<BatchRenderJob>();
             }
         }
 
@@ -39,8 +39,8 @@ namespace Sharp2D.Game.Worlds
             get
             {
                 var sprites = new List<Sprite>();
-                List<SpriteRenderJob> jobs = SpriteRenderJobs;
-                foreach (SpriteRenderJob job in jobs)
+                List<BatchRenderJob> jobs = SpriteRenderJobs;
+                foreach (BatchRenderJob job in jobs)
                 {
                     sprites.AddRange(job.Batch.Sprites);
                 }
@@ -49,7 +49,7 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        public virtual void AddSprite(Sprite s, SpriteRenderJob job)
+        public virtual void AddSprite(Sprite s, BatchRenderJob job)
         {
             if (!HasJob(job))
             {
@@ -85,8 +85,8 @@ namespace Sharp2D.Game.Worlds
 
         public virtual void RemoveSprite(Sprite s)
         {
-            List<SpriteRenderJob> jobs = SpriteRenderJobs;
-            foreach (SpriteRenderJob job in jobs)
+            List<BatchRenderJob> jobs = SpriteRenderJobs;
+            foreach (BatchRenderJob job in jobs)
             {
                 if (job.HasSprite(s))
                     job.RemoveSprite(s);

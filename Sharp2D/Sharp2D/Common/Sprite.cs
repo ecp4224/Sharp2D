@@ -15,7 +15,7 @@ using Sharp2D.Game.Worlds;
 namespace Sharp2D
 {
     /// <summary>
-    /// <para>A Sprite is an object that can be drawn by a <see cref="SpriteRenderJob"/>.</para>
+    /// <para>A Sprite is an object that can be drawn by a <see cref="BatchRenderJob"/>.</para>
     /// <para>A Sprite is a quad that can any width or height, but ALWAYS has a texture</para>
     /// </summary>
     public abstract partial class Sprite : IDisposable, IAttachable, IMoveable3d, IComparable<Sprite>
@@ -59,17 +59,17 @@ namespace Sharp2D
         }
         
         /// <summary>
-        /// The <see cref="SpriteRenderJob"/>'s this Sprite belongs to.
+        /// The <see cref="BatchRenderJob"/>'s this Sprite belongs to.
         /// </summary>
-        public List<SpriteRenderJob> ContainingJobs
+        public List<BatchRenderJob> ContainingJobs
         {
             get
             {
                 var world = CurrentWorld;
-                if (world == null) return new List<SpriteRenderJob>();
-                var toReturn = new List<SpriteRenderJob>();
-                List<SpriteRenderJob> jobs = world.SpriteRenderJobs;
-                foreach (SpriteRenderJob job in jobs)
+                if (world == null) return new List<BatchRenderJob>();
+                var toReturn = new List<BatchRenderJob>();
+                List<BatchRenderJob> jobs = world.SpriteRenderJobs;
+                foreach (BatchRenderJob job in jobs)
                 {
                     if (job.HasSprite(this))
                         toReturn.Add(job);
@@ -137,13 +137,13 @@ namespace Sharp2D
             }
             set
             {
-                List<SpriteRenderJob> temp = ContainingJobs;
+                List<BatchRenderJob> temp = ContainingJobs;
 
-                foreach (SpriteRenderJob job in temp) job.RemoveSprite(this);
+                foreach (BatchRenderJob job in temp) job.RemoveSprite(this);
 
                 _shader = value;
 
-                foreach (SpriteRenderJob job in temp) job.AddSprite(this);
+                foreach (BatchRenderJob job in temp) job.AddSprite(this);
             }
         }
 
@@ -158,13 +158,13 @@ namespace Sharp2D
             }
             set
             {
-                List<SpriteRenderJob> temp = ContainingJobs;
+                List<BatchRenderJob> temp = ContainingJobs;
 
-                foreach (SpriteRenderJob job in temp) job.RemoveSprite(this);
+                foreach (BatchRenderJob job in temp) job.RemoveSprite(this);
 
                 _texture = value;
 
-                foreach (SpriteRenderJob job in temp) job.AddSprite(this);
+                foreach (BatchRenderJob job in temp) job.AddSprite(this);
             }
         }
 
@@ -435,7 +435,7 @@ namespace Sharp2D
         private SpaceType space = SpaceType.World;
         private float z = 0.1f;
         /// <summary>
-        /// The Layer this Sprite lives on in the currently displaying world. Note: Some <see cref="SpriteRenderJob"/>'s don't implement this variable
+        /// The Layer this Sprite lives on in the currently displaying world. Note: Some <see cref="BatchRenderJob"/>'s don't implement this variable
         /// </summary>
         public virtual float Layer { get { return Z; } set { Z = value; } }
 

@@ -14,7 +14,7 @@ namespace Sharp2D.Game.Worlds
     /// </summary>
     public class GenericCamera : Camera
     {
-        public override bool IsOutsideCamera(float x, float y, float width, float height, float Scale)
+        public override bool IsOutsideCamera(float x, float y, float width, float height, float scale)
         {
             return false;
         }
