@@ -95,8 +95,6 @@ namespace Sharp2D
             AmbientBrightness = 1f;
             AmbientColor = Color.White;
 
-            BatchRenderJob.SetDefaultJob(spriteJob);
-
             base.OnLoad();
 
             Layer[] layers = GetLayerByType(LayerType.ObjectLayer);

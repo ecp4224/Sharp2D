@@ -11,7 +11,7 @@ using Sharp2D.Game.Sprites;
 
 namespace Sharp2D.Game.Worlds
 {
-    public abstract class TiledWorld : SpriteWorld
+    public abstract class TiledWorld : BatchJobWorld
     {
         internal readonly Dictionary<int, TexCoords> texcoords_cache = new Dictionary<int, TexCoords>();
         [JsonProperty(PropertyName = "height")]

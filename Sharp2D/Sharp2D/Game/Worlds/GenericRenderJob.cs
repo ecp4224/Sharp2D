@@ -189,7 +189,7 @@ namespace Sharp2D.Game.Worlds
 
         public abstract void PostDraw();
 
-        public abstract void SetupBatch(ref DrawBatch batch);
+        public abstract void SetupBatch(SpriteBatch batch);
 
         public abstract void OnInit();
 

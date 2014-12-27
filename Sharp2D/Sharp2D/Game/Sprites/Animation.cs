@@ -285,9 +285,9 @@ namespace Sharp2D.Game.Sprites
                 {
                     if (ParentAnimation.ModuleOwner.ChildAnimationPlaying != null)
                     {
-                        if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
+                        if (ParentAnimation.Owner.CurrentWorld is Worlds.BatchJobWorld)
                         {
-                            Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
+                            Worlds.BatchJobWorld w = (Worlds.BatchJobWorld)ParentAnimation.Owner.CurrentWorld;
                             w.RemoveSprite(ParentAnimation.ModuleOwner.ChildAnimationPlaying.Owner);
                         }
                     }
@@ -303,16 +303,16 @@ namespace Sharp2D.Game.Sprites
                     {
                         if (ParentAnimation.ModuleOwner.ChildAnimationPlaying != null)
                         {
-                            if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
+                            if (ParentAnimation.Owner.CurrentWorld is Worlds.BatchJobWorld)
                             {
-                                Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
+                                Worlds.BatchJobWorld w = (Worlds.BatchJobWorld)ParentAnimation.Owner.CurrentWorld;
                                 w.RemoveSprite(ParentAnimation.ModuleOwner.ChildAnimationPlaying.Owner);
                             }
                         }
                         ParentAnimation.ModuleOwner.ChildAnimationPlaying = this;
-                        if (ParentAnimation.Owner.CurrentWorld is Worlds.SpriteWorld)
+                        if (ParentAnimation.Owner.CurrentWorld is Worlds.BatchJobWorld)
                         {
-                            Worlds.SpriteWorld w = (Worlds.SpriteWorld)ParentAnimation.Owner.CurrentWorld;
+                            Worlds.BatchJobWorld w = (Worlds.BatchJobWorld)ParentAnimation.Owner.CurrentWorld;
                             if (!w.Sprites.Contains(Owner))
                                 w.AddSprite(Owner);
                         }

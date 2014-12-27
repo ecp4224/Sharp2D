@@ -68,7 +68,7 @@ namespace Sharp2D
                 var world = CurrentWorld;
                 if (world == null) return new List<BatchRenderJob>();
                 var toReturn = new List<BatchRenderJob>();
-                List<BatchRenderJob> jobs = world.SpriteRenderJobs;
+                List<BatchRenderJob> jobs = world.BatchRenderJobs;
                 foreach (BatchRenderJob job in jobs)
                 {
                     if (job.HasSprite(this))
@@ -172,8 +172,8 @@ namespace Sharp2D
         /// The position of this Sprite in the currently displaying world represented as a <see cref="Vector2"/>
         /// </summary>
         public Vector2 Position { get { return new Vector2(X, Y); } }
-        internal readonly List<SpriteWorld> _worlds = new List<SpriteWorld>();
-        public IList<SpriteWorld> ContainingWorlds
+        internal readonly List<BatchJobWorld> _worlds = new List<BatchJobWorld>();
+        public IList<BatchJobWorld> ContainingWorlds
         {
             get
             {
@@ -184,7 +184,7 @@ namespace Sharp2D
         /// <summary>
         /// Get the world the sprite is currently in. This world is the current World being displayed on the screen. To get all the Worlds this sprite is in, use ContainingWorlds
         /// </summary>
-        public SpriteWorld CurrentWorld
+        public BatchJobWorld CurrentWorld
         {
             get
             {

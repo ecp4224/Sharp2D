@@ -39,8 +39,8 @@ namespace Sharp2D.Game.Worlds
             get
             {
                 var sprites = new List<Sprite>();
-                List<BatchRenderJob> jobs = SpriteRenderJobs;
-                foreach (BatchRenderJob job in jobs)
+                var spriteRenderJobs = SpriteRenderJobs;
+                foreach (var job in spriteRenderJobs)
                 {
                     sprites.AddRange(job.Batch.Sprites);
                 }

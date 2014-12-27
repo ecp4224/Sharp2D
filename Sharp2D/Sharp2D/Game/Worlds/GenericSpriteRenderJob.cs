@@ -130,7 +130,7 @@ namespace Sharp2D.Game.Worlds
                 DrawBatch batch = batches[i];
                 DrawPass pass = drawPasses[i];
 
-                pass.SetupBatch(ref batch);
+                pass.SetupBatch(batch);
             }
 
             Batch.ForEach(delegate(Sprite sprite)

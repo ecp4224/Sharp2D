@@ -1,4 +1,5 @@
-﻿using Sharp2D.Core.Graphics.Shaders;
+﻿using Sharp2D.Core;
+using Sharp2D.Core.Graphics.Shaders;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -49,7 +50,7 @@ namespace Sharp2D.Game.Worlds
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
         }
 
-        public override void SetupBatch(ref DrawBatch batch) { }
+        public override void SetupBatch(SpriteBatch batch) { }
 
         public override void PrepareForDraw()
         {
@@ -168,9 +169,11 @@ namespace Sharp2D.Game.Worlds
             //GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
         }
 
-        public override void SetupBatch(ref DrawBatch batch)
+        public override void SetupBatch(SpriteBatch batch)
         {
-            batch.Type = 1;
+            var drawBatch = batch as DrawBatch;
+            if (drawBatch != null)
+                drawBatch.Type = 1;
         }
 
         public override void OnInit()
@@ -323,9 +326,11 @@ namespace Sharp2D.Game.Worlds
             GL.DepthMask(true);
         }
 
-        public override void SetupBatch(ref DrawBatch batch)
+        public override void SetupBatch(SpriteBatch batch)
         {
-            batch.Type = 2;
+            var drawBatch = batch as DrawBatch;
+            if (drawBatch != null)
+                drawBatch.Type = 2;
         }
 
         public override void OnInit()
