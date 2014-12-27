@@ -11,12 +11,12 @@ namespace Sharp2D.Game.Worlds
 
         public override DrawPass[] DefaultPasses
         {
-            get { throw new System.NotImplementedException(); }
+            get { return new DrawPass[0]; }
         }
 
         protected override SpriteBatch[] CreateCulledBatches()
         {
-            throw new System.NotImplementedException();
+            return new SpriteBatch[0];
         }
     }
 }

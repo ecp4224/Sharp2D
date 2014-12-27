@@ -132,37 +132,17 @@ namespace Sharp2D
 
         public bool ModuleExists<T>() where T : IModule
         {
-            foreach (IModule m in _modules)
-            {
-                if (m is T) return true;
-            }
-
-            foreach (IModule m in _toAdd)
-            {
-                if (m is T) return true;
-            }
-
-            return false;
+            return _modules.OfType<T>().Any() || _toAdd.OfType<T>().Any();
         }
 
         public bool ModuleExists(IModule m)
         {
-            return ModuleExists(m.GetType());
+            return _modules.Contains(m) || _toAdd.Contains(m);
         }
 
         public bool ModuleExists(Type T)
         {
-            foreach (IModule m in _modules)
-            {
-                if (m.GetType() == T) return true;
-            }
-
-            foreach (IModule m in _toAdd)
-            {
-                if (m.GetType() == T) return true;
-            }
-
-            return false;
+            return _modules.Any(m => m.GetType() == T) || _toAdd.Any(m => m.GetType() == T);
         }
 
         public List<T> GetModules<T>() where T : IModule

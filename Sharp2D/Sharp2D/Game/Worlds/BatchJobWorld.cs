@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sharp2D.Core;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Interfaces;
-using Sharp2D.Game.Sprites;
 
 namespace Sharp2D.Game.Worlds
 {
-    public abstract class SpriteWorld : World
+    public abstract class BatchJobWorld : World
     {
         private BatchRenderJob _defaultJob;
         public virtual BatchRenderJob DefaultJob
@@ -26,7 +22,7 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        public virtual List<BatchRenderJob> SpriteRenderJobs
+        public virtual List<BatchRenderJob> BatchRenderJobs
         {
             get
             {
@@ -39,7 +35,7 @@ namespace Sharp2D.Game.Worlds
             get
             {
                 var sprites = new List<Sprite>();
-                var spriteRenderJobs = SpriteRenderJobs;
+                var spriteRenderJobs = BatchRenderJobs;
                 foreach (var job in spriteRenderJobs)
                 {
                     sprites.AddRange(job.Batch.Sprites);
@@ -85,7 +81,7 @@ namespace Sharp2D.Game.Worlds
 
         public virtual void RemoveSprite(Sprite s)
         {
-            List<BatchRenderJob> jobs = SpriteRenderJobs;
+            List<BatchRenderJob> jobs = BatchRenderJobs;
             foreach (BatchRenderJob job in jobs)
             {
                 if (job.HasSprite(s))

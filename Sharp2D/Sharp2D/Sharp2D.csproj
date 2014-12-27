@@ -105,7 +105,7 @@
     <Compile Include="Core\Interfaces\ILightWorld.cs" />
     <Compile Include="Common\Light.cs" />
     <Compile Include="Game\Worlds\GenericSpriteRenderJob.cs" />
-    <Compile Include="Game\Worlds\SpriteWorld.cs" />
+    <Compile Include="Game\Worlds\BatchJobWorld.cs" />
     <Compile Include="Game\Sprites\LogicalSprite.cs" />
     <Compile Include="Common\Sprite.cs" />
     <Compile Include="Core\Graphics\BatchRenderJob.cs" />

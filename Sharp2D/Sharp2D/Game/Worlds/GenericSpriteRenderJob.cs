@@ -208,7 +208,7 @@ namespace Sharp2D.Game.Worlds
 
             foreach (Light light in ParentWorld.dynamicLights)
             {
-                if (light.Intensity == 0 || light.Radius == 0 || Screen.Camera.IsOutsideCamera(light))
+                if (light.Intensity == 0 || light.Radius == 0)
                     continue;
 
                 float Y = light.Y + 18f;
@@ -224,7 +224,7 @@ namespace Sharp2D.Game.Worlds
             if (sprite.IsStatic) return;
             foreach (Light light in ParentWorld.lights)
             {
-                if (light.Intensity == 0 || light.Radius == 0 || Screen.Camera.IsOutsideCamera(light))
+                if (light.Intensity == 0 || light.Radius == 0)
                     continue;
 
                 float Y = light.Y + 18f;
