@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 using Sharp2D.Core;
 using Sharp2D.Core.Graphics;
 
@@ -36,14 +37,14 @@ namespace Sharp2D
         /// <para>Measurement: pixels</para>
         /// Default: 1280x720
         /// </summary>
-        public System.Drawing.Rectangle GameSize { get; set; }
+        public System.Drawing.Size GameSize { get; set; }
 
         /// <summary>
         /// <para>The size of the window</para>
         /// <para>Measurement: pixels</para>
         /// Default: 1280x720
         /// </summary>
-        public System.Drawing.Rectangle WindowSize { get; set; }
+        public System.Drawing.Size WindowSize { get; set; }
 
         /// <summary>
         /// <para>Whether to run in fullscreen or not</para>
@@ -82,32 +83,29 @@ namespace Sharp2D
             }
         }
 
-        private OpenTK.Vector2 aspect;
-        private System.Drawing.Rectangle savedW;
-        public OpenTK.Vector2 WindowAspectRatio
+        private Vector2 aspect;
+        private System.Drawing.Size savedW;
+        public Vector2 WindowAspectRatio
         {
             get
             {
-                if (savedW == null || savedW != WindowSize)
+                if (savedW == WindowSize) return aspect;
+                float width = WindowSize.Width;
+                float height = WindowSize.Height;
+
+                float newWidth = width;
+                float newHeight = height;
+
+                while (height != 0)
                 {
-                    float width = WindowSize.Width;
-                    float height = WindowSize.Height;
-
-                    float remainder = 0;
-                    float newWidth = width;
-                    float newHeight = height;
-
-                    while (height != 0)
-                    {
-                        remainder = width % height;
-                        width = height;
-                        height = remainder;
-                    }
-
-                    newWidth = newWidth / width;
-                    newHeight = newHeight / width;
-                    aspect = new OpenTK.Vector2(newWidth, newHeight);
+                    float remainder = width % height;
+                    width = height;
+                    height = remainder;
                 }
+
+                newWidth = newWidth / width;
+                newHeight = newHeight / width;
+                aspect = new OpenTK.Vector2(newWidth, newHeight);
                 return aspect;
             }
         }

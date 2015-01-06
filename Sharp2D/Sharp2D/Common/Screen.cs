@@ -21,7 +21,7 @@ namespace Sharp2D
                 {
                     LogicTickRate = 40,
                     MaxSkippedFrames = 5,
-                    GameSize = new System.Drawing.Rectangle(0, 0, 1280, 720)
+                    GameSize = new System.Drawing.Size(1280, 720)
                 };
                 settings.WindowSize = settings.GameSize;
                 settings.Fullscreen = false;
