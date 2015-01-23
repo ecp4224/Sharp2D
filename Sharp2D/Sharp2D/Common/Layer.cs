@@ -115,7 +115,7 @@ namespace Sharp2D
         [JsonIgnore]
         private TileSprite[] sprites;
 
-        internal void SetTile(int index, TileSprite sprite)
+        public void SetTile(int index, TileSprite sprite)
         {
             if (sprites == null)
                 sprites = new TileSprite[Data.Length];
