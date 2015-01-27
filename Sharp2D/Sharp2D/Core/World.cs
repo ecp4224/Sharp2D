@@ -205,7 +205,7 @@ namespace Sharp2D.Core
                 lCache.Add(logical);
         }
 
-        public void AddLogical(Action action)
+        public ILogical AddLogical(Action action)
         {
             if (action == null)
                 throw new ArgumentException("Action cannot be null!");
@@ -220,6 +220,8 @@ namespace Sharp2D.Core
                 logics.Add(logical);
             else
                 lCache.Add(logical);
+
+            return logical;
         }
 
         public void RemoveLogical(ILogical logical)
