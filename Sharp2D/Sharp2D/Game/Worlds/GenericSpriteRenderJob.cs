@@ -135,7 +135,7 @@ namespace Sharp2D.Game.Worlds
 
             Batch.ForEach(delegate(Sprite sprite)
             {
-                if (sprite.IsOffScreen || !sprite.IsVisible) return;
+                if (sprite.IsOffScreen || !sprite.IsVisible || Math.Abs(sprite.Alpha) < 0.001f) return;
                 CullLights(sprite);
                 for (int i = 0; i < batches.Length; i++)
                 {
