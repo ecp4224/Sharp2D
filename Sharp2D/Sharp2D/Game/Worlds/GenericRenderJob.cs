@@ -174,8 +174,8 @@ namespace Sharp2D.Game.Worlds
 
             tempPos.X /= (aspect.X/aspect.Y);
 
-            return tempPos.X < 0 || tempPos.X > 1 ||
-                   tempPos.Y < 0 || tempPos.Y > 1;
+            return tempPos.X <= -0.3f || tempPos.X >= 1.3f ||
+                   tempPos.Y <= -0.3f || tempPos.Y >= 1.3f;
         }
     }
 

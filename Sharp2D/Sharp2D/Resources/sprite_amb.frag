@@ -1,7 +1,7 @@
 #version 150
 
 uniform vec3 brightness;
-
+uniform float alpha;
 
 in vec2 fragtexcoord;
 
@@ -12,9 +12,9 @@ out vec4 fragColor;
 
 void main(){
 		vec4 difcolor = texture(texture0, fragtexcoord);
-		if(difcolor.a <= 0.0) discard;
+		float real_alpha = clamp(difcolor.a - alpha, 0.0, 1.0);
+		if(real_alpha <= 0.0) discard;
 		
 		fragColor.rgb = brightness * difcolor.rgb;
-		fragColor.a = difcolor.a;
-//		fragColor = vec4(1.0);
+		fragColor.a = real_alpha;
 }

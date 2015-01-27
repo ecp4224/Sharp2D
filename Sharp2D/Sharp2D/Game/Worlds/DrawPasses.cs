@@ -42,6 +42,7 @@ namespace Sharp2D.Game.Worlds
             if ((sprite.FlipState & FlipState.Horizontal) != 0)
                 width = -width;
 
+            _ambiantShader.Uniforms.SetUniform(1f - sprite.Alpha, _ambiantShader.Uniforms["alpha"]);
             _ambiantShader.Uniforms.SetUniform(sprite.Scale, _ambiantShader.Uniforms["spriteScale"]);
             _ambiantShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, width, height), _ambiantShader.Uniforms["spritePos"]);
             _ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), _ambiantShader.Uniforms["texCoordPosAndScale"]);
@@ -125,6 +126,7 @@ namespace Sharp2D.Game.Worlds
             if ((sprite.FlipState & FlipState.Horizontal) != 0)
                 width = -width;
 
+            _lightShader.Uniforms.SetUniform(1f - sprite.Alpha, _lightShader.Uniforms["alpha"]);
             _lightShader.Uniforms.SetUniform(sprite.Scale, _lightShader.Uniforms["spriteScale"]);
             _lightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, width, height), _lightShader.Uniforms["spritePos"]);
             _lightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), _lightShader.Uniforms["texCoordPosAndScale"]);
@@ -234,6 +236,7 @@ namespace Sharp2D.Game.Worlds
             if ((sprite.FlipState & FlipState.Horizontal) != 0)
                 width = -width;
 
+            _alphaLightShader.Uniforms.SetUniform(1f - sprite.Alpha, _alphaLightShader.Uniforms["alpha"]);
             _alphaLightShader.Uniforms.SetUniform(sprite.Scale, _alphaLightShader.Uniforms["spriteScale"]);
             _alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, width, height), _alphaLightShader.Uniforms["spritePos"]);
             _alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), _alphaLightShader.Uniforms["texCoordPosAndScale"]);

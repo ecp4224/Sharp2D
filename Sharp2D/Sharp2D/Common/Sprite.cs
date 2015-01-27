@@ -566,6 +566,15 @@ namespace Sharp2D
             ToAttach.Parents.Add(this);
         }
 
+        private float _alpha = 1f;
+        /// <summary>
+        /// How transparent this Sprite object is. (Must be a value between 0-1)
+        /// </summary>
+        public virtual float Alpha {
+            get { return _alpha; }
+            set { _alpha = Math.Min(1, Math.Max(value, 0)); }
+        }
+
         /// <summary>
         /// Whether or not this Sprite object contains alpha
         /// </summary>
@@ -573,7 +582,7 @@ namespace Sharp2D
         {
             get
             {
-                return Texture.HasAlpha;
+                return Alpha < 1f || Texture.HasAlpha;
             }
         }
 
