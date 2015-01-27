@@ -340,16 +340,11 @@ namespace Sharp2D.Game.Sprites
                 {
                     y += ModuleOwner.Animations[i].Height;
                 }
-                //y = Owner.Texture.TextureHeight - y;
-
-                /*float width = x + Width;
-                float height = Height;*/
                 Vector2 tl = new Vector2((x + Width) / Owner.Texture.TextureWidth,  (y - Height) / Owner.Texture.TextureHeight);
                 Vector2 bl = new Vector2(x / Owner.Texture.TextureWidth,            y / Owner.Texture.TextureHeight);
                 Vector2 br = new Vector2((x + Width) / Owner.Texture.TextureWidth,  y / Owner.Texture.TextureHeight);
 
                 return new TexCoords(bl, default(Vector2), tl, br);
-                //return new TexCoords(x, y, width, height, Owner.Texture);
             }
         }
 

@@ -76,18 +76,18 @@ namespace Sharp2D
             }
         }
 
-        public T AttachModule<T>() where T : IModule
+        public T AttachModule<T>() where T : IModule, new()
         {
-            T m = (T)Activator.CreateInstance(typeof(T));
+            var m = new T();
 
             AttachModule(m);
 
             return m;
         }
 
-        public T AttachModule<T>(params object[] args) where T : IModule
+        public T AttachModule<T>(params object[] args) where T : IModule, new()
         {
-            T m = (T)Activator.CreateInstance(typeof(T), args);
+            var m = new T();
 
             AttachModule(m);
 
