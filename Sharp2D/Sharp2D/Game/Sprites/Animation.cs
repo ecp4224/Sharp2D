@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using OpenTK;
 using Sharp2D;
 using Sharp2D.Core;
 
@@ -334,17 +335,21 @@ namespace Sharp2D.Game.Sprites
                 if (CurrentStep < 0)
                     CurrentStep = 0;
                 float x = Width * CurrentStep;
-                float y = 0f;
+                float y = Height;
                 for (int i = 0; i < Row; i++)
                 {
                     y += ModuleOwner.Animations[i].Height;
                 }
-                y = Owner.Texture.TextureHeight - y;
+                //y = Owner.Texture.TextureHeight - y;
 
-                float width = x + Width;
-                float height = y + Height;
+                /*float width = x + Width;
+                float height = Height;*/
+                Vector2 tl = new Vector2((x + Width) / Owner.Texture.TextureWidth,  (y - Height) / Owner.Texture.TextureHeight);
+                Vector2 bl = new Vector2(x / Owner.Texture.TextureWidth,            y / Owner.Texture.TextureHeight);
+                Vector2 br = new Vector2((x + Width) / Owner.Texture.TextureWidth,  y / Owner.Texture.TextureHeight);
 
-                return new TexCoords(x, y, width, height, Owner.Texture);
+                return new TexCoords(bl, default(Vector2), tl, br);
+                //return new TexCoords(x, y, width, height, Owner.Texture);
             }
         }
 
