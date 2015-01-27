@@ -80,11 +80,19 @@ namespace Sharp2D
         private List<Hitbox> _hitboxes;
         public Hitbox Hitbox { get; set; }
 
+        private string _hitbotPath = null;
+
+        public string HitboxConfigPath
+        {
+            get { return _hitbotPath ?? (_hitbotPath = Name + "/" + Name + "_hitbox.json"); }
+            set { _hitbotPath = value; }
+        }
+
         protected override void OnLoad()
         {
             Hitbox.AddCollidable(this);
 
-            _hitboxes = Hitbox.Read(Name + "/" + Name + "_hitbox.json");
+            _hitboxes = Hitbox.Read(HitboxConfigPath);
             if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
             Hitbox = _hitboxes[0];
         }
