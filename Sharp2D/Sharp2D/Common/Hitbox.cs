@@ -111,6 +111,10 @@ namespace Sharp2D
             {
                 json = File.ReadAllText("sprites/" + filePath);
             }
+            else if (File.Exists(filePath))
+            {
+                json = File.ReadAllText(filePath);
+            }
             else
             {
                 using (var stream = Assembly.GetEntryAssembly().GetManifestResourceStream(filePath))

@@ -6,6 +6,7 @@
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatSlider.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Emerald.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
@@ -25,7 +26,7 @@
         <TabControl SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Animation Preview" Name="Preview">
                 <Grid>
-                    <TextBox Name="sheet_path" HorizontalAlignment="Left" Height="25" Margin="27,69,0,0" TextWrapping="NoWrap" AcceptsReturn="False" VerticalAlignment="Top" Width="304" FontSize="14">
+                    <TextBox Name="sheet_path" HorizontalAlignment="Left" Height="25" Margin="27,13,0,0" TextWrapping="NoWrap" AcceptsReturn="False" VerticalAlignment="Top" Width="304" FontSize="14">
                         <TextBox.Style>
                             <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
                                 <Style.Resources>
@@ -49,7 +50,7 @@
                             </Style>
                         </TextBox.Style>
                     </TextBox>
-                    <TextBox Name="json_path" HorizontalAlignment="Left" Height="25" Margin="27,139,0,0" TextWrapping="NoWrap" AcceptsReturn="False" VerticalAlignment="Top" Width="304" FontSize="14">
+                    <TextBox Name="json_path" HorizontalAlignment="Left" Height="25" Margin="27,76,0,0" TextWrapping="NoWrap" AcceptsReturn="False" VerticalAlignment="Top" Width="304" FontSize="14">
                         <TextBox.Style>
                             <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
                                 <Style.Resources>
@@ -73,13 +74,38 @@
                             </Style>
                         </TextBox.Style>
                     </TextBox>
-                    <Button Click="Button_Click_1"  Content="Browse" HorizontalAlignment="Left" Height="25" Margin="346,139,0,0" VerticalAlignment="Top" Width="71"/>
-                    <Button Click="Button_Click_2" Content="Browse" HorizontalAlignment="Left" Height="25" Margin="346,69,0,0" VerticalAlignment="Top" Width="71"/>
+                    <Button Click="Button_Click_1"  Content="Browse" HorizontalAlignment="Left" Height="25" Margin="346,76,0,0" VerticalAlignment="Top" Width="71"/>
+                    <Button Click="Button_Click_2" Content="Browse" HorizontalAlignment="Left" Height="25" Margin="346,13,0,0" VerticalAlignment="Top" Width="71"/>
                     <Button Click="Button_Click" Content="Reload" HorizontalAlignment="Left" Height="43" Margin="584,357,0,0" VerticalAlignment="Top" Width="95" FontSize="16"/>
                     <Image Name="sheet_preview" HorizontalAlignment="Left" Height="205" VerticalAlignment="Top" Width="248" Margin="53,195,0,0"/>
                     <Label Content="Animation Sheet:" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.49,0.615" FontWeight="Bold"/>
                     <Label Content="Playing Animation:" HorizontalAlignment="Left" Margin="299,164,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.49,0.615" FontWeight="Bold"/>
                     <ListBox SelectionChanged="box_SelectionChanged" Name="animations" HorizontalAlignment="Left" Height="205" Margin="336,195,0,0" VerticalAlignment="Top" Width="243"/>
+                    <TextBox x:Name="hitbox_path" HorizontalAlignment="Left" Height="25" Margin="27,139,0,0" TextWrapping="NoWrap" AcceptsReturn="False" VerticalAlignment="Top" Width="304" FontSize="14">
+                        <TextBox.Style>
+                            <Style xmlns:sys="clr-namespace:System;assembly=mscorlib" TargetType="{x:Type TextBox}">
+                                <Style.Resources>
+                                    <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                        <VisualBrush.Visual>
+                                            <Label Content="Hitbox JSON Config" Foreground="LightGray" />
+                                        </VisualBrush.Visual>
+                                    </VisualBrush>
+                                </Style.Resources>
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                                    </Trigger>
+                                    <Trigger Property="Text" Value="{x:Null}">
+                                        <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                                    </Trigger>
+                                    <Trigger Property="IsKeyboardFocused" Value="True">
+                                        <Setter Property="Background" Value="White" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button Click="Button_Click_3"  Content="Browse" HorizontalAlignment="Left" Height="25" Margin="346,139,0,0" VerticalAlignment="Top" Width="71"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Cascading Animation Editor" Name="CASTab" IsEnabled="False">
@@ -118,6 +144,19 @@
                     <Controls:NumericUpDown RenderTransformOrigin="0.507,0.769" VerticalAlignment="Bottom" ValueChanged="StartFrame_ValueChanged" x:Name="EndFrame" Minimum="0" Margin="83,339,471,47" />
                     <Label Content="Start:" HorizontalAlignment="Left" Margin="10,276,0,0" VerticalAlignment="Top"/>
                     <Label Content="End:" HorizontalAlignment="Left" Margin="10,339,0,0" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Hitbox Creator" Name="HitboxTab">
+                <Grid>
+                    <Button Click="Button_Click" Content="Reload" HorizontalAlignment="Left" Height="43" Margin="584,357,0,0" VerticalAlignment="Top" Width="95" FontSize="16"/>
+                    <Image Name="hitbox_editor" HorizontalAlignment="Left" Height="342" VerticalAlignment="Top" Width="456" Margin="223,10,0,0" MouseUp="Hitbox_editor_OnMouseUp" MouseDown="Hitbox_editor_OnMouseDown" MouseMove="Hitbox_editor_OnMouseMove_" MouseLeave="Hitbox_editor_OnMouseLeave"/>
+                    <ListBox Name="hitbox_animations" HorizontalAlignment="Left" Height="218" Margin="10,22,0,0" VerticalAlignment="Top" Width="208" SelectionChanged="hitbox_animations_SelectionChanged"/>
+                    <Label Content="Select Animation" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Width="108" FontWeight="Bold"/>
+                    <Slider Name="HitboxSlider" Margin="10,371,120,12" TickPlacement="TopLeft" TickFrequency="1" IsSnapToTickEnabled="True" Minimum="0" Maximum="4" ValueChanged="HitboxSlider_OnValueChanged"/>
+                    <Grid>
+                        <Button Name="ClearBtn" Content="Clear" HorizontalAlignment="Left" Margin="63,252,0,125" Width="94" Click="ButtonBase_OnClick" />
+                        <Button Name="SaveButn" Content="Save" HorizontalAlignment="Left" Margin="63,317,0,62" Width="94" />
+                    </Grid>
                 </Grid>
             </TabItem>
         </TabControl>

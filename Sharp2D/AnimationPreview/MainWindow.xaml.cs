@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using OpenTK;
 using Sharp2D;
 using Sharp2D.Game.Sprites;
 using AnimationPreview.Preview;
@@ -110,6 +113,7 @@ namespace AnimationPreview
 
             sprite.TexPath = image;
             sprite.JsonPath = json;
+            sprite.HitboxConfigPath = hitbox_path.Text;
 
             original_texture = null;
             
@@ -233,6 +237,26 @@ namespace AnimationPreview
                 cutter_animations.Items.Clear();
                 sheet_cutter.Source = null;
             }
+
+            if (HitboxTab.IsSelected && !hitbox_selected)
+            {
+                RenderOptions.SetBitmapScalingMode(hitbox_editor, BitmapScalingMode.NearestNeighbor);
+                hitbox_selected = true;
+
+                for (int row = 0; row < sprite.AnimationModule.Animations.Rows; row++)
+                {
+                    hitbox_animations.Items.Add(sprite.AnimationModule.Animations[row].Name);
+                }
+                hitbox_animations.SelectedIndex = 0;
+                HitboxSlider.Value = 0;
+                HitboxSlider_OnValueChanged(null, null);
+            }
+            else if (!HitboxTab.IsSelected)
+            {
+                hitbox_selected = false;
+                hitbox_animations.Items.Clear();
+                hitbox_editor.Source = null;
+            }
         }
 
         private Animation currently_editing_animation;
@@ -240,6 +264,7 @@ namespace AnimationPreview
         private int currently_editing_animation_row;
         private bool selected = false;
         private bool export_selected = false;
+        private bool hitbox_selected = false;
         private int selectedIndex = -1;
         private void editor_animations_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -823,5 +848,147 @@ namespace AnimationPreview
 
             sheet_cutter.Source = @new;
         }
+
+        private Animation currently_hitboxing;
+        private int currently_hitboxing_row;
+        private void hitbox_animations_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!HitboxTab.IsSelected || hitbox_animations.SelectedIndex == -1)
+                return;
+
+            currently_hitboxing = sprite.AnimationModule.Animations[(string) hitbox_animations.SelectedItem];
+            currently_hitboxing_row = hitbox_animations.SelectedIndex;
+
+            HitboxSlider.Maximum = currently_hitboxing.Frames - 1;
+            HitboxSlider.Value = 0;
+            HitboxSlider_OnValueChanged(null, null);
+        }
+
+        private void HitboxSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            sprite.ChangeHitbox(currently_hitboxing.Name + HitboxSlider.Value);
+
+            UpdateImage();
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            var dialog = new VistaOpenFileDialog {Filter = "Config Files(*.conf;*.json)|*.conf;*.json"};
+
+            if ((bool)dialog.ShowDialog(this))
+            {
+                hitbox_path.Text = dialog.FileName;
+            }
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            sprite.Hitbox = new Hitbox(sprite.Hitbox.Name, new List<Vector2>());
+            UpdateImage();
+        }
+
+        private void UpdateImage()
+        {
+            var bitmap = new Bitmap(sprite.Texture.Bitmap);
+
+            var result = new Bitmap(currently_hitboxing.Width, currently_hitboxing.Height);
+
+            int x = (int)(HitboxSlider.Value * currently_hitboxing.Width);
+            int y = 0;
+            for (int i = 0; i < currently_hitboxing.Row; i++)
+            {
+                y += sprite.AnimationModule.Animations[i].Height;
+            }
+
+            using (var graphics = Graphics.FromImage(result))
+            {
+                graphics.DrawImage(bitmap, new RectangleF(0, 0, currently_hitboxing.Width, currently_hitboxing.Height), new RectangleF(x, y, currently_hitboxing.Width, currently_hitboxing.Height), GraphicsUnit.Pixel);
+
+                Hitbox hitbox = sprite.Hitbox;
+                if (hitbox != null)
+                {
+                    var bluePen = new System.Drawing.Pen(System.Drawing.Color.Aqua, 2);
+
+                    for (int i = 0; i < hitbox.Vertices.Count; i++)
+                    {
+                        int next = i + 1;
+                        if (next >= hitbox.Vertices.Count)
+                            next = 0;
+
+                        graphics.DrawLine(bluePen, hitbox.Vertices[i].X, hitbox.Vertices[i].Y, hitbox.Vertices[next].X, hitbox.Vertices[next].Y);
+                    }
+                }
+            }
+
+            bitmap.Dispose();
+
+            ImageSource @new = ToBitmapSource(result);
+
+            result.Dispose();
+
+            hitbox_editor.Source = @new;
+        }
+
+        private void Hitbox_editor_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!moved)
+            {
+                var point = e.GetPosition(hitbox_editor);
+
+                point.X *= (sprite.Width / hitbox_editor.ActualWidth);
+                point.Y *= (sprite.Height / hitbox_editor.ActualHeight);
+
+                sprite.Hitbox.Vertices.Add(new Vector2((float)point.X, (float)point.Y));
+
+                UpdateImage(); 
+            }
+
+            down = false;
+            moved = false;
+        }
+
+        private bool down = false;
+        private bool moved = false;
+        private void Hitbox_editor_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            down = true;
+        }
+
+        private void Hitbox_editor_OnMouseMove_(object sender, MouseEventArgs e)
+        {
+            if (down)
+            {
+                moved = true;
+                var point = e.GetPosition(hitbox_editor);
+
+                point.X *= (sprite.Width / hitbox_editor.ActualWidth);
+                point.Y *= (sprite.Height / hitbox_editor.ActualHeight);
+
+                sprite.Hitbox.Vertices.Add(new Vector2((float)point.X, (float)point.Y));
+
+                UpdateImage(); 
+            }
+        }
+
+        private void Hitbox_editor_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            down = false;
+            moved = false;
+        }
+    }
+
+    internal sealed class HitboxContainer
+    {
+        [JsonProperty(PropertyName = "hitboxes")]
+        public List<HitboxHolder> Hitboxes { get; set; }
+    }
+
+    internal sealed class HitboxHolder
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "vertices")]
+        public List<float> Vertices { get; set; }
     }
 }

@@ -93,7 +93,7 @@ namespace Sharp2D
             Hitbox.AddCollidable(this);
 
             _hitboxes = Hitbox.Read(HitboxConfigPath);
-            if (_hitboxes == null) { Console.WriteLine("Well fuck"); return; }
+            if (_hitboxes == null) { _hitboxes = new List<Hitbox>(); return; }
             Hitbox = _hitboxes[0];
         }
 
@@ -107,9 +107,9 @@ namespace Sharp2D
             return Hitbox.CheckCollision(this, c, new Vector2(0, 0));
         }
 
-        public void ChangeHitbox(string name) //todo handle invalid name
+        public void ChangeHitbox(string name)
         {
-            Hitbox = (from h in _hitboxes where h.Name == name select h).First();
+            Hitbox = (from h in _hitboxes where h.Name == name select h).FirstOrDefault(); //If no hitbox was found, assume none was needed (null)
         }
     }
 }

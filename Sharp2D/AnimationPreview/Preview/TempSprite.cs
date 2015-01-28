@@ -2,7 +2,7 @@
 
 namespace AnimationPreview.Preview
 {
-    public class TempSprite : ModuleSprite
+    public class TempSprite : PhysicsSprite
     {
         private string tex_path;
         private string sheet_path;
@@ -58,6 +58,8 @@ namespace AnimationPreview.Preview
         {
             AnimationModule = AttachModule<AnimationModule>();
             AnimationModule.AnimationConfigPath = sheet_path;
+
+            base.OnLoad();
         }
 
         protected override void OnUnload()
