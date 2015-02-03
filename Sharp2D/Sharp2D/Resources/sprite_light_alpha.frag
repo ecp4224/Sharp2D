@@ -4,7 +4,7 @@ uniform vec3 lightdata; //for now rg is pos, b is radius, a is intensity
 uniform vec3 lightcolor;
 uniform vec3 ambient;
 uniform float ambientmult;
-uniform float alpha;
+uniform vec4 tint;
 
 in vec2 fragtexcoord;
 
@@ -15,7 +15,9 @@ out vec4 fragColor;
 
 void main(){
 		vec4 difcolor = texture(texture0, fragtexcoord);
-		float real_alpha = clamp(difcolor.a - alpha, 0.0, 1.0);
+		float w = (3 - (tint.r + tint.g + tint.b)) * 0.3;
+		difcolor.rgb = mix(difcolor.rgb, tint.rgb, w);
+		float real_alpha = clamp(difcolor.a - tint.a, 0.0, 1.0);
 		if(real_alpha <= 0.0) discard;
 		
 		

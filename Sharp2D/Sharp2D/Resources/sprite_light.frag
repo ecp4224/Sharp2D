@@ -2,7 +2,7 @@
 
 uniform vec3 lightdata; //for now rg is pos, b is radius
 uniform vec3 lightcolor; //for color..
-uniform float alpha; //for sprite alpha
+uniform vec4 tint; //for sprite tint
 
 in vec2 fragtexcoord;
 
@@ -13,7 +13,9 @@ out vec4 fragColor;
 
 void main(){
 		vec4 pdifcolor = texture(texture0, fragtexcoord);
-		float real_alpha = clamp(pdifcolor.a - alpha, 0.0, 1.0);
+		float w = (3 - (tint.r + tint.g + tint.b)) * 0.3;
+		pdifcolor.rgb = mix(pdifcolor.rgb, tint.rgb, w);
+		float real_alpha = clamp(pdifcolor.a - tint.a, 0.0, 1.0);
 		if(real_alpha <= 0) discard;
 
 		vec3 difcolor = pdifcolor.rgb;

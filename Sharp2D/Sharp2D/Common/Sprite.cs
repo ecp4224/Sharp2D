@@ -337,6 +337,19 @@ namespace Sharp2D
             }
         }
 
+        internal Vector4 ShaderColor = new Vector4(1f, 1f, 1f, 0f);
+        private Color _color = Color.White;
+        public Color TintColor
+        {
+            get { return _color; }
+            set
+            {
+                _color = value;
+                
+                ShaderColor = new Vector4((_color.R / 255f), (_color.G / 255f), (_color.B / 255f), 1f - (_color.A / 255f));
+            }
+        }
+
         public virtual FlipState FlipState { get; set; }
         
         /// <summary>
@@ -565,14 +578,17 @@ namespace Sharp2D
             _children.Add(ToAttach);
             ToAttach.Parents.Add(this);
         }
-
-        private float _alpha = 1f;
         /// <summary>
         /// How transparent this Sprite object is. (Must be a value between 0-1)
         /// </summary>
-        public virtual float Alpha {
-            get { return _alpha; }
-            set { _alpha = Math.Min(1, Math.Max(value, 0)); }
+        public float Alpha {
+            get { return _color.A; }
+            set
+            {
+                _color = Color.FromArgb((int) (value*255), _color);
+
+                ShaderColor = new Vector4(_color.R / 255f, _color.G / 255f, _color.B / 255f, 1f - (_color.A / 255f));
+            }
         }
 
         /// <summary>
