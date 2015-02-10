@@ -30,6 +30,7 @@ namespace Fireflies
             moon.Layer = 0.5f;
             moon.IgnoreLights = true;
             moon.NeverClip = true;
+            moon.TintColor = Color.Yellow;
             AddSprite(moon);
 
             var sprite = new BackgroundSprite();
