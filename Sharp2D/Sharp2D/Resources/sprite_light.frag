@@ -13,8 +13,6 @@ out vec4 fragColor;
 
 void main(){
 		vec4 pdifcolor = texture(texture0, fragtexcoord);
-		float w = (3 - (tint.r + tint.g + tint.b)) * 0.3;
-		pdifcolor.rgb = mix(pdifcolor.rgb, tint.rgb, w);
 		float real_alpha = clamp(pdifcolor.a - tint.a, 0.0, 1.0);
 		if(real_alpha <= 0) discard;
 
@@ -30,6 +28,7 @@ void main(){
 		//attenuation = 1.0;
 		
 		fragColor.rgb = attenuation * lightcolor * difcolor;
+		fragColor.rgb *= tint.rgb;
 		fragColor.a = real_alpha;
 //		fragColor += vec4(0.1);
 }

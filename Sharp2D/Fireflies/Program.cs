@@ -28,17 +28,28 @@ namespace Fireflies
             wplayer.settings.setMode("loop", true);
 
             var world = new FireflyWorld();
+            var world2 = new FireflyWorld();
             world.Load();
+            world2.Load();
+            world.Camera.Z = world2.Camera.Z = 200;
+            world.Camera.X = world2.Camera.X = -(24 * 16f);
+            world.Camera.Y = world2.Camera.Y = 18 * 16f;
 
             GlobalSettings.EngineSettings.ShowConsole = true;
 
             world.AmbientBrightness = 0.1f;
+            world2.AmbientBrightness = 0.1f;
 
             world.Display();
 
-            Screen.Camera.Z = 200;
-            Screen.Camera.Y = 18 * 16f;
-            Screen.Camera.X = -(24 * 16f);
+            while (true)
+            {
+                Thread.Sleep(10000);
+                if (world.Displaying)
+                    world2.Display();
+                else 
+                    world.Display();
+            }
         }
     }
 }

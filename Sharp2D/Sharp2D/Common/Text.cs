@@ -51,7 +51,7 @@ namespace Sharp2D
                 Sizes.Add(texture.Name, stringSize);
             }
 
-            return new TextSprite(texture.Name, Sizes[texture.Name])
+            return new TextSprite(texture.Name, Sizes[texture.Name], text)
             {
                 Texture = texture,
                 Width = texture.TextureWidth,
@@ -64,6 +64,8 @@ namespace Sharp2D
     {
         public SizeF StringSize { get; private set; }
 
+        public string Text { get; private set; }
+
         public float StringWidth
         {
             get { return StringSize.Width; }
@@ -74,7 +76,7 @@ namespace Sharp2D
             get { return StringSize.Height; }
         }
 
-        public TextSprite(string name, SizeF stringSize)
+        public TextSprite(string name, SizeF stringSize, string text)
             : base(name)
         {
             StringSize = stringSize;

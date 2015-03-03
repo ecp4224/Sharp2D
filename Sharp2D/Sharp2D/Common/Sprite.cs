@@ -346,7 +346,7 @@ namespace Sharp2D
             {
                 _color = value;
                 
-                ShaderColor = new Vector4((_color.R / 255f), (_color.G / 255f), (_color.B / 255f), 1f - (_color.A / 255f));
+                ShaderColor = new Vector4((_color.R / 255f), (_color.G / 255f), (_color.B / 255f), 1f - _color.A);
             }
         }
 

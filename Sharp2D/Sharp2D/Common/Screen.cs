@@ -26,10 +26,6 @@ namespace Sharp2D
                 settings.WindowSize = settings.GameSize;
                 settings.Fullscreen = false;
                 settings.VSync = false;
-                settings.Camera = new Game.Worlds.GenericCamera
-                {
-                    Z = 100f
-                };
                 settings.WindowTitle = "Sharp2D";
                 settings.UseOpenTKLoop = true;
                 settings.MaxFPS = -1; //Max FPS
@@ -40,14 +36,7 @@ namespace Sharp2D
 
         public static Camera Camera
         {
-            get
-            {
-                return Settings.Camera;
-            }
-            set
-            {
-                Settings.Camera = value;
-            }
+            get { return _renders.Camera; }
         }
 
         public static Thread DisplayThread { get; private set; }
@@ -371,7 +360,7 @@ namespace Sharp2D
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(0f, 0f, 0f, 1f);
 
-            Settings.Camera.BeforeRender();
+            _renders.Camera.BeforeRender();
 
             if (_renders == null) return;
 

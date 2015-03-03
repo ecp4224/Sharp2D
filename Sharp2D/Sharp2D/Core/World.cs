@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sharp2D;
+using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Interfaces;
+using Sharp2D.Game.Worlds;
 
 namespace Sharp2D.Core
 {
@@ -48,6 +50,8 @@ namespace Sharp2D.Core
             }
         }
 
+        public Camera Camera { get; set; }
+
         public bool Loaded { get; private set; }
 
         public bool Displaying { get; private set; }
@@ -68,6 +72,13 @@ namespace Sharp2D.Core
         {
             Screen.ValidateOpenGLUnsafe("Display()");
 
+            var currentWorld = Screen.LogicContainer as World ?? Screen.RenderJobContainer as World;
+
+            if (currentWorld != null)
+            {
+                currentWorld.Displaying = false;
+            }
+
             Screen.LogicContainer = this;
             Screen.RenderJobContainer = this;
             Displaying = true;
@@ -83,6 +94,7 @@ namespace Sharp2D.Core
             jCache = new List<IRenderJob>();
             lToRemove = new List<ILogical>();
             jToRemove = new List<IRenderJob>();
+            Camera = new GenericCamera();
 
             OnLoad();
 
