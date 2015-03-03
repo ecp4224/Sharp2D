@@ -130,9 +130,9 @@ namespace Sharp2D
             }
         }
 
-        protected override void OnDisplay()
+        protected override void OnInitialDisplay()
         {
-            base.OnDisplay();
+            base.OnInitialDisplay();
 
             DefaultJob = spriteJob;
 
@@ -140,6 +140,14 @@ namespace Sharp2D
             {
                 spriteJob.Batch.ForEach(UpdateSpriteLights);
             }
+        }
+
+        protected override void OnBackgroundDisplay()
+        {
+        }
+
+        protected override void OnResumeDisplay()
+        {
         }
 
         public Light AddLight(float X, float Y, LightType LightType)

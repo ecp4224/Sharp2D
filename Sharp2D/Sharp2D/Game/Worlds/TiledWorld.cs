@@ -181,7 +181,7 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        protected override void OnDisplay()
+        protected override void OnInitialDisplay()
         {
             foreach (TileSet tileset in TileSets)
             {

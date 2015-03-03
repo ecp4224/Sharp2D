@@ -20,9 +20,9 @@ namespace Fireflies
             get { return "worlds/fireflys.json"; }
         }
 
-        protected override void OnDisplay()
+        protected override void OnInitialDisplay()
         {
-            base.OnDisplay();
+            base.OnInitialDisplay();
 
             Sprite moon = Sprite.FromImage("sprites/moon.png");
             moon.X = (3.5f * 16f) + (moon.Width / 2f);

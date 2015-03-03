@@ -453,7 +453,7 @@ namespace Sharp2D
         public virtual float Layer { get { return Z; } set { Z = value; } }
 
         /// <summary>
-        /// Request the RenderJob to run the OnDisplay method again
+        /// Request the RenderJob to run the OnInitialDisplay method again
         /// </summary>
         protected void RequestOnDisplay()
         {

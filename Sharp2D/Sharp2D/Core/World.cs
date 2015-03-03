@@ -60,12 +60,35 @@ namespace Sharp2D.Core
 
         public abstract string Name { get; }
 
+        /// <summary>
+        /// This method is invoked when World.Load() is invoked
+        /// </summary>
         protected abstract void OnLoad();
 
-        protected abstract void OnDisplay();
+        /// <summary>
+        /// This method is invoked when the first frame of this World is about to be displayed.
+        /// This method is only ever invoked once during the life cycle, and will can only ever be reinvoked if World.Unload() was invoked
+        /// </summary>
+        protected abstract void OnInitialDisplay();
 
+        /// <summary>
+        /// This method is invoked when the World is displayed on the screen once again after being backgrouned by another World.
+        /// </summary>
+        protected abstract void OnResumeDisplay();
+
+        /// <summary>
+        /// This method is invoked when this World is being removed from the Screen by another World, or being put in the "background"
+        /// </summary>
+        protected abstract void OnBackgroundDisplay();
+
+        /// <summary>
+        /// This method is invoked when World.Unload() is invoked.
+        /// </summary>
         protected abstract void OnUnload();
 
+        /// <summary>
+        /// This method is invoked when World.Dispose() is invoked, or when this World is reclaimed by garbage collection.
+        /// </summary>
         protected abstract void OnDispose();
 
         public void Display()
@@ -77,6 +100,12 @@ namespace Sharp2D.Core
             if (currentWorld != null)
             {
                 currentWorld.Displaying = false;
+                currentWorld.OnBackgroundDisplay();
+            }
+
+            if (used) //This variable will be true if OnInitialDisplay was invoked
+            {
+                OnResumeDisplay();
             }
 
             Screen.LogicContainer = this;
@@ -274,7 +303,7 @@ namespace Sharp2D.Core
             if (!used)
             {
                 used = true;
-                OnDisplay();
+                OnInitialDisplay();
             }
         }
 
