@@ -32,5 +32,8 @@ namespace Sharp2D.Core.Interfaces
         /// This method is invoked after the screen is done with the list for the current frame.
         /// </summary>
         void PostFetch(); //Inform the fetch is complete
+
+        void AddRenderJob(IRenderJob job);
+        void RemoveRenderJob(IRenderJob job);
     }
 }
