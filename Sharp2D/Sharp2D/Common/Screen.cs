@@ -374,19 +374,27 @@ namespace Sharp2D
                         Invokes.Pop().Invoke();
                 }
 
-                _renders.PreFetch();
-                foreach (IRenderJob job in _renders.RenderJobs.TakeWhile(job => IsRunning))
+                try
                 {
-                    try
+                    _renders.PreFetch();
+                    foreach (IRenderJob job in _renders.RenderJobs.TakeWhile(job => IsRunning))
                     {
-                        job.PerformJob();
+                        try
+                        {
+                            job.PerformJob();
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.CaughtException(e);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        Logger.CaughtException(e);
-                    }
+                    _renders.PostFetch();
                 }
-                _renders.PostFetch();
+                catch (Exception e)
+                {
+                    Logger.Debug("Error drawing frame!");
+                    Logger.CaughtException(e);
+                }
             }
         }
 

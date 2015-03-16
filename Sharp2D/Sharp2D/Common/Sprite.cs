@@ -581,8 +581,8 @@ namespace Sharp2D
         /// <summary>
         /// How transparent this Sprite object is. (Must be a value between 0-1)
         /// </summary>
-        public float Alpha {
-            get { return (_color.A / 255f); }
+        public virtual float Alpha {
+            get { return _color.A; }
             set
             {
                 _color = Color.FromArgb((int) (value*255), _color);
