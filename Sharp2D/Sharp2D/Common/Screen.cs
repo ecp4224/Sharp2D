@@ -360,12 +360,12 @@ namespace Sharp2D
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(0f, 0f, 0f, 1f);
 
-            _renders.Camera.BeforeRender();
-
             if (_renders == null) return;
 
             lock (JobLock)
             {
+                _renders.Camera.BeforeRender();
+
                 while (Invokes.Count > 0)
                 {
                     if (Invokes.Peek() == null)
@@ -377,8 +377,10 @@ namespace Sharp2D
                 try
                 {
                     _renders.PreFetch();
-                    foreach (IRenderJob job in _renders.RenderJobs.TakeWhile(job => IsRunning))
+                    foreach (IRenderJob job in _renders.RenderJobs.Where(job => job != null && IsRunning))
                     {
+                        if (_renders == null)
+                            return;
                         try
                         {
                             job.PerformJob();

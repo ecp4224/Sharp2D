@@ -142,6 +142,9 @@ namespace Sharp2D.Core
 
         public void Dispose()
         {
+            if (IsDisposed || IsDisposing)
+                return;
+
             Screen.ValidateOpenGLUnsafe("Dispose()");
 
             IsDisposing = true;
@@ -179,9 +182,12 @@ namespace Sharp2D.Core
             lToRemove = null;
             jToRemove = null;
 
+            IsDisposed = true;
             IsDisposing = false;
             Loaded = false;
         }
+
+        public bool IsDisposed { get; private set; }
 
         public void AddRenderJob(IRenderJob job)
         {
