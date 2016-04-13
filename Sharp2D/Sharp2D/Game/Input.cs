@@ -17,6 +17,8 @@ namespace Sharp2D.Game
 
         static Input()
         {
+            if (!File.Exists(FilePath)) return;
+
             var lines = File.ReadAllLines(FilePath);
 
             foreach (var l in lines.Where(l => !l.Trim().StartsWith("#")))
@@ -67,6 +69,14 @@ namespace Sharp2D.Game
                 return false;
             }
         }
+
+        public void SetDefaults(Dictionary<string, Key> defaultMapping)
+        {
+            foreach (string key in defaultMapping.Keys.Where(key => !Keys.ContainsKey(key)))
+            {
+                Keys.Add(key, defaultMapping[key]);
+            }
+        }
     }
 
     public sealed class Mouse
@@ -88,6 +98,14 @@ namespace Sharp2D.Game
 
                 Logger.Warn("Invalid button name specified: \"" + buttonName + "\".");
                 return false;
+            }
+        }
+
+        public void SetDefaults(Dictionary<string, MouseButton> defaultMapping)
+        {
+            foreach (string key in Buttons.Keys.Where(key => !Buttons.ContainsKey(key)))
+            {
+                Buttons.Add(key, defaultMapping[key]);
             }
         }
 
