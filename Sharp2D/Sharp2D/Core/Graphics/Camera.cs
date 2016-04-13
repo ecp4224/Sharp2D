@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,20 +23,48 @@ namespace Sharp2D.Core.Graphics
         private Vector2 _start;
         private Vector2 _end;
 
+        private Vector3 _pos;
         /// <summary>
         /// The X position of this Camera
         /// </summary>
-        public float X { get; set; }
+        public float X {
+            get { return _pos.X; }
+            set
+            {
+                float x = value;
+
+                if (Bounds.Width != 0 && Bounds.Height != 0)
+                    x = Math.Min(Math.Max(x, Bounds.X), Bounds.Width);
+
+                _pos.X = x;
+            } 
+        }
 
         /// <summary>
         /// The Y position of this Camera
         /// </summary>
-        public float Y { get; set; }
+        public float Y {
+            get { return _pos.Y; }
+            set
+            {
+                float y = value;
+
+                if (Bounds.Width != 0 && Bounds.Height != 0)
+                    y = Math.Min(Math.Max(y, Bounds.X), Bounds.Width);
+             
+                _pos.Y = y;
+            } 
+        }
 
         /// <summary>
         /// The Z position of this Camera
         /// </summary>
-        public float Z { get; set; }
+        public float Z {
+            get { return _pos.Z; }
+            set { _pos.Z = value; } 
+        }
+
+        public Rectangle Bounds { get; set; }
         
         /// <summary>
         /// Setup the camera before all the RenderJobs perform their jobs.

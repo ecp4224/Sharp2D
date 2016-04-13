@@ -22,7 +22,7 @@ namespace Sharp2D
         /// <para>Measurment: ms</para>
         /// Default: 40ms
         /// </summary>
-        public int LogicTickRate { get; set; }
+        public double LogicTickRate { get; set; }
 
         /// <summary>
         /// <para>The maxium number of frames to skip when the computer is running slow.</para>

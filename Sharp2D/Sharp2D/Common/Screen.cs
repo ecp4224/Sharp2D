@@ -57,7 +57,7 @@ namespace Sharp2D
             }
         }
 
-        public static int SkipTicks
+        public static double SkipTicks
         {
             get
             {
@@ -65,11 +65,11 @@ namespace Sharp2D
             }
         }
 
-        public static int TicksPerSecond
+        public static double TicksPerSecond
         {
             get
             {
-                return 1000 / Settings.LogicTickRate;
+                return 1000.0 / Settings.LogicTickRate;
             }
         }
 
@@ -292,7 +292,7 @@ namespace Sharp2D
             float fpsTime = 0;
             int updates = 0;
             int loop = 0;
-            int ntick = TickCount;
+            double ntick = TickCount;
             long ms = TickCount;
             while (IsRunning && !_window.IsExiting)
             {
@@ -361,6 +361,8 @@ namespace Sharp2D
             GL.ClearColor(0f, 0f, 0f, 1f);
 
             if (_renders == null) return;
+
+            _renders.Camera.BeforeRender();
 
             lock (JobLock)
             {
