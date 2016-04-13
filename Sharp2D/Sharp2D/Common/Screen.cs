@@ -228,10 +228,6 @@ namespace Sharp2D
         private static void _prepare()
         {
             GlobalSettings.ScreenSettings = Settings;
-            GlobalSettings.EngineSettings = new EngineSettings();
-
-            GlobalSettings.EngineSettings.ShowConsole = false;
-            GlobalSettings.EngineSettings.WriteLog = false;
 
             _window = new GameWindow(Settings.WindowSize.Width, Settings.WindowSize.Height)
             {
