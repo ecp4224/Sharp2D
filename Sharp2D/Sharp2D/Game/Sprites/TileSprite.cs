@@ -143,7 +143,6 @@ namespace Sharp2D.Game.Sprites
                 }
 
                 bool cached_alpha_answer = testBmp.ContainsAlpha();
-                Logger.Debug("(" + x + "," + y + "; width=" + width + ", height= " + height + ") : " + cached_alpha_answer);
                 TileSet.containsAlpha.Add(ID, cached_alpha_answer);
 
                 testBmp.Dispose();
