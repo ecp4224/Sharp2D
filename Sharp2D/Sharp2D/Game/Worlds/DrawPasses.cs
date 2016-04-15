@@ -246,6 +246,8 @@ namespace Sharp2D.Game.Worlds
 
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
 
+            _alphaLightShader.Uniforms.SetUniform(0f, _alphaLightShader.Uniforms["ambientmult"]);
+
             lock (sprite.light_lock)
             {
                 Light light = null;
@@ -267,9 +269,14 @@ namespace Sharp2D.Game.Worlds
             }
 
             if (sprite.LightCount <= 1)
+            {
+                sprite.dynamicLights.Clear();
+                if (!sprite.IsStatic)
+                {
+                    sprite.Lights.Clear();
+                }
                 return;
-
-            _alphaLightShader.Uniforms.SetUniform(0f, _alphaLightShader.Uniforms["ambientmult"]);
+            }
 
             lock (sprite.light_lock)
             {

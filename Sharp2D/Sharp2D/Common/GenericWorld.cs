@@ -142,14 +142,6 @@ namespace Sharp2D
             }
         }
 
-        protected override void OnBackgroundDisplay()
-        {
-        }
-
-        protected override void OnResumeDisplay()
-        {
-        }
-
         public Light AddLight(float X, float Y, LightType LightType)
         {
             var light = new Light(X, Y, LightType);

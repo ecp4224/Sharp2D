@@ -50,7 +50,7 @@ namespace Sharp2D.Core.Graphics
                 float y = value;
 
                 if (Bounds.Width != 0 && Bounds.Height != 0)
-                    y = Math.Min(Math.Max(y, Bounds.X), Bounds.Width);
+                    y = Math.Min(Math.Max(y, Bounds.Y), Bounds.Height);
              
                 _pos.Y = y;
             } 

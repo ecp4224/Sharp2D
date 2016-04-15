@@ -613,7 +613,7 @@ namespace Sharp2D
                 else
                     return Texture.ID - other.Texture.ID;
             }
-            return (int)(Layer - other.Layer);
+            return (int)((other.Layer * 100) - (Layer * 100));
         }
     }
 
