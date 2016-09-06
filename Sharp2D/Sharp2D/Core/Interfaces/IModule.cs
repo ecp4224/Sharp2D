@@ -22,7 +22,8 @@ namespace Sharp2D.Core.Interfaces
     [Flags]
     public enum ModuleRules
     {
-        OnePerSprite = 0,
-        RunOnce = 1
+        None = 0,
+        OnePerSprite = 1,
+        RunOnce = 2
     }
 }

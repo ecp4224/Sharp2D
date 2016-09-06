@@ -83,6 +83,7 @@
     <Compile Include="Core\TexCoords.cs" />
     <Compile Include="Game\Sprites\Animation.cs" />
     <Compile Include="Game\Sprites\DefaultSprite.cs" />
+    <Compile Include="Game\Sprites\GenericSprite.cs" />
     <Compile Include="Game\Sprites\NullSprite.cs" />
     <Compile Include="Common\PhysicsSprite.cs" />
     <Compile Include="Game\Sprites\PlayableSprite.cs" />
