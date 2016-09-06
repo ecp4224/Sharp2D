@@ -22,7 +22,7 @@ namespace Sharp2D
         /// <para>Measurment: ms</para>
         /// Default: 40ms
         /// </summary>
-        public int LogicTickRate { get; set; }
+        public double LogicTickRate { get; set; }
 
         /// <summary>
         /// <para>The maxium number of frames to skip when the computer is running slow.</para>
@@ -110,12 +110,6 @@ namespace Sharp2D
             }
         }
 
-        /// <summary>
-        /// <para>The Camera object to use.</para>
-        /// Default: Sharp2D.Game.Worlds.GenericCamera
-        /// </summary>
-        public Camera Camera { get; set; }
-
         public ScreenSettings(ScreenSettings orginal)
         {
             if (orginal == null)
@@ -127,7 +121,6 @@ namespace Sharp2D
             WindowSize = orginal.GameSize;
             Fullscreen = orginal.Fullscreen;
             VSync = orginal.VSync;
-            Camera = orginal.Camera;
             MaxFPS = orginal.MaxFPS;
         }
 

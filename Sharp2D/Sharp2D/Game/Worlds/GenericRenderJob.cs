@@ -52,7 +52,7 @@ namespace Sharp2D.Game.Worlds
 
         protected GenericRenderJob(GenericWorld parent)
         {
-            Screen.Camera = new OpenGL3Camera();
+             parent.Camera = new OpenGL3Camera();
             _parent = parent;
             _drawPasses.AddRange(DefaultPasses.ToList());
         }

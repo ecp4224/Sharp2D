@@ -12,11 +12,10 @@ out vec4 fragColor;
 
 void main(){
 		vec4 difcolor = texture(texture0, fragtexcoord);
-		float w = (3 - (tint.r + tint.g + tint.b)) * 0.3;
-		difcolor.rgb = mix(difcolor.rgb, tint.rgb, w);
 		float real_alpha = clamp(difcolor.a - tint.a, 0.0, 1.0);
 		if(real_alpha <= 0.0) discard;
 		
 		fragColor.rgb = brightness * difcolor.rgb;
+		fragColor.rgb *= tint.rgb;
 		fragColor.a = real_alpha;
 }

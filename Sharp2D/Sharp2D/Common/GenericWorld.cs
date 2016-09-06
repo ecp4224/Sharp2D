@@ -130,9 +130,9 @@ namespace Sharp2D
             }
         }
 
-        protected override void OnDisplay()
+        protected override void OnInitialDisplay()
         {
-            base.OnDisplay();
+            base.OnInitialDisplay();
 
             DefaultJob = spriteJob;
 

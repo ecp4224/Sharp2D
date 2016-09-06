@@ -18,6 +18,9 @@ namespace Sharp2D.Game.Sprites
         [JsonIgnore]
         private AnimationHolder holder;
 
+        [JsonIgnore] 
+        private Action animationComplete;
+
         [JsonIgnore]
         public AnimationHolder Animations
         {
@@ -197,6 +200,9 @@ namespace Sharp2D.Game.Sprites
         [JsonProperty(PropertyName = "row")]
         private int row = -1;
 
+        [JsonProperty(PropertyName = "repeatTo")]
+        private int repeatTo = 0;
+
         public int Row { get { return row; } }
 
         [JsonProperty(PropertyName="framecount")]
@@ -263,8 +269,17 @@ namespace Sharp2D.Game.Sprites
             set
             {
                 _step = value;
+
+                if (_step + 1 == Frames)
+                {
+                    if (animationComplete != null)
+                        animationComplete();
+                }
+
                 if (_step >= Frames)
-                    _step = 0;
+                {
+                    _step = repeatTo;
+                }
                 if (_step < 0)
                     _step = Frames - 1;
             }
@@ -348,6 +363,12 @@ namespace Sharp2D.Game.Sprites
             }
         }
 
+        public Animation OnAnimationComplete(Action action)
+        {
+            this.animationComplete = action;
+            return this;
+        }
+
         public Animation Play()
         {
             if (ParentAnimation != null)
@@ -413,6 +434,7 @@ namespace Sharp2D.Game.Sprites
             toReturn._play = _play;
             toReturn.IsEmpty = IsEmpty;
             toReturn.Frames = Frames;
+            toReturn.repeatTo = repeatTo;
 
             return toReturn;
         }
@@ -522,6 +544,12 @@ namespace Sharp2D.Game.Sprites
         object ICloneable.Clone()
         {
             return this.Clone();
+        }
+
+        public Animation Reset()
+        {
+            CurrentStep = 0;
+            return this;
         }
     }
 }

@@ -453,7 +453,7 @@ namespace Sharp2D
         public virtual float Layer { get { return Z; } set { Z = value; } }
 
         /// <summary>
-        /// Request the RenderJob to run the OnDisplay method again
+        /// Request the RenderJob to run the OnInitialDisplay method again
         /// </summary>
         protected void RequestOnDisplay()
         {
@@ -581,8 +581,8 @@ namespace Sharp2D
         /// <summary>
         /// How transparent this Sprite object is. (Must be a value between 0-1)
         /// </summary>
-        public float Alpha {
-            get { return _color.A; }
+        public virtual float Alpha {
+            get { return _color.A / 255f; }
             set
             {
                 _color = Color.FromArgb((int) (value*255), _color);
@@ -613,7 +613,7 @@ namespace Sharp2D
                 else
                     return Texture.ID - other.Texture.ID;
             }
-            return (int)(Layer - other.Layer);
+            return (int)((other.Layer * 100) - (Layer * 100));
         }
     }
 

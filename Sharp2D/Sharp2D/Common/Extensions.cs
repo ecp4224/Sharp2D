@@ -83,7 +83,7 @@ namespace Sharp2D
                 byte* ptrAlpha = ((byte*)bmpData.Scan0.ToPointer()) + 3;
                 for (int i = bmpData.Width * bmpData.Height; i > 0; --i)  // prefix-- should be faster
                 {
-                    if (*ptrAlpha < 255 && *ptrAlpha > 0)
+                    if (*ptrAlpha < 255)
                         answer = true;
 
                     ptrAlpha += 4;

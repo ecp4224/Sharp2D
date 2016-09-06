@@ -116,6 +116,45 @@ namespace Sharp2D.Game.Worlds
             return sprites;
         }
 
+        protected override void OnBackgroundDisplay()
+        {
+            foreach (Layer layer in Layers)
+            {
+                if (layer.IsTileLayer)
+                {
+                    for (int i = 0; i < layer.Data.Length; i++)
+                    {
+                        TileSprite t = layer[i];
+                        if (t == null)
+                            continue;
+
+                        if (t.IsCollidable)
+                        {
+                            Hitbox.RemoveCollidable(t);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override void OnResumeDisplay()
+        {
+            foreach (Layer layer in Layers)
+            {
+                if (layer.IsTileLayer)
+                {
+                    for (int i = 0; i < layer.Data.Length; i++)
+                    {
+                        TileSprite t = layer[i];
+                        if (t.IsCollidable)
+                        {
+                            Hitbox.AddCollidable(t);
+                        }
+                    }
+                }
+            }
+        }
+
         protected override void OnLoad()
         {
             if (!File.Exists(Name))
@@ -181,7 +220,7 @@ namespace Sharp2D.Game.Worlds
             }
         }
 
-        protected override void OnDisplay()
+        protected override void OnInitialDisplay()
         {
             foreach (TileSet tileset in TileSets)
             {

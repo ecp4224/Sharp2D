@@ -9,6 +9,11 @@ namespace Sharp2D
 {
     public static class GlobalSettings
     {
+        static GlobalSettings()
+        {
+            EngineSettings = new EngineSettings {ShowConsole = false, WriteLog = false};
+        }
+
         public static ScreenSettings ScreenSettings { get; internal set; }
         public static EngineSettings EngineSettings { get; internal set; }
     }

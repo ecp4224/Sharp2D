@@ -26,10 +26,6 @@ namespace Sharp2D
                 settings.WindowSize = settings.GameSize;
                 settings.Fullscreen = false;
                 settings.VSync = false;
-                settings.Camera = new Game.Worlds.GenericCamera
-                {
-                    Z = 100f
-                };
                 settings.WindowTitle = "Sharp2D";
                 settings.UseOpenTKLoop = true;
                 settings.MaxFPS = -1; //Max FPS
@@ -40,14 +36,7 @@ namespace Sharp2D
 
         public static Camera Camera
         {
-            get
-            {
-                return Settings.Camera;
-            }
-            set
-            {
-                Settings.Camera = value;
-            }
+            get { return _renders.Camera; }
         }
 
         public static Thread DisplayThread { get; private set; }
@@ -68,7 +57,7 @@ namespace Sharp2D
             }
         }
 
-        public static int SkipTicks
+        public static double SkipTicks
         {
             get
             {
@@ -76,11 +65,11 @@ namespace Sharp2D
             }
         }
 
-        public static int TicksPerSecond
+        public static double TicksPerSecond
         {
             get
             {
-                return 1000 / Settings.LogicTickRate;
+                return 1000.0 / Settings.LogicTickRate;
             }
         }
 
@@ -239,10 +228,6 @@ namespace Sharp2D
         private static void _prepare()
         {
             GlobalSettings.ScreenSettings = Settings;
-            GlobalSettings.EngineSettings = new EngineSettings();
-
-            GlobalSettings.EngineSettings.ShowConsole = false;
-            GlobalSettings.EngineSettings.WriteLog = false;
 
             _window = new GameWindow(Settings.WindowSize.Width, Settings.WindowSize.Height)
             {
@@ -303,7 +288,7 @@ namespace Sharp2D
             float fpsTime = 0;
             int updates = 0;
             int loop = 0;
-            int ntick = TickCount;
+            double ntick = TickCount;
             long ms = TickCount;
             while (IsRunning && !_window.IsExiting)
             {
@@ -371,12 +356,14 @@ namespace Sharp2D
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(0f, 0f, 0f, 1f);
 
-            Settings.Camera.BeforeRender();
-
             if (_renders == null) return;
+
+            _renders.Camera.BeforeRender();
 
             lock (JobLock)
             {
+                _renders.Camera.BeforeRender();
+
                 while (Invokes.Count > 0)
                 {
                     if (Invokes.Peek() == null)
@@ -385,19 +372,29 @@ namespace Sharp2D
                         Invokes.Pop().Invoke();
                 }
 
-                _renders.PreFetch();
-                foreach (IRenderJob job in _renders.RenderJobs.TakeWhile(job => IsRunning))
+                try
                 {
-                    try
+                    _renders.PreFetch();
+                    foreach (IRenderJob job in _renders.RenderJobs.Where(job => job != null && IsRunning))
                     {
-                        job.PerformJob();
+                        if (_renders == null)
+                            return;
+                        try
+                        {
+                            job.PerformJob();
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.CaughtException(e);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        Logger.CaughtException(e);
-                    }
+                    _renders.PostFetch();
                 }
-                _renders.PostFetch();
+                catch (Exception e)
+                {
+                    Logger.Debug("Error drawing frame!");
+                    Logger.CaughtException(e);
+                }
             }
         }
 

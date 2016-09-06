@@ -20,9 +20,9 @@ namespace Fireflies
             get { return "worlds/fireflys.json"; }
         }
 
-        protected override void OnDisplay()
+        protected override void OnInitialDisplay()
         {
-            base.OnDisplay();
+            base.OnInitialDisplay();
 
             Sprite moon = Sprite.FromImage("sprites/moon.png");
             moon.X = (3.5f * 16f) + (moon.Width / 2f);
@@ -30,7 +30,6 @@ namespace Fireflies
             moon.Layer = 0.5f;
             moon.IgnoreLights = true;
             moon.NeverClip = true;
-            moon.TintColor = Color.Yellow;
             AddSprite(moon);
 
             var sprite = new BackgroundSprite();
@@ -50,7 +49,6 @@ namespace Fireflies
             for (int i = 0; i < CloudCount; i++)
             {
                 var c = new Cloud {X = Rand.Next(-10, 50)*16f, Y = 8f*16f, Layer = (float) Rand.NextDouble(), IgnoreLights = true, Alpha = (float) Rand.NextDouble()};
-
                 AddSprite(c);
             }
 

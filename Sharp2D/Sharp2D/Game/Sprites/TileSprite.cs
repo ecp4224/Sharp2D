@@ -38,7 +38,7 @@ namespace Sharp2D.Game.Sprites
             X *= TileSet.TileWidth;
             Y *= TileSet.TileHeight;
 
-            Layer = 1;
+            Layer = 1f/ParentLayer.LayerNumber;
 
             IsStatic = !(parent.TileProperties.ContainsKey(ID) && parent.TileProperties[ID].ContainsKey("static") && parent.TileProperties[ID]["static"].ToLower() == "true");
 
@@ -46,8 +46,7 @@ namespace Sharp2D.Game.Sprites
 
             Texture = TileSet.TileTexture;
 
-            if (parent.TileProperties.ContainsKey(ID) &&
-                parent.TileProperties[ID].ContainsKey("collide"))
+            if (IsCollidable)
             {
                 Hitbox = new Hitbox("Space", new List<Vector2>
                 {
@@ -58,6 +57,11 @@ namespace Sharp2D.Game.Sprites
                 });
                 Hitbox.AddCollidable(this);
             }
+        }
+
+        public bool IsCollidable
+        {
+            get { return TileSet.TileProperties.ContainsKey(ID) && TileSet.TileProperties[ID].ContainsKey("collide"); }
         }
 
         public override bool HasAlpha
@@ -110,14 +114,12 @@ namespace Sharp2D.Game.Sprites
             IsStatic = true;
         }
 
-        private bool cached_alpha_answer;
-        private bool valid_alpha_answer;
         public bool TileHasAlpha
         {
             get
             {
-                if (valid_alpha_answer)
-                    return cached_alpha_answer;
+                if (TileSet.containsAlpha.ContainsKey(ID))
+                    return TileSet.containsAlpha[ID];
 
                 int tilepos = (ID - TileSet.FirstGID) + 1;
                 int step = (tilepos - 1) % TileSet.TilesPerRow, row = 0;
@@ -140,8 +142,8 @@ namespace Sharp2D.Game.Sprites
                     g.DrawImage(Texture.Bitmap, new RectangleF(0, 0, width, height), new RectangleF(x, y, width, height), GraphicsUnit.Pixel);
                 }
 
-                cached_alpha_answer = testBmp.ContainsAlpha();
-                valid_alpha_answer = true;
+                bool cached_alpha_answer = testBmp.ContainsAlpha();
+                TileSet.containsAlpha.Add(ID, cached_alpha_answer);
 
                 testBmp.Dispose();
                 return cached_alpha_answer;

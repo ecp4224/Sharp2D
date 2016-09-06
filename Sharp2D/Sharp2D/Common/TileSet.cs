@@ -51,6 +51,9 @@ namespace Sharp2D
         [JsonIgnore]
         public TileProperties TileProperties { get; private set; }
 
+        [JsonIgnore]
+        internal Dictionary<long, bool> containsAlpha = new Dictionary<long, bool>(); 
+
         public int TilesPerRow
         {
             get

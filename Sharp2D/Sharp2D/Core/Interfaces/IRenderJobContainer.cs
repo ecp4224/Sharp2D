@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sharp2D.Core.Graphics;
 
 namespace Sharp2D.Core.Interfaces
 {
@@ -23,8 +24,16 @@ namespace Sharp2D.Core.Interfaces
         List<IRenderJob> RenderJobs { get; } //Fetch
 
         /// <summary>
+        /// The camera used by this RenderJobContainer
+        /// </summary>
+        Camera Camera { get; }
+
+        /// <summary>
         /// This method is invoked after the screen is done with the list for the current frame.
         /// </summary>
         void PostFetch(); //Inform the fetch is complete
+
+        void AddRenderJob(IRenderJob job);
+        void RemoveRenderJob(IRenderJob job);
     }
 }
