@@ -93,7 +93,7 @@ namespace Sharp2D
             guiJob = new GuiRenderJob(this);
 
             AmbientBrightness = 1f;
-            AmbientColor = Color.White;
+            AmbientColor = Color.FromArgb(255, 255, 255, 255);
 
             base.OnLoad();
 

@@ -35,13 +35,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\OpenTK.1.1.1589.5941\lib\NET40\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <HintPath>..\packages\OpenTK.1.1.2349.61993\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,7 +66,10 @@
     <Compile Include="Core\Graphics\Shaders\Source.cs" />
     <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />
     <Compile Include="Core\Interfaces\IAttachable.cs" />
+    <Compile Include="Core\Interfaces\INativeSystem.cs" />
+    <Compile Include="Core\MonoNativeSystem.cs" />
     <Compile Include="Core\ParallelStringWriter.cs" />
+    <Compile Include="Core\WindowsNativeCalls.cs" />
     <Compile Include="Core\World.cs" />
     <Compile Include="Core\Network\Client.cs" />
     <Compile Include="Core\Network\Session.cs" />
@@ -130,7 +132,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <EmbeddedResource Include="Resources\sprite_amb.frag" />
     <EmbeddedResource Include="Resources\sprite_amb.vert" />
     <EmbeddedResource Include="Resources\sprite_light.frag" />
@@ -138,7 +139,9 @@
     <EmbeddedResource Include="Resources\sprite_light_alpha.frag" />
     <EmbeddedResource Include="Resources\sprite_light_alpha.vert" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

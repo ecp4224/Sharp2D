@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D.Core
 {
     public class EngineSettings : SaveableSettings
     {
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
 
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
-
+        private INativeSystem nativeSystem;
         private bool _showConsole;
         private bool _writeLog;
 
@@ -38,14 +27,7 @@ namespace Sharp2D.Core
             }
             set
             {
-                _showConsole = value; 
-                
-                var handle = GetConsoleWindow();
-
-                if (_showConsole)
-                    ShowWindow(handle, SW_SHOW);
-                else
-                    ShowWindow(handle, SW_HIDE);
+                _showConsole = nativeSystem.ToggleConsoleWindow(value);
             }
         }
 
@@ -66,17 +48,38 @@ namespace Sharp2D.Core
             }
         }
 
-        public EngineSettings(EngineSettings settings)
+        public bool IsRunningMono
+        {
+            get
+            {
+                return Type.GetType("Mono.Runtime") != null;
+            }
+        } 
+
+        internal EngineSettings(EngineSettings settings) : this()
         {
             if (settings == null)
                 return;
 
             PreferEmbeddedResources = settings.PreferEmbeddedResources;
+            _showConsole = settings._showConsole;
+            _writeLog = settings._writeLog;
         }
 
-        public EngineSettings()
+        internal EngineSettings()
         {
             PreferEmbeddedResources = true;
+            _showConsole = false;
+            _writeLog = false;
+
+            if (IsRunningMono)
+            {
+                nativeSystem = new MonoNativeSystem();
+            }
+            else
+            {
+                nativeSystem = new WindowsNativeSystem();
+            }
         }
 
         protected override void OnLoad()

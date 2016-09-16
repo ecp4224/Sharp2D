@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using Sharp2D.Core;
 using Sharp2D.Core.Graphics;
@@ -229,15 +230,17 @@ namespace Sharp2D
         {
             GlobalSettings.ScreenSettings = Settings;
 
-            _window = new GameWindow(Settings.WindowSize.Width, Settings.WindowSize.Height)
+            _window = new GameWindow(Settings.WindowSize.Width, Settings.WindowSize.Height, GraphicsMode.Default, "Sharp2D", GameWindowFlags.Default, DisplayDevice.Default, 3, 2, GraphicsContextFlags.Default)
             {
                 Visible = true,
                 Title = Settings.WindowTitle,
                 VSync = Settings.VSync ? VSyncMode.On : VSyncMode.Off,
-                WindowBorder = WindowBorder.Fixed
+                WindowBorder = WindowBorder.Fixed,
+
             };
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+
 
             GL.ClearColor(0f, 0f, 0f, 1f);
             GL.ClearDepth(1.0);

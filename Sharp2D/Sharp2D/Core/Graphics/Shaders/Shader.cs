@@ -56,8 +56,6 @@ namespace Sharp2D.Core.Graphics.Shaders
                     type = ShaderType.FragmentShader;
                 else if (f.EndsWith(".vert"))
                     type = ShaderType.VertexShader;
-                else if (f.EndsWith(".cpu"))
-                    type = ShaderType.ComputeShader;
                 else
                     throw new FileLoadException("Not a valid shader file!", f);
 
@@ -97,7 +95,7 @@ namespace Sharp2D.Core.Graphics.Shaders
             GL.LinkProgram(ProgramID);
 
             int status;
-            GL.GetProgram(ProgramID, GetProgramParameterName.LinkStatus, out status);
+            GL.GetProgram(ProgramID, ProgramParameter.LinkStatus, out status);
             if (status == 0)
             {
                 throw new InvalidProgramException("Linking the program failed!\n" + GL.GetShaderInfoLog(ProgramID));

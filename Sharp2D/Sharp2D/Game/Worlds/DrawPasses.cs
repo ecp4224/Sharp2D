@@ -48,7 +48,7 @@ namespace Sharp2D.Game.Worlds
             _ambiantShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), _ambiantShader.Uniforms["texCoordPosAndScale"]);
             _ambiantShader.Uniforms.SetUniform(sprite.Layer, _ambiantShader.Uniforms["spriteDepth"]);
 
-            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
         }
 
         public override void SetupBatch(SpriteBatch batch) { }
@@ -139,14 +139,14 @@ namespace Sharp2D.Game.Worlds
                     _lightShader.Uniforms.SetUniform(light.ShaderColor, _lightShader.Uniforms["lightcolor"]);
                     _lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _lightShader.Uniforms["lightdata"]);
 
-                    GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 }
                 foreach (Light light in sprite.dynamicLights)
                 {
                     _lightShader.Uniforms.SetUniform(light.ShaderColor, _lightShader.Uniforms["lightcolor"]);
                     _lightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _lightShader.Uniforms["lightdata"]);
 
-                    GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 }
 
                 sprite.dynamicLights.Clear();
@@ -244,7 +244,7 @@ namespace Sharp2D.Game.Worlds
 
             _alphaLightShader.Uniforms.SetUniform(1f, _alphaLightShader.Uniforms["ambientmult"]);
 
-            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
 
             _alphaLightShader.Uniforms.SetUniform(0f, _alphaLightShader.Uniforms["ambientmult"]);
 
@@ -264,7 +264,7 @@ namespace Sharp2D.Game.Worlds
                 {
                     _alphaLightShader.Uniforms.SetUniform(light.ShaderColor, _alphaLightShader.Uniforms["lightcolor"]);
                     _alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _alphaLightShader.Uniforms["lightdata"]);
-                    GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 }
             }
 
@@ -291,7 +291,7 @@ namespace Sharp2D.Game.Worlds
                     _alphaLightShader.Uniforms.SetUniform(light.ShaderColor, _alphaLightShader.Uniforms["lightcolor"]);
                     _alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _alphaLightShader.Uniforms["lightdata"]);
 
-                    GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 }
 
                 i = 0;
@@ -305,7 +305,7 @@ namespace Sharp2D.Game.Worlds
                     _alphaLightShader.Uniforms.SetUniform(light.ShaderColor, _alphaLightShader.Uniforms["lightcolor"]);
                     _alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _alphaLightShader.Uniforms["lightdata"]);
 
-                    GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 }
 
                 sprite.dynamicLights.Clear();

@@ -139,10 +139,10 @@ namespace Sharp2D.Game.Worlds
                         GL.BufferData(BufferTarget.ArrayBuffer, size, point, BufferUsageHint.StaticDraw); //TODO Maybe don't use static draw
 
                         GL.EnableVertexAttribArray(PosLocation);
-                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(PosLocation, 2, OpenTK.Graphics.ES20.All.Float, false, 4 * sizeof(float), new IntPtr(0));
+                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(PosLocation, 2, OpenTK.Graphics.ES20.VertexAttribPointerType.Float, false, 4 * sizeof(float), new IntPtr(0));
 
                         GL.EnableVertexAttribArray(TexcoordLocation);
-                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(TexcoordLocation, 2, OpenTK.Graphics.ES20.All.Float, false, 4 * sizeof(float), new IntPtr(2 * sizeof(float)));
+                        OpenTK.Graphics.ES20.GL.VertexAttribPointer(TexcoordLocation, 2, OpenTK.Graphics.ES20.VertexAttribPointerType.Float, false, 4 * sizeof(float), new IntPtr(2 * sizeof(float)));
 
                         GL.BindBuffer(BufferTarget.ElementArrayBuffer, TriId);
                         GL.BufferData(BufferTarget.ElementArrayBuffer, tsize, tpoint, BufferUsageHint.StaticDraw); //TODO Maybe don't use static draw
