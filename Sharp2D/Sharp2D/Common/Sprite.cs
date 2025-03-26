@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
-using System.Drawing;
+using OpenTK.Mathematics;
+using Sharp2D.Common;
 using Sharp2D.Core;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Graphics.Shaders;
 using Sharp2D.Core.Interfaces;
-using Sharp2D.Game.Sprites;
 using Sharp2D.Game.Worlds;
+using SkiaSharp;
 
 namespace Sharp2D
 {
@@ -338,15 +336,15 @@ namespace Sharp2D
         }
 
         internal Vector4 ShaderColor = new Vector4(1f, 1f, 1f, 0f);
-        private Color _color = Color.White;
-        public Color TintColor
+        private SKColor _color = SKColors.White;
+        public SKColor TintColor
         {
             get { return _color; }
             set
             {
                 _color = value;
                 
-                ShaderColor = new Vector4((_color.R / 255f), (_color.G / 255f), (_color.B / 255f), 1f - (_color.A / 255f));
+                ShaderColor = new Vector4((_color.Red / 255f), (_color.Green / 255f), (_color.Blue / 255f), 1f - (_color.Alpha / 255f));
             }
         }
 
@@ -391,6 +389,15 @@ namespace Sharp2D
                     if (oy != value && CurrentWorld is ILightWorld)
                         ((ILightWorld)w).UpdateSpriteLights(this);
                 }
+                
+                // Update Z based on Y
+                /*float scaleFactor = 700;
+                if (CurrentWorld is TiledWorld)
+                {
+                    var world = CurrentWorld as TiledWorld;
+                    scaleFactor = world.Height * world.TileHeight;
+                }
+                Z = 1.0f - (Y / scaleFactor);*/
             }
         }
 
@@ -535,7 +542,7 @@ namespace Sharp2D
         /// <param name="w">The world this Sprite has been added to</param>
         public virtual void OnAddedToWorld(World w)
         {
-
+            
         }
 
         /// <summary>
@@ -582,12 +589,12 @@ namespace Sharp2D
         /// How transparent this Sprite object is. (Must be a value between 0-1)
         /// </summary>
         public virtual float Alpha {
-            get { return _color.A / 255f; }
+            get { return _color.Alpha / 255f; }
             set
             {
-                _color = Color.FromArgb((int) (value*255), _color);
+                _color = new SKColor(_color.Red, _color.Green, _color.Blue, (byte)(value * 255));
 
-                ShaderColor = new Vector4(_color.R / 255f, _color.G / 255f, _color.B / 255f, 1f - (_color.A / 255f));
+                ShaderColor = new Vector4(_color.Red / 255f, _color.Green / 255f, _color.Blue / 255f, 1f - (_color.Alpha / 255f));
             }
         }
 

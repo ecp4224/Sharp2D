@@ -6,6 +6,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using OpenTK;
 using Newtonsoft.Json.Linq;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D

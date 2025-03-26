@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,29 +8,39 @@ using System.Threading;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+using Sharp2D.Common;
 using Sharp2D.Core;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Interfaces;
+using Sharp2D.Game;
 
 namespace Sharp2D
 {
-    public class Screen
+    public class Screen : GameWindow
     {
+        private Screen(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, Action readyCallback) : base(gameWindowSettings, nativeWindowSettings)
+        {
+            this.readyCallback = readyCallback;
+        }
+
         public static ScreenSettings DefaultSettings { 
             get 
             {
                 var settings = new ScreenSettings(null)
                 {
                     LogicTickRate = 40,
-                    MaxSkippedFrames = 5,
-                    GameSize = new System.Drawing.Size(1280, 720)
+                    GameSize = new Size(1280, 720)
                 };
                 settings.WindowSize = settings.GameSize;
                 settings.Fullscreen = false;
                 settings.VSync = false;
                 settings.WindowTitle = "Sharp2D";
-                settings.UseOpenTKLoop = true;
                 settings.MaxFPS = -1; //Max FPS
+                settings.AsyncReadyCallback = true;
+                settings.PauseOnWindowDrag = false;
 
                 return settings;
             } 
@@ -37,7 +48,7 @@ namespace Sharp2D
 
         public static Camera Camera
         {
-            get { return _renders.Camera; }
+            get { return _window._renders.Camera; }
         }
 
         public static Thread DisplayThread { get; private set; }
@@ -54,7 +65,7 @@ namespace Sharp2D
         {
             get
             {
-                return Environment.TickCount - _tickAtStart;
+                return Environment.TickCount - _window._tickAtStart;
             }
         }
 
@@ -78,14 +89,14 @@ namespace Sharp2D
         {
             set
             {
-                lock (LogicLock)
+                lock (_window.LogicLock)
                 {
-                    _logics = value;
+                    _window._logics = value;
                 }
             }
             get
             {
-                return _logics;
+                return _window._logics;
             }
         }
 
@@ -93,20 +104,20 @@ namespace Sharp2D
         {
             set
             {
-                lock (JobLock)
+                lock (_window.JobLock)
                 {
-                    _renders = value;
+                    _window._renders = value;
                 }
             }
             get
             {
-                return _renders;
+                return _window._renders;
             }
         }
 
         public static bool IsFocused
         {
-            get { return _window != null && _window.Focused; }
+            get { return NativeWindow is { IsFocused: true }; }
         }
 
         public static Process CurrentProcess
@@ -119,44 +130,27 @@ namespace Sharp2D
             get { return _window; }
         }
 
+        private int _tickAtStart;
+        private readonly Stack<Action> Invokes = new Stack<Action>();
+        private ILogicContainer _logics;
+        private IRenderJobContainer _renders;
+        private Action readyCallback;
+        
+        private static Screen _window;
         private static Process _curProcess;
-        private static int _tickAtStart;
-        private static readonly Stack<Action> Invokes = new Stack<Action>();
-        private static ILogicContainer _logics;
-        private static IRenderJobContainer _renders;
-        private static GameWindow _window;
 
-        private static readonly object JobLock = new object();
-        private static readonly object LogicLock = new object();
+        private readonly object JobLock = new object();
+        private readonly object LogicLock = new object();
 
-        [DllImport("User32.dll")]
-        public static extern Int32 SetForegroundWindow(int hWnd);
-
-        public static void DisplayScreenAsync()
+        public static void DisplayScreen(Action readyCallback = null)
         {
-            Settings = DefaultSettings;
-            DisplayThread = new Thread(DisplayScreen)
+            DisplayScreen(DefaultSettings, readyCallback ?? (() =>
             {
-                Priority = ThreadPriority.Highest,
-                Name = "Display Thread"
-            };
-            DisplayThread.Start();
+                Logger.Log("Screen displayed");
+            }));
         }
 
-        public static void DisplayScreenAsync(ScreenSettings settings)
-        {
-            Settings = settings;
-            DisplayThread = new Thread(() => DisplayScreen(settings)) {Name = "Display Thread"};
-            //DisplayThread.Priority = ThreadPriority.Highest;
-            DisplayThread.Start();
-        }
-
-        public static void DisplayScreen()
-        {
-            DisplayScreen(DefaultSettings);
-        }
-
-        public static void DisplayScreen(ScreenSettings settings)
+        public static void DisplayScreen(ScreenSettings settings, Action readyCallback)
         {
             if (DisplayThread == null)
                 DisplayThread = Thread.CurrentThread;
@@ -164,11 +158,29 @@ namespace Sharp2D
 
             IsRunning = true;
             _curProcess = Process.GetCurrentProcess();
-            _prepare();
-            if (!Settings.UseOpenTKLoop)
-                _gameLoop();
-            else
-                _openTKStart();
+
+            var gameWindowSettings = new GameWindowSettings()
+            {
+                UpdateFrequency = 1000.0 / Settings.LogicTickRate,
+                Win32SuspendTimerOnDrag = Settings.PauseOnWindowDrag,
+            };
+
+            var clientSize = new Vector2i(Settings.WindowSize.Width, Settings.WindowSize.Height);
+            var nativeWindowSettings = new NativeWindowSettings()
+            {
+                Title = Settings.WindowTitle,
+                ClientSize = clientSize,
+                MaximumClientSize = clientSize,
+                MinimumClientSize = clientSize,
+                WindowState = Settings.Fullscreen ? WindowState.Fullscreen : WindowState.Normal,
+                Vsync = Settings.VSync ? VSyncMode.Adaptive : VSyncMode.Off,
+            };
+
+            using (_window = new Screen(gameWindowSettings, nativeWindowSettings, readyCallback))
+            {
+                _window._prepare();
+                _window._openTKStart();
+            }
         }
 
         public static void RequestFocus()
@@ -178,23 +190,27 @@ namespace Sharp2D
                 Invoke(RequestFocus);
                 return;
             }
-            SetForegroundWindow(CurrentProcess.MainWindowHandle.ToInt32());
+            NativeWindow.Focus();
         }
 
         public static void Invoke(Action action)
         {
-            lock (JobLock)
+            lock (_window.JobLock)
             {
-                Invokes.Push(action);
+                _window.Invokes.Push(action);
             }
         }
 
         public static void TerminateScreen()
         {
+            _window.Close();
+        }
+
+        private static void _cleanUp()
+        {
             IsRunning = false;
             if (DisplayThread != null)
             {
-                _window.Close();
                 Environment.Exit(0);
             }
         }
@@ -226,21 +242,11 @@ namespace Sharp2D
             return DisplayThread != null && DisplayThread == Thread.CurrentThread;
         }
 
-        private static void _prepare()
+        private void _prepare()
         {
             GlobalSettings.ScreenSettings = Settings;
-
-            _window = new GameWindow(Settings.WindowSize.Width, Settings.WindowSize.Height, GraphicsMode.Default, "Sharp2D", GameWindowFlags.Default, DisplayDevice.Default, 3, 2, GraphicsContextFlags.Default)
-            {
-                Visible = true,
-                Title = Settings.WindowTitle,
-                VSync = Settings.VSync ? VSyncMode.On : VSyncMode.Off,
-                WindowBorder = WindowBorder.Fixed,
-
-            };
-
+            
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-
 
             GL.ClearColor(0f, 0f, 0f, 1f);
             GL.ClearDepth(1.0);
@@ -248,111 +254,76 @@ namespace Sharp2D
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         }
-
-        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        
+        void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             Logger.SaveLog();
         }
 
-        static void window_UpdateFrame(object sender, FrameEventArgs e)
+        void window_UpdateFrame(FrameEventArgs e)
         {
+            Input.Update(_window.KeyboardState, _window.MouseState);
             _window.Title = Settings.WindowTitle + "  FPS: " + Fps + "  UPS: " + Ups;
             _logicTick();
-            Ups = _window.UpdateFrequency;
+            Ups = _window.UpdateTime * 1000;
         }
 
-        static void window_RenderFrame(object sender, FrameEventArgs e)
+        void window_RenderFrame(FrameEventArgs e)
         {
             _draw();
             _window.SwapBuffers();
-            Fps = _window.RenderFrequency;
+            Fps = _window.UpdateTime * 1000;
         }
 
-        private static void _openTKStart()
+        private void _openTKStart()
         {
             _window.RenderFrame += window_RenderFrame;
             _window.UpdateFrame += window_UpdateFrame;
-
-            if (Settings.MaxFPS == -1)
-                _window.Run(1000.0 / Settings.LogicTickRate);
-            else
-                _window.Run(1000.0 / Settings.LogicTickRate, Settings.MaxFPS);
+            _window.Load += WindowOnLoad;
+            _window.Closing += WindowOnClosing;
+            
+            _window.Run();
         }
 
-        private static void _gameLoop()
+        private void WindowOnClosing(CancelEventArgs obj)
         {
-            _tickAtStart = Environment.TickCount;
-            int fpsCount = 0;
-            long cur;
-            long now = TickCount;
-            float delta;
-            float fpsTime = 0;
-            int updates = 0;
-            int loop = 0;
-            double ntick = TickCount;
-            long ms = TickCount;
-            while (IsRunning && !_window.IsExiting)
+            _cleanUp();
+        }
+
+        private void WindowOnLoad()
+        {
+            if (readyCallback == null) return;
+            
+            if (Settings.AsyncReadyCallback)
             {
-                _window.Title = Settings.WindowTitle + "  FPS: " + Fps + "  UPS: " + Ups;
-                cur = now;
-                now = TickCount;
-                delta = (now - cur) / 100f;
-
-                _window.ProcessEvents();
-                
-                loop = 0;
-                while (TickCount > ntick && loop < Settings.MaxSkippedFrames)
+                var displayReadyThread = new Thread(() => readyCallback())
                 {
-                    _logicTick();
-
-                    ntick += SkipTicks;
-                    loop++;
-                    updates++;
-                    if (TickCount - ms < 1000) continue;
-                    Ups = updates;
-                    updates = 0;
-                    ms = TickCount;
-                }
-
-                _draw();
-                try
-                {
-                    _window.SwapBuffers();
-                }
-                catch { }
-
-                if (_window.IsExiting)
-                {
-                    IsRunning = false;
-                    break;
-                }
-
-                fpsTime += delta;
-                fpsCount++;
-                if (fpsCount == 100)
-                {
-                    fpsCount = 0;
-                    Fps = (1000f / fpsTime);
-                    fpsTime = 0;
-                }
+                    Priority = ThreadPriority.Highest,
+                    Name = "Display Ready Thread"
+                };
+                displayReadyThread.Start();
+            }
+            else
+            {
+                readyCallback();
             }
         }
 
         public static void GoFullscreen()
         {
-
             _window.WindowBorder = WindowBorder.Hidden;
 
-            DisplayDevice.Default.ChangeResolution(_window.Width, _window.Height, DisplayDevice.Default.BitsPerPixel, DisplayDevice.Default.RefreshRate);
+            _window.WindowState = WindowState.Fullscreen;
+            //DisplayDevice.Default.ChangeResolution(_window.Width, _window.Height, DisplayDevice.Default.BitsPerPixel, DisplayDevice.Default.RefreshRate);
 
             _window.WindowState = WindowState.Maximized;
         }
 
-        private static void _draw()
+        private void _draw()
         {
-            if (Settings.Fullscreen && _window.WindowState != WindowState.Maximized)
+            if (Settings.Fullscreen && _window.WindowState != WindowState.Fullscreen)
             {
                 GoFullscreen();
             }
@@ -401,7 +372,7 @@ namespace Sharp2D
             }
         }
 
-        private static void _logicTick()
+        private void _logicTick()
         {
             if (_logics == null) return;
 

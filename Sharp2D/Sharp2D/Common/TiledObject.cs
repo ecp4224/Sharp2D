@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using Sharp2D.Game.Worlds;
 using Newtonsoft.Json;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D

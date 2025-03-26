@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
+using OpenTK.Mathematics;
+using Sharp2D.Common;
 using Sharp2D.Core;
-using Sharp2D.Core.Graphics;
 
 namespace Sharp2D
 {
@@ -30,6 +26,7 @@ namespace Sharp2D
         /// <para>Measurement: frames</para>
         /// Default: 5 frames
         /// </summary>
+        [Obsolete("There is no longer a custom game loop")]
         public int MaxSkippedFrames { get; set; }
 
         /// <summary>
@@ -37,14 +34,14 @@ namespace Sharp2D
         /// <para>Measurement: pixels</para>
         /// Default: 1280x720
         /// </summary>
-        public System.Drawing.Size GameSize { get; set; }
+        public Size GameSize { get; set; }
 
         /// <summary>
         /// <para>The size of the window</para>
         /// <para>Measurement: pixels</para>
         /// Default: 1280x720
         /// </summary>
-        public System.Drawing.Size WindowSize { get; set; }
+        public Size WindowSize { get; set; }
 
         /// <summary>
         /// <para>Whether to run in fullscreen or not</para>
@@ -64,6 +61,17 @@ namespace Sharp2D
         /// Default: -1
         /// </summary>
         public int MaxFPS { get; set; }
+        
+        /// <summary>
+        /// Whether the readyCallback function passed to DisplayScreen should be called async or on the OpenGL thread
+        /// </summary>
+        public bool AsyncReadyCallback { get; set; }
+        
+        /// <summary>
+        /// Whether the window should pause the game loop while the window is being dragged. This is only applicable
+        /// on Windows platform
+        /// </summary>
+        public bool PauseOnWindowDrag { get; set; }
 
         private bool _opentk;
         /// <summary>
@@ -71,6 +79,7 @@ namespace Sharp2D
         /// <para>Notes: Sharp2D's game loop code does not support the MaxFPS setting, so if a MaxFPS is set, then OpenTK's game loop code will be used.</para>
         /// Default: True
         /// </summary>
+        [Obsolete("OpenTK game loop is now always used regardless of this setting", error: true)]
         public bool UseOpenTKLoop
         {
             get
@@ -84,7 +93,7 @@ namespace Sharp2D
         }
 
         private Vector2 aspect;
-        private System.Drawing.Size savedW;
+        private Size savedW;
         public Vector2 WindowAspectRatio
         {
             get
@@ -105,7 +114,8 @@ namespace Sharp2D
 
                 newWidth = newWidth / width;
                 newHeight = newHeight / width;
-                aspect = new OpenTK.Vector2(newWidth, newHeight);
+                aspect = new Vector2(newWidth, newHeight);
+                Logger.Debug($"Window Aspect Ratio: ({newWidth}, {newHeight})");
                 return aspect;
             }
         }

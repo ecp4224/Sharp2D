@@ -1,136 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1EDCB581-8960-417A-929F-5EEF65A7F73D}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sharp2D</RootNamespace>
-    <AssemblyName>Sharp2D</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\SomeGame\SomeGame\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFrameworks>net8.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>..\packages\OpenTK.1.1.2349.61993\lib\NET40\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Common\AnimationModule.cs" />
-    <Compile Include="Common\ModuleSprite.cs" />
-    <Compile Include="Common\Sprite.Helpers.cs" />
-    <Compile Include="Common\SpriteBuilder.cs" />
-    <Compile Include="Common\Text.cs" />
-    <Compile Include="Core\Graphics\Camera.cs" />
-    <Compile Include="Core\Interfaces\IModule.cs" />
-    <Compile Include="Core\Interfaces\IMoveable2d.cs" />
-    <Compile Include="Core\Interfaces\IMoveable3d.cs" />
-    <Compile Include="Core\Graphics\Shaders\Shader.cs" />
-    <Compile Include="Core\Graphics\Shaders\Source.cs" />
-    <Compile Include="Core\Graphics\Shaders\UniformHolder.cs" />
-    <Compile Include="Core\Interfaces\IAttachable.cs" />
-    <Compile Include="Core\Interfaces\INativeSystem.cs" />
-    <Compile Include="Core\MonoNativeSystem.cs" />
-    <Compile Include="Core\ParallelStringWriter.cs" />
-    <Compile Include="Core\WindowsNativeCalls.cs" />
-    <Compile Include="Core\World.cs" />
-    <Compile Include="Core\Network\Client.cs" />
-    <Compile Include="Core\Network\Session.cs" />
-    <Compile Include="Common\OnCollisionEventArgs.cs" />
-    <Compile Include="Core\EngineSettings.cs" />
-    <Compile Include="Common\GlobalSettings.cs" />
-    <Compile Include="Game\Input.cs" />
-    <Compile Include="Core\SaveableSettings.cs" />
-    <Compile Include="Common\Logger.cs" />
-    <Compile Include="Common\MathUtils.cs" />
-    <Compile Include="Common\Hitbox.cs" />
-    <Compile Include="Core\Interfaces\ICollidable.cs" />
-    <Compile Include="Core\Placement.cs" />
-    <Compile Include="Common\Extensions.cs" />
-    <Compile Include="Core\TexCoords.cs" />
-    <Compile Include="Game\Sprites\Animation.cs" />
-    <Compile Include="Game\Sprites\DefaultSprite.cs" />
-    <Compile Include="Game\Sprites\GenericSprite.cs" />
-    <Compile Include="Game\Sprites\NullSprite.cs" />
-    <Compile Include="Common\PhysicsSprite.cs" />
-    <Compile Include="Game\Sprites\PlayableSprite.cs" />
-    <Compile Include="Common\Sprite.Events.cs" />
-    <Compile Include="Core\SpriteBatch.cs" />
-    <Compile Include="Game\Sprites\TileSprite.cs" />
-    <Compile Include="Common\Layer.cs" />
-    <Compile Include="Common\TiledObject.cs" />
-    <Compile Include="Common\TileSet.cs" />
-    <Compile Include="Game\Worlds\DrawPasses.cs" />
-    <Compile Include="Game\Worlds\GenericCamera.cs" />
-    <Compile Include="Core\Interfaces\IRenderJob.cs" />
-    <Compile Include="Core\Interfaces\IRenderJobContainer.cs" />
-    <Compile Include="Common\Screen.cs" />
-    <Compile Include="Common\Texture.cs" />
-    <Compile Include="Core\Interfaces\ILogical.cs" />
-    <Compile Include="Core\Interfaces\ILogicContainer.cs" />
-    <Compile Include="Game\Worlds\GenericRenderJob.cs" />
-    <Compile Include="Common\GenericWorld.cs" />
-    <Compile Include="Core\Interfaces\ILightWorld.cs" />
-    <Compile Include="Common\Light.cs" />
-    <Compile Include="Game\Worlds\GenericSpriteRenderJob.cs" />
-    <Compile Include="Game\Worlds\BatchJobWorld.cs" />
-    <Compile Include="Game\Sprites\LogicalSprite.cs" />
-    <Compile Include="Common\Sprite.cs" />
-    <Compile Include="Core\Graphics\BatchRenderJob.cs" />
-    <Compile Include="Game\Worlds\TiledWorld.cs" />
-    <Compile Include="Game\Worlds\UIRenderJob.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Common\ScreenSettings.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\sprite_amb.frag" />
     <EmbeddedResource Include="Resources\sprite_amb.vert" />
@@ -140,21 +22,22 @@
     <EmbeddedResource Include="Resources\sprite_light_alpha.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="NVorbis" Version="0.10.5" />
+    <PackageReference Include="SkiaSharp" Version="3.116.1" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OpenTK" Version="4.9.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Game\Worlds\GuiRenderJob.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Core\NativeLibs\openal32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>openal32.dll</Link>
+    </None>
+  </ItemGroup>
 </Project>

@@ -41,13 +41,13 @@ namespace Sharp2D.Game.Sprites
             var count = Screen.TickCount;
             var delta = count - _lastTick;
 
-            IsMoving = Input.Keyboard["MoveUp"] || Input.Keyboard["MoveDown"] || Input.Keyboard["MoveLeft"] || Input.Keyboard["MoveRight"];
+            IsMoving = Input.Keyboard["MoveUp"].IsDown || Input.Keyboard["MoveDown"].IsDown || Input.Keyboard["MoveLeft"].IsDown || Input.Keyboard["MoveRight"].IsDown;
 
-            if (Input.Keyboard["MoveUp"]) { Y -= Speed; }
-            if (Input.Keyboard["MoveDown"]) { Y += Speed; }
-            if (Input.Keyboard["MoveLeft"]) { X -= Speed; }
-            if (Input.Keyboard["MoveRight"]) { X += Speed; }
-            if (Input.Keyboard["Jump"])
+            if (Input.Keyboard["MoveUp"].IsDown) { Y -= Speed; }
+            if (Input.Keyboard["MoveDown"].IsDown) { Y += Speed; }
+            if (Input.Keyboard["MoveLeft"].IsDown) { X -= Speed; }
+            if (Input.Keyboard["MoveRight"].IsDown) { X += Speed; }
+            if (Input.Keyboard["Jump"].IsPressed)
             {
                 if (!IsOnGround())
                 {

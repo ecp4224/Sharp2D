@@ -2,6 +2,7 @@
 using Sharp2D.Core.Graphics.Shaders;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 
 
 namespace Sharp2D.Game.Worlds
@@ -41,6 +42,11 @@ namespace Sharp2D.Game.Worlds
                 height = -height;
             if ((sprite.FlipState & FlipState.Horizontal) != 0)
                 width = -width;
+
+            if (sprite.Name.Contains("ball"))
+            {
+                Logger.Debug($"Drawing no alpha sprite {sprite.Name} @ ({sprite.X}, {sprite.Y})");
+            }
 
             _ambiantShader.Uniforms.SetUniform(sprite.ShaderColor, _ambiantShader.Uniforms["tint"]);
             _ambiantShader.Uniforms.SetUniform(sprite.Scale, _ambiantShader.Uniforms["spriteScale"]);
@@ -134,6 +140,12 @@ namespace Sharp2D.Game.Worlds
 
             lock (sprite.light_lock)
             {
+                if (sprite.Name.Contains("ball"))
+                {
+                    Logger.Debug(
+                        $"Drawing non-alpha sprite {sprite.Name} @ ({sprite.X}, {sprite.Y}) with {sprite.LightCount} lights. {sprite.Lights.Count} static lights and {sprite.dynamicLights.Count} dynamic lights");
+                }
+
                 foreach (Light light in sprite.Lights)
                 {
                     _lightShader.Uniforms.SetUniform(light.ShaderColor, _lightShader.Uniforms["lightcolor"]);
@@ -166,8 +178,9 @@ namespace Sharp2D.Game.Worlds
             _lightShader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), _lightShader.Uniforms["camPosAndScale"]);
             _lightShader.Uniforms.SetUniform(aspect.X / aspect.Y, _lightShader.Uniforms["screenRatioFix"]);
 
+            GL.DepthMask(false);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+            GL.BlendFunc(BlendingFactor.One, BlendingFactor.One);
             //GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
         }
 
@@ -196,7 +209,8 @@ namespace Sharp2D.Game.Worlds
 
         public override void PostDraw()
         {
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.DepthMask(true);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         }
     }
     #endregion
@@ -242,7 +256,7 @@ namespace Sharp2D.Game.Worlds
             _alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), _alphaLightShader.Uniforms["texCoordPosAndScale"]);
             _alphaLightShader.Uniforms.SetUniform(sprite.Layer, _alphaLightShader.Uniforms["spriteDepth"]);
 
-            _alphaLightShader.Uniforms.SetUniform(1f, _alphaLightShader.Uniforms["ambientmult"]);
+            _alphaLightShader.Uniforms.SetUniform(0f, _alphaLightShader.Uniforms["ambientmult"]);
 
             GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
 
@@ -266,20 +280,17 @@ namespace Sharp2D.Game.Worlds
                     _alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _alphaLightShader.Uniforms["lightdata"]);
                     GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 }
-            }
-
-            if (sprite.LightCount <= 1)
-            {
-                sprite.dynamicLights.Clear();
-                if (!sprite.IsStatic)
+                
+                if (sprite.LightCount <= 1)
                 {
-                    sprite.Lights.Clear();
+                    sprite.dynamicLights.Clear();
+                    if (!sprite.IsStatic)
+                    {
+                        sprite.Lights.Clear();
+                    }
+                    return;
                 }
-                return;
-            }
-
-            lock (sprite.light_lock)
-            {
+                
                 int i = 0;
                 if (sprite.Lights.Count > 0) //If the sprite had static lights
                 {
@@ -287,7 +298,7 @@ namespace Sharp2D.Game.Worlds
                 }
                 for (; i < sprite.Lights.Count; i++)
                 {
-                    Light light = sprite.Lights[i];
+                    light = sprite.Lights[i];
                     _alphaLightShader.Uniforms.SetUniform(light.ShaderColor, _alphaLightShader.Uniforms["lightcolor"]);
                     _alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _alphaLightShader.Uniforms["lightdata"]);
 
@@ -295,13 +306,13 @@ namespace Sharp2D.Game.Worlds
                 }
 
                 i = 0;
-                if (sprite.Lights.Count == 0) //If the sprite had no static lights
+                if (sprite.dynamicLights.Count == 0) //If the sprite had no static lights
                 {
                     i = 1; //Then the first dynamic light has already been applied 
                 }
                 for (; i < sprite.dynamicLights.Count; i++)
                 {
-                    Light light = sprite.dynamicLights[i];
+                    light = sprite.dynamicLights[i];
                     _alphaLightShader.Uniforms.SetUniform(light.ShaderColor, _alphaLightShader.Uniforms["lightcolor"]);
                     _alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _alphaLightShader.Uniforms["lightdata"]);
 
@@ -324,15 +335,15 @@ namespace Sharp2D.Game.Worlds
             _alphaLightShader.Uniforms.SetUniform(aspect.X / aspect.Y, _alphaLightShader.Uniforms["screenRatioFix"]);
 
             _alphaLightShader.Uniforms.SetUniform(ParentJob.ParentWorld.AmbientShaderColor, _alphaLightShader.Uniforms["ambient"]);
-
-
+            
+            GL.DepthMask(false);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
         }
 
         public override void PostDraw()
         {
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.DepthMask(true);
         }
 

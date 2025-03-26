@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenTK;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Graphics;
 
 namespace Sharp2D.Core

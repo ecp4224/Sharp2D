@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Interfaces;
 
 namespace Sharp2D

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
+﻿using OpenTK.Windowing.GraphicsLibraryFramework;
 using Sharp2D;
 using Sharp2D.Core.Interfaces;
+using Sharp2D.Game;
+using SkiaSharp;
 
 namespace Fireflies
 {
@@ -27,7 +24,7 @@ namespace Fireflies
 
         public void Update()
         {
-            if (OpenTK.Input.Keyboard.GetState().IsKeyDown(OpenTK.Input.Key.Escape))
+            if (Input.IsKeyDown(Keys.Escape))
             {
                 Screen.TerminateScreen();
                 return;
@@ -73,7 +70,7 @@ namespace Fireflies
             }
         }
 
-        public Firefly() : base(0, 0, 0f, 10f, Color.Gold, LightType.DynamicPointLight)
+        public Firefly() : base(0, 0, 0f, 10f, SKColors.Gold, LightType.DynamicPointLight)
         {
             
         }
@@ -90,7 +87,7 @@ namespace Fireflies
             real_y = Y;
 
             Intensity = 0f;
-            Color = Color.Gold;
+            Color = SKColors.Gold;
 
             Radius = random.Next(4, 10);
         }

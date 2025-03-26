@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Drawing.Imaging;
-using OpenTK;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Interfaces;
+using SkiaSharp;
 
 namespace Sharp2D
 {
@@ -74,25 +70,19 @@ namespace Sharp2D
             return toReturn;
         }
 
-        public static bool ContainsAlpha(this Bitmap Bitmap)
+        public static bool ContainsAlpha(this SKBitmap Bitmap)
         {
-            BitmapData bmpData = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            bool answer = false;
-            unsafe
+            for (int y = 0; y < Bitmap.Height; y++)
             {
-                byte* ptrAlpha = ((byte*)bmpData.Scan0.ToPointer()) + 3;
-                for (int i = bmpData.Width * bmpData.Height; i > 0; --i)  // prefix-- should be faster
+                for (int x = 0; x < Bitmap.Width; x++)
                 {
-                    if (*ptrAlpha < 255)
-                        answer = true;
-
-                    ptrAlpha += 4;
+                    SKColor color = Bitmap.GetPixel(x, y);
+                    if (color.Alpha < 255)
+                        return true;
                 }
             }
 
-            Bitmap.UnlockBits(bmpData);
-
-            return answer;
+            return false;
         }
     }
 }

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
-using System.Drawing;
-using Sharp2D;
+using System.IO;
+using OpenTK.Mathematics;
 using Sharp2D.Core;
 using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Worlds;
+using SkiaSharp;
 
 namespace Sharp2D.Game.Sprites
 {
@@ -118,8 +115,8 @@ namespace Sharp2D.Game.Sprites
         {
             get
             {
-                if (TileSet.containsAlpha.ContainsKey(ID))
-                    return TileSet.containsAlpha[ID];
+                if (TileSet.containsAlpha.TryGetValue(ID, out var alpha))
+                    return alpha;
 
                 int tilepos = (ID - TileSet.FirstGID) + 1;
                 int step = (tilepos - 1) % TileSet.TilesPerRow, row = 0;
@@ -136,17 +133,23 @@ namespace Sharp2D.Game.Sprites
                 int height = TileSet.TileHeight;
 
 
-                var testBmp = new Bitmap(width, height);
-                using (Graphics g = Graphics.FromImage(testBmp))
+                // Create a new SKBitmap to hold the tile image.
+                SKBitmap testBmp = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+                using (var canvas = new SKCanvas(testBmp))
                 {
-                    g.DrawImage(Texture.Bitmap, new RectangleF(0, 0, width, height), new RectangleF(x, y, width, height), GraphicsUnit.Pixel);
+                    // Define destination and source rectangles.
+                    SKRect destRect = new SKRect(0, 0, width, height);
+                    SKRect srcRect = new SKRect(x, y, x + width, y + height);
+                    // Draw the relevant portion of the texture onto the test bitmap.
+                    canvas.DrawBitmap(Texture.Bitmap, srcRect, destRect);
                 }
 
-                bool cached_alpha_answer = testBmp.ContainsAlpha();
-                TileSet.containsAlpha.Add(ID, cached_alpha_answer);
+                // Check for alpha using the SKBitmap extension we defined earlier.
+                bool cachedAlphaAnswer = testBmp.ContainsAlpha();
+                TileSet.containsAlpha.Add(ID, cachedAlphaAnswer);
 
                 testBmp.Dispose();
-                return cached_alpha_answer;
+                return cachedAlphaAnswer;
             }
         }
 

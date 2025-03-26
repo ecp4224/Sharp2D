@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenTK;
-using System.Drawing;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Worlds;
 using Sharp2D.Game.Sprites;
+using SkiaSharp;
 
 namespace Sharp2D
 {
@@ -13,8 +13,8 @@ namespace Sharp2D
     {
         private float _brightness;
         internal Vector3 AmbientShaderColor;
-        private Color _color;
-        public Color AmbientColor
+        private SKColor _color;
+        public SKColor AmbientColor
         {
             get
             {
@@ -24,7 +24,7 @@ namespace Sharp2D
             {
                 _color = value;
 
-                AmbientShaderColor = new Vector3(_color.R / 255f * _brightness, _color.G / 255f * _brightness, _color.B / 255f * _brightness);
+                AmbientShaderColor = new Vector3(_color.Red / 255f * _brightness, _color.Green / 255f * _brightness, _color.Blue / 255f * _brightness);
             }
         }
         public float AmbientBrightness
@@ -37,7 +37,7 @@ namespace Sharp2D
             {
                 _brightness = value; 
                 
-                AmbientShaderColor = new Vector3(_color.R / 255f * _brightness, _color.G / 255f * _brightness, _color.B / 255f * _brightness);
+                AmbientShaderColor = new Vector3(_color.Red / 255f * _brightness, _color.Green / 255f * _brightness, _color.Blue / 255f * _brightness);
             
             }
         }
@@ -86,6 +86,25 @@ namespace Sharp2D
                 action();
             }
         }
+        
+        public static SKColor ColorFromName(string name)
+        {
+            switch(name.ToLower())
+            {
+                case "black": return SKColors.Black;
+                case "white": return SKColors.White;
+                case "red": return SKColors.Red;
+                case "green": return SKColors.Green;
+                case "blue": return SKColors.Blue;
+                case "yellow": return SKColors.Yellow;
+                case "cyan": return SKColors.Cyan;
+                case "magenta": return SKColors.Magenta;
+                // Add additional mappings as needed.
+                default:
+                    // Fallback to transparent or throw an exception if an unknown name is provided.
+                    return SKColors.Transparent;
+            }
+        }
 
         protected override void OnLoad()
         {
@@ -93,7 +112,7 @@ namespace Sharp2D
             guiJob = new GuiRenderJob(this);
 
             AmbientBrightness = 1f;
-            AmbientColor = Color.FromArgb(255, 255, 255, 255);
+            AmbientColor = new SKColor(255, 255, 255, 255);
 
             base.OnLoad();
 
@@ -111,7 +130,7 @@ namespace Sharp2D
                     y = y + (radius / 2f);
 
                     float intense = 1f;
-                    Color color = Color.White;
+                    SKColor color = SKColors.White;
                     if (obj.Properties != null)
                     {
                         if (obj.Properties.ContainsKey("brightness"))
@@ -120,7 +139,7 @@ namespace Sharp2D
                         }
                         if (obj.Properties.ContainsKey("color"))
                         {
-                            color = Color.FromName(obj.Properties["color"]);
+                            color = ColorFromName(obj.Properties["color"]);
                         }
                     }
 
@@ -163,7 +182,7 @@ namespace Sharp2D
             return light;
         }
 
-        public Light AddLight(float X, float Y, float Intensity, float Radius, Color color, LightType LightType)
+        public Light AddLight(float X, float Y, float Intensity, float Radius, SKColor color, LightType LightType)
         {
             var light = new Light(X, Y, Intensity, Radius, color, LightType);
             AddLight(light);
@@ -304,6 +323,7 @@ namespace Sharp2D
                     if (X + (Width / 2f) >= xmin && X - (Width / 2f) <= xmax && Y + (Height / 2f) >= ymin && Y - (Height / 2f) <= ymax)
                     {
                         sprite.Lights.Add(light);
+                        Logger.Log($"Sprite {sprite.Name} is affected by light at ({light.X}, {light.Y})");
                     }
                 }
             }

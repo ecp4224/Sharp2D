@@ -146,7 +146,7 @@ namespace Sharp2D.Game.Worlds
                     for (int i = 0; i < layer.Data.Length; i++)
                     {
                         TileSprite t = layer[i];
-                        if (t.IsCollidable)
+                        if (t != null && t.IsCollidable)
                         {
                             Hitbox.AddCollidable(t);
                         }

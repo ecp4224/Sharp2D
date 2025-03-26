@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
-using Sharp2D;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Interfaces;
+using SkiaSharp;
 
 
 namespace Sharp2D.Core.Graphics
@@ -29,15 +25,13 @@ namespace Sharp2D.Core.Graphics
         /// </summary>
         public float X {
             get { return _pos.X; }
-            set
-            {
+            set {
                 float x = value;
-
+                // Clamp x between Bounds.Left and Bounds.Right
                 if (Bounds.Width != 0 && Bounds.Height != 0)
-                    x = Math.Min(Math.Max(x, Bounds.X), Bounds.Width);
-
+                    x = Math.Min(Math.Max(x, Bounds.Left), Bounds.Right);
                 _pos.X = x;
-            } 
+            }
         }
 
         /// <summary>
@@ -45,15 +39,13 @@ namespace Sharp2D.Core.Graphics
         /// </summary>
         public float Y {
             get { return _pos.Y; }
-            set
-            {
+            set {
                 float y = value;
-
+                // Clamp y between Bounds.Top and Bounds.Bottom
                 if (Bounds.Width != 0 && Bounds.Height != 0)
-                    y = Math.Min(Math.Max(y, Bounds.Y), Bounds.Height);
-             
+                    y = Math.Min(Math.Max(y, Bounds.Top), Bounds.Bottom);
                 _pos.Y = y;
-            } 
+            }
         }
 
         /// <summary>
@@ -64,7 +56,7 @@ namespace Sharp2D.Core.Graphics
             set { _pos.Z = value; } 
         }
 
-        public Rectangle Bounds { get; set; }
+        public SKRect Bounds { get; set; }
         
         /// <summary>
         /// Setup the camera before all the RenderJobs perform their jobs.

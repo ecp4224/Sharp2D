@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sharp2D.Game.Sprites;
-using System.Drawing;
-using OpenTK;
+using OpenTK.Mathematics;
 using Sharp2D.Core.Interfaces;
+using SkiaSharp;
 
 namespace Sharp2D
 {
     public class Light : IAttachable, IMoveable2d
     {
         internal Vector3 ShaderColor;
-        private Color _color;
+        private SKColor _color;
         private float _intense;
 
         /// <summary>
@@ -24,7 +20,7 @@ namespace Sharp2D
 
         public LightType LightType { get; private set; }
 
-        public Color Color
+        public SKColor Color
         {
             get
             {
@@ -34,7 +30,7 @@ namespace Sharp2D
             {
                 _color = value;
 
-                ShaderColor = new Vector3((_color.R / 255f) * Intensity, (_color.G / 255f) * Intensity, (_color.B / 255f) * Intensity);
+                ShaderColor = new Vector3((_color.Red / 255f) * Intensity, (_color.Green / 255f) * Intensity, (_color.Blue / 255f) * Intensity);
             }
         }
 
@@ -141,12 +137,12 @@ namespace Sharp2D
             {
                 _intense = value;
 
-                ShaderColor = new Vector3((_color.R / 255f) * Intensity, (_color.G / 255f) * Intensity, (_color.B / 255f) * Intensity);
+                ShaderColor = new Vector3((_color.Red / 255f) * Intensity, (_color.Green / 255f) * Intensity, (_color.Blue / 255f) * Intensity);
             }
         }
         public float Radius { get; set; }
 
-        public Light(float X, float Y, float Intensity, float Radius, Color color, LightType LightType)
+        public Light(float X, float Y, float Intensity, float Radius, SKColor color, LightType LightType)
         {
             this.X = X;
             this.Y = Y;
@@ -158,7 +154,7 @@ namespace Sharp2D
             this.IsStatic = (LightType & LightType.Static) != 0;
         }
 
-        public Light(float X, float Y, float Intensity, float Radius, LightType LightType) : this(X, Y, Intensity, Radius, Color.White, LightType) { }
+        public Light(float X, float Y, float Intensity, float Radius, LightType LightType) : this(X, Y, Intensity, Radius, SKColors.White, LightType) { }
 
         public Light(float X, float Y, float Intensity, LightType LightType) : this(X, Y, Intensity, 1f, LightType) { }
 

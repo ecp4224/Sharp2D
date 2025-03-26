@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
 using System.Reflection;
 using OpenTK.Graphics.OpenGL;
 using System.IO;
+using SkiaSharp;
 
 namespace Sharp2D
 {
@@ -63,7 +58,7 @@ namespace Sharp2D
 
         public string Name { get; private set; }
 
-        public Bitmap Bitmap { get; private set; }
+        public SKBitmap Bitmap { get; private set; }
 
         private Texture() { ID = -1; MinFilter = (int)TextureMinFilter.Nearest; MagFilter = (int)TextureMagFilter.Nearest; }
 
@@ -78,22 +73,30 @@ namespace Sharp2D
             if (stream == null)
                 throw new FileNotFoundException("Could not find resource " + Name);
 
-            Bitmap = new Bitmap(stream, false);
-
+            // Decode stream into SKBitmap
+            var temp = SKBitmap.Decode(stream);
+            var info = new SKImageInfo(temp.Width, temp.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            Bitmap = new SKBitmap(info);
+            temp.CopyTo(Bitmap);
+            temp.Dispose();
             HasAlpha = Bitmap.ContainsAlpha();
-
             ValidateSize();
         }
 
         public void LoadTextureFromFile()
         {
             Screen.ValidateOpenGLUnsafe("Texture.LoadTextureFromFile", true);
-            
-            using (var fs = new System.IO.FileStream(Name, System.IO.FileMode.Open))
-            {
-                Bitmap = new Bitmap(fs);
-            }
 
+            SKBitmap temp;
+            using (var fs = new FileStream(Name, FileMode.Open))
+            {
+                temp = SKBitmap.Decode(fs);
+            }
+            
+            var info = new SKImageInfo(temp.Width, temp.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            Bitmap = new SKBitmap(info);
+            temp.CopyTo(Bitmap);
+            temp.Dispose();
             HasAlpha = Bitmap.ContainsAlpha();
 
             ValidateSize();
@@ -113,11 +116,16 @@ namespace Sharp2D
 
             if (TextureWidth != ImageWidth || TextureHeight != ImageHeight)
             {
-                Bitmap bmp = new Bitmap(TextureWidth, TextureHeight);
-                System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp);
-                g.DrawImage(Bitmap, new RectangleF(0f, 0f, ImageWidth, ImageHeight), new RectangleF(0f, 0f, ImageWidth, ImageHeight), GraphicsUnit.Pixel);
-                g.Dispose();
-                Bitmap = bmp;
+                // Create a new bitmap with the proper power-of-two dimensions.
+                SKBitmap newBitmap = new SKBitmap(TextureWidth, TextureHeight, SKColorType.Bgra8888, SKAlphaType.Premul);
+                using (var canvas = new SKCanvas(newBitmap))
+                {
+                    // Draw the original bitmap into the new one.
+                    SKRect destRect = new SKRect(0, 0, ImageWidth, ImageHeight);
+                    SKRect srcRect = new SKRect(0, 0, ImageWidth, ImageHeight);
+                    canvas.DrawBitmap(Bitmap, srcRect, destRect);
+                }
+                Bitmap = newBitmap;
             }
         }
 
@@ -133,11 +141,11 @@ namespace Sharp2D
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
 
-            BitmapData bmp = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp.Width, bmp.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp.Scan0);
-
-            Bitmap.UnlockBits(bmp);
+            
+            // Get pixel data from SKBitmap.
+            // Ensure the bitmap uses a format compatible with our GL call (typically BGRA8888).
+            IntPtr pixelData = Bitmap.GetPixels();
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixelData);
         }
 
         public void CreateOrUpdate()
@@ -155,28 +163,10 @@ namespace Sharp2D
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
 
-                BitmapData bmp = Bitmap.LockBits(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp.Width, bmp.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp.Scan0);
-
-                Bitmap.UnlockBits(bmp);
+                IntPtr pixelData = Bitmap.GetPixels();
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0,
+                    OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData);
             }
-        }
-
-        private bool CheckAlphaChannel(BitmapData bmpData)
-        {
-            unsafe
-            {
-                byte* ptrAlpha = ((byte*)bmpData.Scan0.ToPointer()) + 3;
-                for (int i = bmpData.Width * bmpData.Height; i > 0; --i)  // prefix-- should be faster
-                {
-                    if (*ptrAlpha < 255)
-                        return true;
-
-                    ptrAlpha += 4;
-                }
-            }
-            return false;
         }
 
         private static int _currentBind;
@@ -200,19 +190,15 @@ namespace Sharp2D
             if (!Loaded)
                 throw new InvalidOperationException("Cannot clear a null texture!");
 
-            using (var g = System.Drawing.Graphics.FromImage(Bitmap))
+            using (var canvas = new SKCanvas(Bitmap))
             {
-                g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-                using (var br = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(0, 255, 255, 255)))
-                {
-                    g.FillRectangle(br, 0, 0, Bitmap.Width, Bitmap.Height);
-                }
+                canvas.Clear(SKColors.Transparent);
             }
         }
 
-        public void BlankTexture(int Width, int Height)
+        public void BlankTexture(int width, int height)
         {
-            Bitmap = new Bitmap(Width, Height);
+            Bitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
             ValidateSize();
         }
 
@@ -221,7 +207,7 @@ namespace Sharp2D
             var texture = new Texture
             {
                 Name = Name,
-                Bitmap = new Bitmap(Bitmap),
+                Bitmap = Bitmap.Copy(SKColorType.Bgra8888), // SKBitmap.Copy() creates a duplicate
                 MagFilter = MagFilter,
                 MinFilter = MinFilter,
                 HasAlpha = HasAlpha,

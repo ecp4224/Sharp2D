@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
 using Sharp2D.Core;
+using SkiaSharp;
 
 namespace Sharp2D.Common
 {
-    public class Test
+    /*public class Test
     {
         public static void TestMethod()
         {
-            /*
+
             SpriteBuilder builder = new SpriteBuilder();
-            
+
             Sprite s = builder
                         .MakeAndEditRectangle(300, 100)
                             .MakeAndEditText("Test")
@@ -23,19 +20,19 @@ namespace Sharp2D.Common
                                 .Parent()
                             .SetColor(Color.Black)
                             .BuildSprite();
-            
+
             myWorld.AddSprite(s);
-            */
+            
         }
-    }
+    }*/
 
 
 
     public abstract class Builder
     {
-        protected Queue<Action<Graphics>> actionQueue = new Queue<Action<Graphics>>();
+        protected Queue<Action<SKCanvas>> actionQueue = new Queue<Action<SKCanvas>>();
         public int X, Y, Width, Height;
-        public Color Color = Color.Black;
+        public SKColor  Color = SKColors.Black;
         private Builder parent;
 
         public Builder(Builder parent)
@@ -46,7 +43,7 @@ namespace Sharp2D.Common
         public RectangleObject MakeAndEditRectangle(int width, int height)
         {
             RectangleObject obj = new RectangleObject(width, height, this);
-            AddAction(delegate(Graphics g)
+            AddAction(delegate(SKCanvas g)
             {
                 obj.Build(g);
             });
@@ -56,14 +53,14 @@ namespace Sharp2D.Common
         public TextObject AddText(string text)
         {
             TextObject obj = new TextObject(text, this);
-            AddAction(delegate(Graphics g)
+            AddAction(delegate(SKCanvas g)
             {
                 obj.Build(g);
             });
             return obj;
         }
 
-        public virtual Builder SetColor(Color color)
+        public virtual Builder SetColor(SKColor color)
         {
             this.Color = color;
 
@@ -100,7 +97,7 @@ namespace Sharp2D.Common
             return this;
         }
         
-        public Builder AddAction(Action<Graphics> action)
+        public Builder AddAction(Action<SKCanvas> action)
         {
             actionQueue.Enqueue(action);
             return this;
@@ -111,7 +108,7 @@ namespace Sharp2D.Common
             return parent;
         }
 
-        public abstract void Build(Graphics g);
+        public abstract void Build(SKCanvas g);
     }
 
     public class BuiltSprite : Sprite
@@ -165,22 +162,24 @@ namespace Sharp2D.Common
             Texture texture = Texture.NewTexture(spriteName + "_autobuild");
             texture.BlankTexture(Width, Height);
 
-            Bitmap image = texture.Bitmap;
+            // Get the SKBitmap from the texture.
+            SKBitmap image = texture.Bitmap;
 
-            using (Graphics g = Graphics.FromImage(image))
+            // Use an SKCanvas to perform the queued drawing actions.
+            using (var canvas = new SKCanvas(image))
             {
-                while (base.actionQueue.Count > 0)
+                while (actionQueue.Count > 0)
                 {
-                    base.actionQueue.Dequeue()(g);
+                    actionQueue.Dequeue().Invoke(canvas);
                 }
             }
 
             sprite.Texture = texture;
-
+            
             return sprite;
         }
 
-        public override void Build(Graphics g)
+        public override void Build(SKCanvas g)
         {
             throw new NotImplementedException();
         }
@@ -199,11 +198,15 @@ namespace Sharp2D.Common
             this.Height = height;
         }
 
-        public override void Build(Graphics g)
+        public override void Build(SKCanvas canvas)
         {
-            using (Brush b = new SolidBrush(base.Color))
+            using (var paint = new SKPaint())
             {
-                g.FillRectangle(b, new Rectangle(X, Y, Width, Height));
+                paint.Color = this.Color;
+                paint.IsAntialias = true;
+                paint.Style = SKPaintStyle.Fill;
+                SKRect rect = new SKRect(X, Y, X + Width, Y + Height);
+                canvas.DrawRect(rect, paint);
             }
         }
     }
@@ -211,7 +214,7 @@ namespace Sharp2D.Common
     public class TextObject : Builder
     {
         private string text;
-        private StringAlignment alignment;
+        private SKTextAlign  alignment = SKTextAlign.Left;
         internal TextObject(string text, Builder parent) : base(parent)
         {
             this.text = text;
@@ -221,23 +224,32 @@ namespace Sharp2D.Common
         {
             if ((position & Placement.Left) != 0)
             {
-                alignment = StringAlignment.Near;
+                alignment = SKTextAlign.Left;
             }
             else if ((position & Placement.Right) != 0)
             {
-                alignment = StringAlignment.Far;
+                alignment = SKTextAlign.Right;
             }
             else if ((position & Placement.Center) != 0)
             {
-                alignment = StringAlignment.Center;
+                alignment = SKTextAlign.Center;
             }
 
             return this;
         }
 
-        public override void Build(Graphics g)
+        public override void Build(SKCanvas canvas)
         {
-            
+            // Basic implementation: draw text at (X, Y) with current Color.
+            using (var paint = new SKPaint())
+            {
+                paint.Color = this.Color;
+                paint.TextSize = 16; // Default text size; consider making this configurable.
+                paint.IsAntialias = true;
+                paint.TextAlign = alignment;
+                // For simplicity, draw at (X, Y). More advanced rendering might measure text.
+                canvas.DrawText(text, X, Y, paint);
+            }
         }
     }
 }

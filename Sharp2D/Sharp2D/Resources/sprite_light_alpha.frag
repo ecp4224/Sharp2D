@@ -23,7 +23,7 @@ void main(){
 		vec2 deltapos = lightpos - pixpos;
 		float lightdist = length(deltapos);
 		float lsize = lightdata.b;
-		float attenuation = clamp(1.0 - lightdist*lightdist/(lsize*lsize), 0.0, 1.0); 
+		float attenuation = clamp(1.0 - (lightdist*lightdist)/(lsize*lsize), 0.0, 1.0); 
 		attenuation *= attenuation;
 		
 		

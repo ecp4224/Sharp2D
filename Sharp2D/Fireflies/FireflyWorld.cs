@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Sharp2D;
+﻿using Sharp2D;
+using SkiaSharp;
 
 namespace Fireflies
 {
@@ -52,7 +47,7 @@ namespace Fireflies
                 AddSprite(c);
             }
 
-            _lightingLight = new Light(this.PixelWidth / 2f, 0f, OriginalIntensity, 750f, Color.FromArgb(36, 42, 255), LightType.StaticPointLight)
+            _lightingLight = new Light(this.PixelWidth / 2f, 0f, OriginalIntensity, 750f, new SKColor(36, 42, 255), LightType.StaticPointLight)
             {
                 Intensity = 0f
             };

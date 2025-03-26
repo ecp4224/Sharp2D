@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using Sharp2D.Core;
 using Sharp2D.Game.Sprites;
 using Sharp2D.Core.Graphics;
@@ -105,6 +106,8 @@ namespace Sharp2D.Game.Worlds
 
                     batch.PrepareForDraw();
                     pass.PrepareForDraw();
+                    
+                    Logger.Debug($"Batch {i} will draw {batch.Count} sprites");
 
                     batch.ForEach(pass.DrawSprite);
 
