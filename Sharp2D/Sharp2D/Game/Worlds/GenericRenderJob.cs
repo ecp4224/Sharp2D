@@ -106,8 +106,6 @@ namespace Sharp2D.Game.Worlds
 
                     batch.PrepareForDraw();
                     pass.PrepareForDraw();
-                    
-                    Logger.Debug($"Batch {i} will draw {batch.Count} sprites");
 
                     batch.ForEach(pass.DrawSprite);
 

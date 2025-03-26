@@ -140,12 +140,6 @@ namespace Sharp2D.Game.Worlds
 
             lock (sprite.light_lock)
             {
-                if (sprite.Name.Contains("ball"))
-                {
-                    Logger.Debug(
-                        $"Drawing non-alpha sprite {sprite.Name} @ ({sprite.X}, {sprite.Y}) with {sprite.LightCount} lights. {sprite.Lights.Count} static lights and {sprite.dynamicLights.Count} dynamic lights");
-                }
-
                 foreach (Light light in sprite.Lights)
                 {
                     _lightShader.Uniforms.SetUniform(light.ShaderColor, _lightShader.Uniforms["lightcolor"]);
@@ -256,11 +250,9 @@ namespace Sharp2D.Game.Worlds
             _alphaLightShader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), _alphaLightShader.Uniforms["texCoordPosAndScale"]);
             _alphaLightShader.Uniforms.SetUniform(sprite.Layer, _alphaLightShader.Uniforms["spriteDepth"]);
 
-            _alphaLightShader.Uniforms.SetUniform(0f, _alphaLightShader.Uniforms["ambientmult"]);
-
+            _alphaLightShader.Uniforms.SetUniform(1f, _alphaLightShader.Uniforms["ambientmult"]);
+            
             GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
-
-            _alphaLightShader.Uniforms.SetUniform(0f, _alphaLightShader.Uniforms["ambientmult"]);
 
             lock (sprite.light_lock)
             {
@@ -280,6 +272,9 @@ namespace Sharp2D.Game.Worlds
                     _alphaLightShader.Uniforms.SetUniform(new Vector3(light.X, -light.Y, light.Radius), _alphaLightShader.Uniforms["lightdata"]);
                     GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 }
+                
+                // NOTE: ENSURE THE FIRST LIGHT APPLIES AMBIENT, NEVER FORGET 
+                _alphaLightShader.Uniforms.SetUniform(0f, _alphaLightShader.Uniforms["ambientmult"]);
                 
                 if (sprite.LightCount <= 1)
                 {
@@ -306,7 +301,7 @@ namespace Sharp2D.Game.Worlds
                 }
 
                 i = 0;
-                if (sprite.dynamicLights.Count == 0) //If the sprite had no static lights
+                if (sprite.Lights.Count == 0) //If the sprite had no static lights
                 {
                     i = 1; //Then the first dynamic light has already been applied 
                 }

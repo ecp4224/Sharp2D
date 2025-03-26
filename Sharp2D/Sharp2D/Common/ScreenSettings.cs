@@ -115,7 +115,6 @@ namespace Sharp2D
                 newWidth = newWidth / width;
                 newHeight = newHeight / width;
                 aspect = new Vector2(newWidth, newHeight);
-                Logger.Debug($"Window Aspect Ratio: ({newWidth}, {newHeight})");
                 return aspect;
             }
         }
