@@ -51,6 +51,7 @@ namespace Sharp2D.Game
         {
             Keyboard._state = keyboard;
             Mouse._state = mouse;
+            _mouse = mouse;
         }
 
         public static bool IsKeyDown(Keys key)
