@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using OpenTK.Graphics.OpenGL;
+using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using GLPixelInternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat;
 using System.IO;
 using SkiaSharp;
 
@@ -39,6 +41,32 @@ namespace Sharp2D
         public int TextureHeight { get; private set; }
 
         public SKColorType ColorType { get; set; } = SKColorType.Bgra8888;
+
+        public GLPixelFormat PixelFormat
+        {
+            get
+            {
+                return ColorType switch
+                {
+                    SKColorType.Bgra8888 => GLPixelFormat.Bgra,
+                    SKColorType.Rgba8888 => GLPixelFormat.Rgba,
+                    SKColorType.Gray8 => GLPixelFormat.Red,
+                    _ => GLPixelFormat.Rgba
+                };
+            }
+        }
+
+        public GLPixelInternalFormat PixelInternalFormat
+        {
+            get
+            {
+                return ColorType switch
+                {
+                    SKColorType.Gray8 => GLPixelInternalFormat.R8,
+                    _ => GLPixelInternalFormat.Rgba
+                };
+            }
+        }
 
         public bool Loaded
         {
@@ -146,8 +174,7 @@ namespace Sharp2D
             
             // Get pixel data from SKBitmap using the configured color type.
             IntPtr pixelData = Bitmap.GetPixels();
-            var format = ColorType == SKColorType.Bgra8888 ? PixelFormat.Bgra : PixelFormat.Rgba;
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0, format, PixelType.UnsignedByte, pixelData);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, Bitmap.Width, Bitmap.Height, 0, PixelFormat, PixelType.UnsignedByte, pixelData);
         }
 
         public void CreateOrUpdate()
@@ -166,9 +193,8 @@ namespace Sharp2D
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
 
                 IntPtr pixelData = Bitmap.GetPixels();
-                var format = ColorType == SKColorType.Bgra8888 ? PixelFormat.Bgra : PixelFormat.Rgba;
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0,
-                    format, PixelType.UnsignedByte, pixelData);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, Bitmap.Width, Bitmap.Height, 0,
+                    PixelFormat, PixelType.UnsignedByte, pixelData);
             }
         }
 

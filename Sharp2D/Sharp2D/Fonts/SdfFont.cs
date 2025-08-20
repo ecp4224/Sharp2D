@@ -193,7 +193,9 @@ namespace Sharp2D.Fonts
         private static void LoadTexture(string atlasPath, SdfFont font)
         {
             var tex = Texture.NewTexture(atlasPath);
-            tex.ColorType = SKColorType.Rgba8888;
+            // The SDF atlas is a single-channel image. Use an 8-bit grayscale bitmap so we
+            // can upload it to OpenGL as a red channel texture.
+            tex.ColorType = SKColorType.Gray8;
             tex.MinFilter = (int)TextureMinFilter.Linear;
             tex.MagFilter = (int)TextureMagFilter.Linear;
             tex.LoadTextureFromFile();
