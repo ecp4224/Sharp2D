@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml.Linq;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
+using SkiaSharp;
 
 namespace Sharp2D.Fonts
 {
@@ -192,6 +193,7 @@ namespace Sharp2D.Fonts
         private static void LoadTexture(string atlasPath, SdfFont font)
         {
             var tex = Texture.NewTexture(atlasPath);
+            tex.ColorType = SKColorType.Rgba8888;
             tex.MinFilter = (int)TextureMinFilter.Linear;
             tex.MagFilter = (int)TextureMagFilter.Linear;
             tex.LoadTextureFromFile();
