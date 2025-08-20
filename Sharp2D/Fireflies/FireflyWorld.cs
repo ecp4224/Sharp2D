@@ -1,4 +1,7 @@
 ﻿using Sharp2D;
+using Sharp2D.Fonts;
+using Sharp2D.Text;
+using OpenTK.Mathematics;
 using SkiaSharp;
 
 namespace Fireflies
@@ -54,6 +57,15 @@ namespace Fireflies
 
             AddLight(_lightingLight);
             AddLogical(Lighting);
+
+            var font = SdfFont.Load("sprites/font.fnt", "sprites/font.png");
+            _fpsText = new TextSprite(font);
+            _fpsText.SetScale(1f);
+            _fpsText.SetColor(SKColors.Yellow);
+            _fpsText.SetPosition(new Vector2(5f, PixelHeight - font.LineHeight));
+            _fpsText.SetText("FPS: 0");
+            TextRenderJob.Add(_fpsText);
+            AddLogical(UpdateFps);
         }
 
         private bool _started = false;
@@ -64,6 +76,22 @@ namespace Fireflies
         private long _wait = 2500;
         private long _lastEnd = CurrentTimeMillis();
         private const float OriginalIntensity = 20f;
+
+        private TextSprite _fpsText;
+        private int _fpsCounter;
+        private long _fpsLast;
+
+        private void UpdateFps()
+        {
+            _fpsCounter++;
+            long now = CurrentTimeMillis();
+            if (now - _fpsLast >= 1000)
+            {
+                _fpsText.SetText("FPS: " + _fpsCounter);
+                _fpsCounter = 0;
+                _fpsLast = now;
+            }
+        }
 
         private void Lighting()
         {

@@ -5,6 +5,7 @@ using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Worlds;
 using Sharp2D.Game.Sprites;
+using Sharp2D.Render;
 using SkiaSharp;
 
 namespace Sharp2D
@@ -46,6 +47,7 @@ namespace Sharp2D
         internal List<Light> dynamicLights = new List<Light>();
         private GenericSpriteRenderJob spriteJob;
         private GuiRenderJob guiJob;
+        private TextRenderJob textJob;
 
         public GenericSpriteRenderJob SpriteRenderJob
         {
@@ -55,6 +57,11 @@ namespace Sharp2D
         public GuiRenderJob GuiRenderJob
         {
             get { return guiJob; }
+        }
+
+        public TextRenderJob TextRenderJob
+        {
+            get { return textJob; }
         }
 
         public IList<Light> Lights
@@ -110,11 +117,14 @@ namespace Sharp2D
         {
             spriteJob = new GenericSpriteRenderJob(this);
             guiJob = new GuiRenderJob(this);
+            textJob = new TextRenderJob(this);
 
             AmbientBrightness = 1f;
             AmbientColor = new SKColor(255, 255, 255, 255);
 
             base.OnLoad();
+
+            AddRenderJob(textJob);
 
             Layer[] layers = GetLayerByType(LayerType.ObjectLayer);
             foreach (Layer layer in layers)

@@ -20,6 +20,8 @@
     <EmbeddedResource Include="Resources\sprite_light.vert" />
     <EmbeddedResource Include="Resources\sprite_light_alpha.frag" />
     <EmbeddedResource Include="Resources\sprite_light_alpha.vert" />
+    <EmbeddedResource Include="Resources\sdf_text.vert" />
+    <EmbeddedResource Include="Resources\sdf_text.frag" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
