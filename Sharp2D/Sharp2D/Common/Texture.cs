@@ -38,6 +38,8 @@ namespace Sharp2D
 
         public int TextureHeight { get; private set; }
 
+        public SKColorType ColorType { get; set; } = SKColorType.Bgra8888;
+
         public bool Loaded
         {
             get
@@ -75,7 +77,7 @@ namespace Sharp2D
 
             // Decode stream into SKBitmap
             var temp = SKBitmap.Decode(stream);
-            var info = new SKImageInfo(temp.Width, temp.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            var info = new SKImageInfo(temp.Width, temp.Height, ColorType, SKAlphaType.Premul);
             Bitmap = new SKBitmap(info);
             temp.CopyTo(Bitmap);
             temp.Dispose();
@@ -93,7 +95,7 @@ namespace Sharp2D
                 temp = SKBitmap.Decode(fs);
             }
             
-            var info = new SKImageInfo(temp.Width, temp.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            var info = new SKImageInfo(temp.Width, temp.Height, ColorType, SKAlphaType.Premul);
             Bitmap = new SKBitmap(info);
             temp.CopyTo(Bitmap);
             temp.Dispose();
@@ -117,7 +119,7 @@ namespace Sharp2D
             if (TextureWidth != ImageWidth || TextureHeight != ImageHeight)
             {
                 // Create a new bitmap with the proper power-of-two dimensions.
-                SKBitmap newBitmap = new SKBitmap(TextureWidth, TextureHeight, SKColorType.Bgra8888, SKAlphaType.Premul);
+                SKBitmap newBitmap = new SKBitmap(TextureWidth, TextureHeight, ColorType, SKAlphaType.Premul);
                 using (var canvas = new SKCanvas(newBitmap))
                 {
                     // Draw the original bitmap into the new one.
@@ -142,10 +144,10 @@ namespace Sharp2D
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
 
             
-            // Get pixel data from SKBitmap.
-            // Ensure the bitmap uses a format compatible with our GL call (typically BGRA8888).
+            // Get pixel data from SKBitmap using the configured color type.
             IntPtr pixelData = Bitmap.GetPixels();
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixelData);
+            var format = ColorType == SKColorType.Bgra8888 ? PixelFormat.Bgra : PixelFormat.Rgba;
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0, format, PixelType.UnsignedByte, pixelData);
         }
 
         public void CreateOrUpdate()
@@ -164,8 +166,9 @@ namespace Sharp2D
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
 
                 IntPtr pixelData = Bitmap.GetPixels();
+                var format = ColorType == SKColorType.Bgra8888 ? PixelFormat.Bgra : PixelFormat.Rgba;
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Bitmap.Width, Bitmap.Height, 0,
-                    OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, pixelData);
+                    format, PixelType.UnsignedByte, pixelData);
             }
         }
 
@@ -198,7 +201,7 @@ namespace Sharp2D
 
         public void BlankTexture(int width, int height)
         {
-            Bitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            Bitmap = new SKBitmap(width, height, ColorType, SKAlphaType.Premul);
             ValidateSize();
         }
 
@@ -207,14 +210,15 @@ namespace Sharp2D
             var texture = new Texture
             {
                 Name = Name,
-                Bitmap = Bitmap.Copy(SKColorType.Bgra8888), // SKBitmap.Copy() creates a duplicate
+                Bitmap = Bitmap.Copy(ColorType), // SKBitmap.Copy() creates a duplicate
                 MagFilter = MagFilter,
                 MinFilter = MinFilter,
                 HasAlpha = HasAlpha,
                 ImageHeight = ImageHeight,
                 ImageWidth = ImageWidth,
                 TextureWidth = TextureWidth,
-                TextureHeight = TextureHeight
+                TextureHeight = TextureHeight,
+                ColorType = ColorType
             };
 
             return texture;
