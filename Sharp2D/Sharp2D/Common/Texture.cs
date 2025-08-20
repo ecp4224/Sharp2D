@@ -174,7 +174,6 @@ namespace Sharp2D
             
             // Get pixel data from SKBitmap using the configured color type.
             IntPtr pixelData = Bitmap.GetPixels();
-
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, Bitmap.Width, Bitmap.Height, 0, PixelFormat, PixelType.UnsignedByte, pixelData);
         }
 
@@ -194,7 +193,6 @@ namespace Sharp2D
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
 
                 IntPtr pixelData = Bitmap.GetPixels();
-
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, Bitmap.Width, Bitmap.Height, 0,
                     PixelFormat, PixelType.UnsignedByte, pixelData);
             }
