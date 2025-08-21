@@ -74,7 +74,7 @@ namespace Sharp2D.Render
                     _shader.Uniforms.SetUniform(sprite.Z, _shader.Uniforms["spriteDepth"]);
 
                     GL.BindVertexArray(sprite.Mesh.Vao);
-                    GL.DrawArrays(PrimitiveType.Triangles, 0, sprite.Mesh.VertexCount);
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, sprite.Mesh.VertexCount * 6);
                 }
             }
 
