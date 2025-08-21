@@ -311,6 +311,10 @@ namespace Sharp2D.Core
             return jobs.Contains(job) || jCache.Contains(job);
         }
 
+        public T GetJob<T>() where T : IRenderJob
+        {
+            return jobs.OfType<T>().FirstOrDefault();
+        }
 
         public void PreFetch()
         {

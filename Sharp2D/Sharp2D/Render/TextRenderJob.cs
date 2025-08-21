@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using Sharp2D.Core.Graphics.Shaders;
+using Sharp2D.Core.Interfaces;
 using Sharp2D.Fonts;
 using Sharp2D.Text;
-using Sharp2D.Game.Worlds;
-using SkiaSharp;
 
 namespace Sharp2D.Render
 {

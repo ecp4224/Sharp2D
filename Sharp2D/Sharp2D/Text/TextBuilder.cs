@@ -1,22 +1,25 @@
 ﻿using System.Collections.Generic;
+using Sharp2D.Core;
+using Sharp2D.Fonts;
+using Sharp2D.Render;
 using SkiaSharp;
 
-namespace Sharp2D
+namespace Sharp2D.Text
 {
-    public static class Text
+    public static class TextBuilder
     {
         private static readonly Dictionary<string, SKSize> Sizes = new Dictionary<string, SKSize>();
-        public static TextSprite CreateTextSprite(string text)
+        public static StaticTextSprite CreateTextSprite(string text)
         {
             return CreateTextSprite(text, SKColors.Black, SKTypeface.Default, 16);
         }
 
-        public static TextSprite CreateTextSprite(string text, SKColor color)
+        public static StaticTextSprite CreateTextSprite(string text, SKColor color)
         {
             return CreateTextSprite(text, color, SKTypeface.Default, 16);
         }
 
-        public static TextSprite CreateTextSprite(string text, SKColor color, SKTypeface font, float fontSize)
+        public static StaticTextSprite CreateTextSprite(string text, SKColor color, SKTypeface font, float fontSize)
         {
             string textureName = "TEXT_" + text + "_FONT_" + font.FamilyName;
             Texture texture = Texture.NewTexture(textureName);
@@ -69,35 +72,27 @@ namespace Sharp2D
                 }
             }
 
-            return new TextSprite(texture.Name, Sizes[texture.Name], text)
+            return new StaticTextSprite(texture.Name, Sizes[texture.Name], text)
             {
                 Texture = texture,
                 Width = texture.TextureWidth,
                 Height = texture.TextureHeight
             };
         }
-    }
+        
 
-    public sealed class TextSprite : Sprite.BlankSprite
-    {
-        public SKSize StringSize { get; private set; }
-
-        public string Text { get; private set; }
-
-        public float StringWidth
+        public static TextSprite AddTextSprite(this GenericWorld world, SdfFont font, string text)
         {
-            get { return StringSize.Width; }
-        }
+            var job = world.GetJob<TextRenderJob>();
+            if (job == null)
+            {
+                job = new TextRenderJob(world);
+                world.AddRenderJob(job);
+            }
 
-        public float StringHeight
-        {
-            get { return StringSize.Height; }
-        }
-
-        public TextSprite(string name, SKSize stringSize, string text)
-            : base(name)
-        {
-            StringSize = stringSize;
+            var textSprite = new TextSprite(font);
+            textSprite.SetText(text);
+            return textSprite;
         }
     }
 }
