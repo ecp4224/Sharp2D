@@ -6,8 +6,9 @@ namespace Fireflies
     {
         public static void Main(string[] args)
         {
-            Console.Write("How many should I make? ");
-            FireflyWorld.FireflyCount = int.Parse(Console.ReadLine());
+            //Console.Write("How many should I make? ");
+            //FireflyWorld.FireflyCount = int.Parse(Console.ReadLine());
+            FireflyWorld.FireflyCount = 10;
             
             Screen.DisplayScreen(() =>
             {
