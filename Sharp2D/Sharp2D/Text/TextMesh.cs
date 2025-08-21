@@ -20,7 +20,7 @@ namespace Sharp2D.Text
             Font = font;
             _text = text;
             var layout = TextLayout.Build(font, text, origin, scale, useKerning);
-            VertexCount = layout.Vertices.Length / 4;
+            VertexCount = layout.QuadCount * 6;
 
             if (Vao == 0)
             {
