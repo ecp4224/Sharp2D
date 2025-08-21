@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using OpenTK.Mathematics;
-using Sharp2D.Fonts;
 
 namespace Sharp2D.Text
 {
@@ -21,41 +21,66 @@ namespace Sharp2D.Text
             float x = origin.X;
             float y = origin.Y;
             int last = -1;
+
             foreach (char c in text)
             {
                 if (c == '\n')
                 {
                     x = origin.X;
-                    y -= font.LineHeight * scale;
+                    y -= font.LineHeight * scale; // If your screen is Y-down, make this +=
                     last = -1;
                     continue;
                 }
 
-                if (!font.TryGetKerning(last, c, out float kern)) kern = 0f;
+                float kern = 0f;
+                if (useKerning && last != -1 && font.TryGetKerning(last, c, out var k)) kern = k;
                 x += kern * scale;
 
                 var glyph = font.GetGlyph(c);
-                float x0 = x + glyph.XOffset * scale;
-                float y0 = y - glyph.YOffset * scale;
+
                 float w = glyph.Width * scale;
                 float h = glyph.Height * scale;
 
-                // positions
-                Vector2 p0 = new Vector2(x0, y0 - h);
-                Vector2 p1 = new Vector2(x0 + w, y0 - h);
-                Vector2 p2 = new Vector2(x0 + w, y0);
-                Vector2 p3 = new Vector2(x0, y0);
+                // Skip empty quads (e.g., spaces)
+                if (w <= 0f || h <= 0f)
+                {
+                    x += glyph.XAdvance * scale;
+                    last = c;
+                    continue;
+                }
 
-                Vector2[] uv = glyph.UV;
+                // Assumes Y-up. For Y-down, use y + glyph.YOffset * scale and adjust corners accordingly.
+                float x0 = x + glyph.XOffset * scale;
+                float y0 = y + glyph.YOffset * scale;  // top edge
 
-                // triangle 1
-                verts.Add(p0.X); verts.Add(p0.Y); verts.Add(uv[0].X); verts.Add(uv[0].Y);
-                verts.Add(p1.X); verts.Add(p1.Y); verts.Add(uv[1].X); verts.Add(uv[1].Y);
-                verts.Add(p2.X); verts.Add(p2.Y); verts.Add(uv[2].X); verts.Add(uv[2].Y);
-                // triangle 2
-                verts.Add(p0.X); verts.Add(p0.Y); verts.Add(uv[0].X); verts.Add(uv[0].Y);
-                verts.Add(p2.X); verts.Add(p2.Y); verts.Add(uv[2].X); verts.Add(uv[2].Y);
-                verts.Add(p3.X); verts.Add(p3.Y); verts.Add(uv[3].X); verts.Add(uv[3].Y);
+                // corners (Y-up): p0=BL, p1=BR, p2=TR, p3=TL
+                var p0 = new Vector2(x0, y0 - h);
+                var p1 = new Vector2(x0 + w, y0 - h);
+                var p2 = new Vector2(x0 + w, y0);
+                var p3 = new Vector2(x0, y0);
+
+                // Expect glyph.UV ordered BL, BR, TR, TL in [0..1], V from bottom.
+                var uv = glyph.UV; // Vector2[4] : [bl, br, tr, tl]
+
+                // tri 1: p0,p1,p2
+                verts.Add(p0.X); verts.Add(p0.Y); 
+                verts.Add(uv[0].X); verts.Add(uv[0].Y);
+                
+                verts.Add(p1.X); verts.Add(p1.Y);
+                verts.Add(uv[1].X); verts.Add(uv[1].Y);
+                
+                verts.Add(p2.X); verts.Add(p2.Y);
+                verts.Add(uv[2].X); verts.Add(uv[2].Y);
+                
+                // tri 2: p0,p2,p3
+                verts.Add(p0.X); verts.Add(p0.Y);
+                verts.Add(uv[0].X); verts.Add(uv[0].Y);
+                
+                verts.Add(p2.X); verts.Add(p2.Y); 
+                verts.Add(uv[2].X); verts.Add(uv[2].Y);
+                
+                verts.Add(p3.X); verts.Add(p3.Y);
+                verts.Add(uv[3].X); verts.Add(uv[3].Y);
 
                 x += glyph.XAdvance * scale;
                 last = c;

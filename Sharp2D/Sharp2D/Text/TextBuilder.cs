@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Sharp2D.Core;
-using Sharp2D.Fonts;
 using Sharp2D.Render;
 using SkiaSharp;
 

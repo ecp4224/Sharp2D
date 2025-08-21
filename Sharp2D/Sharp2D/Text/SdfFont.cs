@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,7 +6,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using SkiaSharp;
 
-namespace Sharp2D.Fonts
+namespace Sharp2D.Text
 {
     /// <summary>
     /// Represents a bitmap font backed by a single-channel SDF atlas.
@@ -99,10 +98,10 @@ namespace Sharp2D.Fonts
                         XAdvance = xa,
                         UV = new[]
                         {
-                            new Vector2(x / font.AtlasWidth, y / font.AtlasHeight),
-                            new Vector2((x + w) / font.AtlasWidth, y / font.AtlasHeight),
+                            new Vector2(x / font.AtlasWidth, (y + h) / font.AtlasHeight),
                             new Vector2((x + w) / font.AtlasWidth, (y + h) / font.AtlasHeight),
-                            new Vector2(x / font.AtlasWidth, (y + h) / font.AtlasHeight)
+                            new Vector2((x + w) / font.AtlasWidth, y / font.AtlasHeight),
+                            new Vector2(x / font.AtlasWidth, y / font.AtlasHeight),
                         }
                     };
                     font._glyphs[id] = glyph;
@@ -157,10 +156,10 @@ namespace Sharp2D.Fonts
                         XAdvance = xa,
                         UV = new[]
                         {
-                            new Vector2(x / font.AtlasWidth, y / font.AtlasHeight),
-                            new Vector2((x + w) / font.AtlasWidth, y / font.AtlasHeight),
+                            new Vector2(x / font.AtlasWidth, (y + h) / font.AtlasHeight),
                             new Vector2((x + w) / font.AtlasWidth, (y + h) / font.AtlasHeight),
-                            new Vector2(x / font.AtlasWidth, (y + h) / font.AtlasHeight)
+                            new Vector2((x + w) / font.AtlasWidth, y / font.AtlasHeight),
+                            new Vector2(x / font.AtlasWidth, y / font.AtlasHeight),
                         }
                     };
                     font._glyphs[id] = glyph;

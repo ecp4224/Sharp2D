@@ -1,5 +1,4 @@
 using OpenTK.Mathematics;
-using Sharp2D.Fonts;
 using SkiaSharp;
 
 namespace Sharp2D.Text
@@ -17,6 +16,8 @@ namespace Sharp2D.Text
         public SKColor Color { get; private set; } = SKColors.White;
         public float Smoothing { get; set; } = 0.1f;
         public float Threshold { get; set; } = 0.5f;
+        public float Z { get; set; } = 0.1f;
+        
         private string _text = string.Empty;
 
         public TextSprite(SdfFont font)
@@ -43,7 +44,7 @@ namespace Sharp2D.Text
 
         public void SetPosition(Vector2 pos)
         {
-            Position = pos;
+            Position = new Vector2(pos.X, -pos.Y);
             Mesh.SetText(Font, _text, Position, Scale, UseKerning);
         }
 

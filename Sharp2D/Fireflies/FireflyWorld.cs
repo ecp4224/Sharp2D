@@ -1,5 +1,4 @@
 ﻿using Sharp2D;
-using Sharp2D.Fonts;
 using Sharp2D.Text;
 using OpenTK.Mathematics;
 using Sharp2D.Render;
@@ -60,10 +59,10 @@ namespace Fireflies
             AddLogical(Lighting);
 
             var font = SdfFont.Load("sprites/font.fnt", "sprites/font.png");
-            _fpsText = this.AddTextSprite(font, "FPS: 0");
-            _fpsText.SetScale(9f);
+            _fpsText = this.AddTextSprite(font, $"FPS: ...");
+            _fpsText.SetScale(1f);
             _fpsText.SetColor(SKColors.Yellow);
-            _fpsText.SetPosition(new Vector2(100,100));
+            _fpsText.SetPosition(new Vector2(50, 150));
             AddLogical(UpdateFps);
         }
 

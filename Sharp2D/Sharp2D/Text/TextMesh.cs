@@ -1,7 +1,6 @@
 using System;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using Sharp2D.Fonts;
 
 namespace Sharp2D.Text
 {

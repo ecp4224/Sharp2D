@@ -3,7 +3,6 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using Sharp2D.Core.Graphics.Shaders;
 using Sharp2D.Core.Interfaces;
-using Sharp2D.Fonts;
 using Sharp2D.Text;
 
 namespace Sharp2D.Render
@@ -49,12 +48,17 @@ namespace Sharp2D.Render
             }
 
             GL.DepthMask(false);
+            GL.Enable(EnableCap.Blend);
+            GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.DepthTest);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             _shader.Use();
-            Matrix4 proj = Matrix4.CreateOrthographicOffCenter(0, _world.PixelWidth, 0, _world.PixelHeight, -1, 1);
-            _shader.Uniforms.SetUniform(proj, _shader.Uniforms["u_projection"]);
-
+            
+            var aspect = Screen.Settings.WindowAspectRatio;
+            _shader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), _shader.Uniforms["camPosAndScale"]);
+            _shader.Uniforms.SetUniform(aspect.X / aspect.Y, _shader.Uniforms["screenRatioFix"]);
+            
             foreach (var group in GroupByFont())
             {
                 SdfFont font = group.Key;
@@ -67,6 +71,7 @@ namespace Sharp2D.Render
                     _shader.Uniforms.SetUniform(col, _shader.Uniforms["u_textColor"]);
                     _shader.Uniforms.SetUniform(sprite.Threshold, _shader.Uniforms["u_threshold"]);
                     _shader.Uniforms.SetUniform(sprite.Smoothing, _shader.Uniforms["u_smoothing"]);
+                    _shader.Uniforms.SetUniform(sprite.Z, _shader.Uniforms["spriteDepth"]);
 
                     GL.BindVertexArray(sprite.Mesh.Vao);
                     GL.DrawArrays(PrimitiveType.Triangles, 0, sprite.Mesh.VertexCount);
@@ -74,6 +79,7 @@ namespace Sharp2D.Render
             }
 
             GL.DepthMask(true);
+            GL.Enable(EnableCap.DepthTest);
         }
 
         private Dictionary<SdfFont, List<TextSprite>> GroupByFont()
