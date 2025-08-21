@@ -44,6 +44,8 @@ namespace Sharp2D.Text
 
         public void SetPosition(Vector2 pos)
         {
+            // Negate Y to convert from a coordinate system with origin at top-left (e.g., screen space)
+            // to one with origin at bottom-left (e.g., OpenGL). This ensures correct positioning.
             Position = new Vector2(pos.X, -pos.Y);
             Mesh.SetText(Font, _text, Position, Scale, UseKerning);
         }
