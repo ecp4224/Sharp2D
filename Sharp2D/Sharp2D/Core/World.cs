@@ -66,6 +66,13 @@ namespace Sharp2D.Core
         protected abstract void OnLoad();
 
         /// <summary>
+        /// This method is invoked after World.Load() has completed fully
+        /// </summary>
+        protected virtual void OnLoadCompleted()
+        {
+        }
+
+        /// <summary>
         /// This method is invoked when the first frame of this World is about to be displayed.
         /// This method is only ever invoked once during the life cycle, and will can only ever be reinvoked if World.Unload() was invoked
         /// </summary>
@@ -128,6 +135,8 @@ namespace Sharp2D.Core
             OnLoad();
 
             Loaded = true;
+            
+            OnLoadCompleted();
         }
 
         public void Unload()

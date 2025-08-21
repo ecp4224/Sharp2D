@@ -35,7 +35,7 @@ namespace Sharp2D.Game.Sprites
             X *= TileSet.TileWidth;
             Y *= TileSet.TileHeight;
 
-            Layer = 1f/ParentLayer.LayerNumber;
+            Layer = 1f/ParentLayer.LayerNumber - 0.1f;
 
             IsStatic = !(parent.TileProperties.ContainsKey(ID) && parent.TileProperties[ID].ContainsKey("static") && parent.TileProperties[ID]["static"].ToLower() == "true");
 

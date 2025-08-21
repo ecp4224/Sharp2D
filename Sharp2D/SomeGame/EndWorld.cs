@@ -42,7 +42,7 @@ namespace SomeGame
                 background.Y = ((Camera.Y*0.25f) - -Camera.Y);
             });
 
-            SpawnFireflies(5, 32, 19, 39, 20);
+            SpawnFireflies(1, 29, 19, 48, 20);
 
             FadeIn(null);
 
@@ -57,17 +57,17 @@ namespace SomeGame
         private void SpawnFireflies(int minx, int miny, int maxx, int maxy, int maxCount)
         {
             var random = new Random();
-            int c = random.Next(maxCount) + 1;
+            int c = random.Next(maxCount) + 20;
             for (int i = 0; i < c; i++)
             {
-                int tx = random.Next(minx * 32, maxx * 32);
-                int ty = random.Next(miny * 32, maxy * 32);
+                int tx = random.Next(minx * TileWidth, maxx * TileWidth);
+                int ty = random.Next(miny * TileHeight, maxy * TileHeight);
                 int count = random.Next(8 - 4) + 4;
 
                 for (int z = 0; z < count; z++)
                 {
-                    int xadd = random.Next(-32 * 2, 32 * 2);
-                    int yadd = random.Next(-32 * 2, 32 * 2);
+                    int xadd = random.Next(-TileWidth * 2, TileWidth * 2);
+                    int yadd = random.Next(-TileHeight * 2, TileHeight * 2);
 
                     var fly = new Firefly { X = tx + xadd, Y = ty + yadd };
                     Logger.Debug("Spawn @ " + fly.X + ", " + fly.Y);
