@@ -49,18 +49,16 @@ namespace Sharp2D.Render
             }
 
             GL.DepthMask(false);
-            GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             _shader.Use();
             Matrix4 proj = Matrix4.CreateOrthographicOffCenter(0, _world.PixelWidth, 0, _world.PixelHeight, -1, 1);
             _shader.Uniforms.SetUniform(proj, _shader.Uniforms["u_projection"]);
-            _shader.Uniforms.SetUniform(0, _shader.Uniforms["u_texture"]);
 
             foreach (var group in GroupByFont())
             {
                 SdfFont font = group.Key;
-                GL.ActiveTexture(TextureUnit.Texture0);
+                //GL.ActiveTexture(TextureUnit.Texture0);
                 font.AtlasTexture.Bind();
 
                 foreach (var sprite in group.Value)
@@ -75,7 +73,6 @@ namespace Sharp2D.Render
                 }
             }
 
-            GL.Disable(EnableCap.Blend);
             GL.DepthMask(true);
         }
 

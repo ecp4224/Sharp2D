@@ -61,9 +61,9 @@ namespace Fireflies
 
             var font = SdfFont.Load("sprites/font.fnt", "sprites/font.png");
             _fpsText = this.AddTextSprite(font, "FPS: 0");
-            _fpsText.SetScale(1f);
+            _fpsText.SetScale(9f);
             _fpsText.SetColor(SKColors.Yellow);
-            _fpsText.SetPosition(new Vector2(5f, PixelHeight - font.LineHeight));
+            _fpsText.SetPosition(new Vector2(100,100));
             AddLogical(UpdateFps);
         }
 

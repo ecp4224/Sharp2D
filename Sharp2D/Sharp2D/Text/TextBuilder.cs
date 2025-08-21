@@ -107,6 +107,7 @@ namespace Sharp2D.Text
 
             var textSprite = new TextSprite(font);
             textSprite.SetText(text);
+            job.Add(textSprite);
             return textSprite;
         }
     }
