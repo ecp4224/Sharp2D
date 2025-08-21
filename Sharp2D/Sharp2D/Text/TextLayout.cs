@@ -86,7 +86,8 @@ namespace Sharp2D.Text
                 last = c;
             }
 
-            return new LayoutResult { Vertices = verts.ToArray(), QuadCount = verts.Count / (6 * 4) };
+            // Each quad consists of 6 vertices, each vertex has 4 floats (position.xy, uv.xy), so 24 floats per quad.
+            return new LayoutResult { Vertices = verts.ToArray(), QuadCount = verts.Count / 24 };
         }
     }
 }
