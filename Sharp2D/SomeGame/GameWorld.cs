@@ -1,5 +1,7 @@
-﻿using Sharp2D;
+﻿using OpenTK.Windowing.GraphicsLibraryFramework;
+using Sharp2D;
 using Sharp2D.Core.Interfaces;
+using Sharp2D.Game;
 using SkiaSharp;
 
 namespace SomeGame
@@ -41,13 +43,13 @@ namespace SomeGame
 
             SpawnFireflies(0, 10, 56, 16, 3);
 
-            SpawnFireflies(58, 5, 74, 20, 10);
+            SpawnFireflies(58, 5, 74, 20, 20, 10);
         }
 
-        private void SpawnFireflies(int minx, int miny, int maxx, int maxy, int maxCount)
+        private void SpawnFireflies(int minx, int miny, int maxx, int maxy, int maxCount, int minCount = 1)
         {
             var random = new Random();
-            int c = random.Next(maxCount) + 1;
+            int c = random.Next(maxCount) + minCount;
             for (int i = 0; i < c; i++)
             {
                 int tx = random.Next(minx * 32, maxx * 32);

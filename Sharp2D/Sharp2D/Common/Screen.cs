@@ -313,12 +313,7 @@ namespace Sharp2D
 
         public static void GoFullscreen()
         {
-            _window.WindowBorder = WindowBorder.Hidden;
-
             _window.WindowState = WindowState.Fullscreen;
-            //DisplayDevice.Default.ChangeResolution(_window.Width, _window.Height, DisplayDevice.Default.BitsPerPixel, DisplayDevice.Default.RefreshRate);
-
-            _window.WindowState = WindowState.Maximized;
         }
 
         private void _draw()
@@ -392,6 +387,11 @@ namespace Sharp2D
                 }
                 _logics.PostFetch();
             }
+        }
+
+        public static void GoWindowed()
+        {
+            _window.WindowState = WindowState.Normal;
         }
     }
 }
