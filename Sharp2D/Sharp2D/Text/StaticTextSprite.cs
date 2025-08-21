@@ -22,6 +22,7 @@ namespace Sharp2D.Text
             : base(name)
         {
             StringSize = stringSize;
+            Text = text;
         }
     }
 }
