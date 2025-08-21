@@ -26,6 +26,8 @@ namespace Sharp2D.Core
         private List<IRenderJob> jToRemove;
         private bool lFetch;
 
+        public event EventHandler OnWorldLoaded;
+
         public List<ILogical> LogicalList
         {
             get
@@ -70,6 +72,7 @@ namespace Sharp2D.Core
         /// </summary>
         protected virtual void OnLoadCompleted()
         {
+            OnWorldLoaded?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

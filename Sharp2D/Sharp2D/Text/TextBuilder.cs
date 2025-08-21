@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Sharp2D.Core;
 using Sharp2D.Fonts;
 using Sharp2D.Render;
@@ -87,7 +88,21 @@ namespace Sharp2D.Text
             if (job == null)
             {
                 job = new TextRenderJob(world);
-                world.AddRenderJob(job);
+
+                if (!world.Loaded)
+                {
+                    world.OnWorldLoaded += WorldOnOnWorldLoaded;
+
+                    void WorldOnOnWorldLoaded(object sender, EventArgs e)
+                    {
+                        world.AddRenderJob(job);
+                        world.OnWorldLoaded -= WorldOnOnWorldLoaded;
+                    }
+                }
+                else
+                {
+                    world.AddRenderJob(job);
+                }
             }
 
             var textSprite = new TextSprite(font);

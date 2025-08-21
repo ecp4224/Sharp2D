@@ -42,4 +42,7 @@
       <Link>openal32.dll</Link>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Fonts\font_0.png" />
+  </ItemGroup>
 </Project>

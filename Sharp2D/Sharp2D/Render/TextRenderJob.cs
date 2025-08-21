@@ -16,14 +16,12 @@ namespace Sharp2D.Render
         private readonly List<TextSprite> _sprites = new List<TextSprite>();
         private readonly Shader _shader;
         private readonly GenericWorld _world;
+        private bool _shaderInit;
 
         public TextRenderJob(GenericWorld world)
         {
             _world = world;
-            _shader = new Shader("Resources/sdf_text.vert", "Resources/sdf_text.frag");
-            _shader.LoadAll();
-            _shader.CompileAll();
-            _shader.LinkAll();
+            _shader = new Shader("Sharp2D.Resources.sdf_text.vert", "Sharp2D.Resources.sdf_text.frag");
         }
 
         public void Add(TextSprite sprite)
@@ -40,6 +38,15 @@ namespace Sharp2D.Render
         public void PerformJob()
         {
             if (_sprites.Count == 0) return;
+
+            if (!_shaderInit)
+            {
+                _shader.LoadAll();
+                _shader.CompileAll();
+                _shader.LinkAll();
+
+                _shaderInit = true;
+            }
 
             GL.DepthMask(false);
             GL.Enable(EnableCap.Blend);
