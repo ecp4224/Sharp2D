@@ -20,6 +20,8 @@
     <EmbeddedResource Include="Resources\sprite_light.vert" />
     <EmbeddedResource Include="Resources\sprite_light_alpha.frag" />
     <EmbeddedResource Include="Resources\sprite_light_alpha.vert" />
+    <EmbeddedResource Include="Resources\sdf_text.vert" />
+    <EmbeddedResource Include="Resources\sdf_text.frag" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -39,5 +41,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Link>openal32.dll</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Fonts\font_0.png" />
   </ItemGroup>
 </Project>

@@ -133,8 +133,8 @@ namespace Sharp2D.Game.Sprites
                 int height = TileSet.TileHeight;
 
 
-                // Create a new SKBitmap to hold the tile image.
-                SKBitmap testBmp = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+                // Create a new SKBitmap to hold the tile image using the texture's color type.
+                SKBitmap testBmp = new SKBitmap(width, height, Texture.ColorType, SKAlphaType.Premul);
                 using (var canvas = new SKCanvas(testBmp))
                 {
                     // Define destination and source rectangles.

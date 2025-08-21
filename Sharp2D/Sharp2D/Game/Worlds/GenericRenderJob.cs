@@ -79,6 +79,10 @@ namespace Sharp2D.Game.Worlds
                 _gen = true;
                 OnFirstRun();
             }
+            else
+            {
+                GL.BindVertexArray(VaoId);
+            }
         }
 
         public override void PerformJob()

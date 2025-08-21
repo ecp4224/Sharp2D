@@ -32,7 +32,15 @@ namespace Sharp2D.Core.Graphics.Shaders
                 
                 id = GL.GetUniformLocation(program_id, var);
                 if (id == -1)
-                    throw new System.IO.FileNotFoundException("The variable was not found!", var);
+                {
+                    #if DEBUG
+                        // allow returns of -1
+                        return -1;
+                    #else        
+                        throw new System.IO.FileNotFoundException("The variable was not found!", var);
+                    #endif
+                }
+
                 locations.Add(var, id);
 
                 return id;
@@ -42,144 +50,318 @@ namespace Sharp2D.Core.Graphics.Shaders
         [UniformAttribute]
         public void SetUniform(float value, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader float variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
+            
             GL.Uniform1(id, value);
         }
 
         [UniformAttribute]
         public void SetUniform(double value, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader double variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
+            
             GL.Uniform1(id, value);
         }
 
         [UniformAttribute]
         public void SetUniform(int value, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader int variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
+            
             GL.Uniform1(id, value);
         }
 
         [UniformAttribute]
         public void SetUniform(Vector2 vector, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Vector2 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
+            
             GL.Uniform2(id, vector);
         }
 
         [UniformAttribute]
         public void SetUniform(Vector3 vector, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Vector3 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
+            
             GL.Uniform3(id, vector);
         }
 
         [UniformAttribute]
         public void SetUniform(Vector4 vector, int id)
         {
+            #if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Vector4 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+            #endif
+            
             GL.Uniform4(id, vector.X, vector.Y, vector.Z, vector.W);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix2 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix2 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix2(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix2d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix2d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix2(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix2x3 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix2x3 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix2x3(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix2x3d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix2x3d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix2x3(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix2x4 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix2x4 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix2x4(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix2x4d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix2x4d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix2x4(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix3 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix3 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix3(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix3d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix3d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix3(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix3x2 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix3x2 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix3x2(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix3x2d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix3x2d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix3x2(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix3x4 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix3x4 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix3x4(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix3x4d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix3x4d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix3x4(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix4 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix4 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix4(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix4d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix4d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix4(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix4x2 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix4x2 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix4x2(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix4x2d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix4x2d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix4x2(id, true, ref matrix);
         }
 
         [UniformAttribute]
         public void SetUniform(Matrix4x3 matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix4x3 variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix4x3(id, true, ref matrix);
         }
         
         [UniformAttribute]
         public void SetUniform(Matrix4x3d matrix, int id)
         {
+#if DEBUG
+            if (id == -1)
+            {
+                Logger.Warn($"Shader Matrix4x3d variable for shader {program_id} not set, debug mode - skipping");
+                return;
+            }
+#endif
             GL.UniformMatrix4x3(id, true, ref matrix);
         }
 

@@ -5,6 +5,7 @@ using Sharp2D.Core.Graphics;
 using Sharp2D.Core.Interfaces;
 using Sharp2D.Game.Worlds;
 using Sharp2D.Game.Sprites;
+using Sharp2D.Render;
 using SkiaSharp;
 
 namespace Sharp2D
