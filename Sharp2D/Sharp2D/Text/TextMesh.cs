@@ -21,13 +21,7 @@ namespace Sharp2D.Text
             _text = text;
             var layout = TextLayout.Build(font, text, origin, scale, useKerning);
             VertexCount = layout.QuadCount * 6;
-        public TextMesh()
-        {
-            InitializeBuffers();
-        }
-
-        private void InitializeBuffers()
-        {
+            
             if (Vao == 0)
             {
                 GL.GenVertexArrays(1, out int vao);
