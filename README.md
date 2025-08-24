@@ -153,9 +153,54 @@ var enemy = new Enemy();
 world.AddSprite(enemy);
 ```
 
+### Sprite Modules
+
+Sprites that inherit from `ModuleSprite` can be extended with reusable pieces of
+functionality called *modules*. Attach a module with `AttachModule<T>()` and it
+will receive update calls each frame.
+
+```csharp
+public class BlinkModule : IModule
+{
+    public Sprite Owner { get; private set; }
+    public string ModuleName => "Blink";
+    public ModuleRules Rules => ModuleRules.None;
+
+    public void InitializeWith(Sprite sprite)
+    {
+        Owner = sprite;
+    }
+
+    public void OnUpdate()
+    {
+        Owner.IsVisible = !Owner.IsVisible;
+    }
+
+    public void Dispose() { }
+}
+
+// Attach the custom module
+player.AttachModule<BlinkModule>();
+```
+
 ### Animation
 
-Attach an `AnimationModule` to a sprite to play animations:
+Animations are configured through a JSON file that describes the sprite sheet
+and each animation's frames. Place the file in `animations/` and by default the
+module will look for a file matching the sprite's name, e.g.
+`animations/player.conf`:
+
+```json
+{
+  "width": 32,
+  "height": 32,
+  "animations": {
+    "walk": { "row": 0, "framecount": 4, "speed": 100 }
+  }
+}
+```
+
+Attach an `AnimationModule` to the sprite and trigger an animation:
 
 ```csharp
 var animations = player.AttachModule<AnimationModule>();
