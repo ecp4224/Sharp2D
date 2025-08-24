@@ -263,7 +263,7 @@ world.AddRenderJob(textJob);
 textJob.Add(textSprite);
 ```
 
-If you're using the `Sharp2D.Text` package, the `AddTextSprite` extension on
+If you're using the `Sharp2D.Text` namespace, the `AddTextSprite` extension on
 `GenericWorld` demonstrates how a small render job API can be wrapped for
 convenience. It ensures a `TextRenderJob` is present and adds the sprite in one
 call:
