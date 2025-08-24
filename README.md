@@ -77,13 +77,80 @@ Screen.DisplayScreen(() =>
 
 ### Sprites
 
-Sprites represent entities in the world. Create a sprite, assign a texture, then add it to the world:
+Sprites represent entities in the world. Each sprite has a position, size and
+texture and can optionally use modules for features like animation or physics.
+To introduce a new sprite type, subclass `Sprite` (or a derived class such as
+`PhysicsSprite`) and override members as needed.
+
+#### Simple Image Sprite
+
+For a quick way to display an image without creating a subclass, use the
+static `Sprite.FromImage` helper:
 
 ```csharp
-var player = new Player();
-player.Texture = Texture.NewTexture("sprites/player.png");
-player.Texture.LoadTextureFromFile();
-world.AddSprite(player);
+Sprite moon = Sprite.FromImage("sprites/moon.png");
+moon.X = (3.5f * 16f) + (moon.Width / 2f);
+moon.Y = (7.5f * 16f) + (moon.Height / 2f) + 3f;
+moon.Layer = 0.5f;
+moon.IgnoreLights = true;
+moon.NeverClip = true;
+world.AddSprite(moon);
+```
+
+If you need a reusable type or custom logic, subclass `Sprite`:
+
+```csharp
+public class Tree : Sprite
+{
+    public override string Name => "tree";
+
+    public Tree()
+    {
+        Texture = Texture.NewTexture("sprites/tree.png");
+        Texture.LoadTextureFromFile();
+        Width = Texture.TextureWidth;
+        Height = Texture.TextureHeight;
+    }
+}
+
+var tree = new Tree();
+tree.SetPosition(new Vector2(400, 300));
+world.AddSprite(tree);
+```
+
+#### Complex Sprite with Animation and Movement
+
+For interactive characters, inherit from `PhysicsSprite` and attach modules:
+
+```csharp
+public class Enemy : PhysicsSprite
+{
+    private AnimationModule animations;
+
+    public override string Name => "enemy";
+
+    public Enemy()
+    {
+        Texture = Texture.NewTexture("sprites/enemy_idle.png");
+        Texture.LoadTextureFromFile();
+        Width = Texture.TextureWidth;
+        Height = Texture.TextureHeight;
+
+        animations = AttachModule<AnimationModule>();
+        animations.Animations["walk"].Play();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        X += 2f;
+        if (X > 400)
+            X = 0;
+    }
+}
+
+var enemy = new Enemy();
+world.AddSprite(enemy);
 ```
 
 ### Animation
