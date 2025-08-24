@@ -232,16 +232,58 @@ world.AmbientBrightness = 0.5f;
 
 Use the `Input` class to query keyboard and mouse state. Bind named actions to keys and read them in your update loop.
 
+### Custom Render Pipelines
+
+Rendering in Sharp2D is organized into *render jobs*. A render job implements
+`IRenderJob` and performs the OpenGL work needed to draw a particular type of
+content.
+
+```csharp
+public class MyRenderJob : IRenderJob
+{
+    public void PerformJob()
+    {
+        // issue custom draw calls here
+    }
+
+    public void Dispose() { }
+}
+
+var job = new MyRenderJob();
+world.AddRenderJob(job);
+```
+
+The built-in `TextRenderJob` is a complete example of a render pipeline for
+signed distance field text. It batches `TextSprite` meshes and draws them in
+`PerformJob`. Register the job with your world and add sprites to it:
+
+```csharp
+var textJob = new TextRenderJob(world);
+world.AddRenderJob(textJob);
+textJob.Add(textSprite);
+```
+
+If you're using the `Sharp2D.Text` package, the `AddTextSprite` extension on
+`GenericWorld` demonstrates how a small render job API can be wrapped for
+convenience. It ensures a `TextRenderJob` is present and adds the sprite in one
+call:
+
+```csharp
+using Sharp2D.Text;
+
+var sprite = world.AddTextSprite(font, "Hello");
+```
+
 ### SDF Text Rendering
 
 Signed distance field fonts provide crisp text at any scale:
 
 ```csharp
+using Sharp2D.Text;
+
 var font = SdfFont.Load("path/to/font.fnt", "path/to/font.png");
-var text = new TextSprite(font);
+var text = world.AddTextSprite(font, "Hello SDF");
 text.SetPosition(new Vector2(10, 10));
-text.SetText("Hello SDF");
-TextRenderJob.Add(text);
 ```
 
 ### Audio
