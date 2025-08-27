@@ -78,7 +78,11 @@ namespace Sharp2D.Core
             }
             else
             {
+                #if WINDOWS
                 nativeSystem = new WindowsNativeSystem();
+                #else
+                nativeSystem = new MonoNativeSystem();
+                #endif
             }
         }
 

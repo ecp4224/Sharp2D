@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WINDOWS
+using System;
 using System.Runtime.InteropServices;
 using Sharp2D.Core.Interfaces;
 
@@ -29,3 +30,4 @@ namespace Sharp2D.Core
         }
     }
 }
+#endif
