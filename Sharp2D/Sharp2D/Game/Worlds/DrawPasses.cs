@@ -365,4 +365,103 @@ namespace Sharp2D.Game.Worlds
         }
     }
 #endregion
+
+    #region UI Sprite Pass
+    public class DrawUiSprite : DrawPass
+    {
+        private Shader _shader;
+
+        public override bool MeetsRequirements(Sprite sprite)
+        {
+            return sprite.Texture != null;
+        }
+
+        public override void DrawSprite(Shader shader, Texture texture, Sprite sprite)
+        {
+            if (sprite.FirstRun)
+            {
+                sprite.Display();
+                sprite.FirstRun = false;
+            }
+
+            if (shader != null)
+            {
+                shader.Use();
+            }
+
+            if (texture != null && sprite.Texture.ID != texture.ID)
+            {
+                sprite.Texture.Bind();
+            }
+            else if (texture != null)
+            {
+                texture.Bind();
+            }
+
+            sprite.PrepareDraw();
+
+            float width = sprite.Width;
+            float height = sprite.Height;
+
+            if ((sprite.FlipState & FlipState.Vertical) != 0)
+            {
+                height = -height;
+            }
+
+            if ((sprite.FlipState & FlipState.Horizontal) != 0)
+            {
+                width = -width;
+            }
+
+            _shader.Uniforms.SetUniform(sprite.ShaderColor, _shader.Uniforms["tint"]);
+            _shader.Uniforms.SetUniform(sprite.Scale, _shader.Uniforms["spriteScale"]);
+            _shader.Uniforms.SetUniform(new Vector4(sprite.X, -sprite.Y, width, height), _shader.Uniforms["spritePos"]);
+            _shader.Uniforms.SetUniform(new Vector4(sprite.TexCoords.BottomLeft.X, sprite.TexCoords.BottomLeft.Y, (sprite.TexCoords.BottomLeft.X - sprite.TexCoords.BottomRight.X), (sprite.TexCoords.BottomLeft.Y - sprite.TexCoords.TopLeft.Y)), _shader.Uniforms["texCoordPosAndScale"]);
+            _shader.Uniforms.SetUniform(sprite.Layer, _shader.Uniforms["spriteDepth"]);
+
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+        }
+
+        public override void PrepareForDraw()
+        {
+            var aspect = Screen.Settings.WindowAspectRatio;
+
+            _shader.Use();
+            _shader.Uniforms.SetUniform(new Vector3(Screen.Camera.X, Screen.Camera.Y, 1f / Screen.Camera.Z), _shader.Uniforms["camPosAndScale"]);
+            _shader.Uniforms.SetUniform(aspect.X / aspect.Y, _shader.Uniforms["screenRatioFix"]);
+            _shader.Uniforms.SetUniform(new Vector3(1f, 1f, 1f), _shader.Uniforms["brightness"]);
+
+            GL.DepthMask(false);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        }
+
+        public override void PostDraw()
+        {
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            GL.DepthMask(true);
+            GL.Disable(EnableCap.Blend);
+        }
+
+        public override void SetupBatch(SpriteBatch batch)
+        {
+        }
+
+        public override void OnInit()
+        {
+            _shader = new Shader("Sharp2D.Resources.sprite_amb.vert", "Sharp2D.Resources.sprite_amb.frag");
+            _shader.LoadAll();
+            _shader.CompileAll();
+            _shader.LinkAll();
+        }
+
+        public override int Order
+        {
+            get
+            {
+                return 0;
+            }
+        }
+    }
+    #endregion
 }
