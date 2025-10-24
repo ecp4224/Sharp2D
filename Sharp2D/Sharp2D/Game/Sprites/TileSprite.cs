@@ -111,46 +111,45 @@ namespace Sharp2D.Game.Sprites
             IsStatic = true;
         }
 
-        public bool TileHasAlpha
+        public bool TileHasAlpha => CheckIfAlpha();
+
+        internal bool CheckIfAlpha()
         {
-            get
+            if (TileSet.containsAlpha.TryGetValue(ID, out var alpha))
+                return alpha;
+            
+            int tilepos = (ID - TileSet.FirstGID) + 1;
+            int step = (tilepos - 1) % TileSet.TilesPerRow, row = 0;
+
+            for (int i = 0; i != ID; i++)
             {
-                if (TileSet.containsAlpha.TryGetValue(ID, out var alpha))
-                    return alpha;
-
-                int tilepos = (ID - TileSet.FirstGID) + 1;
-                int step = (tilepos - 1) % TileSet.TilesPerRow, row = 0;
-
-                for (int i = 0; i != ID; i++)
-                {
-                    if (i % TileSet.TilesPerRow == 0 && i != 0)
-                        row++;
-                }
-
-                int x = TileSet.TileWidth * step;
-                int y = TileSet.TileHeight * row;
-                int width = TileSet.TileWidth;
-                int height = TileSet.TileHeight;
-
-
-                // Create a new SKBitmap to hold the tile image using the texture's color type.
-                SKBitmap testBmp = new SKBitmap(width, height, Texture.ColorType, SKAlphaType.Premul);
-                using (var canvas = new SKCanvas(testBmp))
-                {
-                    // Define destination and source rectangles.
-                    SKRect destRect = new SKRect(0, 0, width, height);
-                    SKRect srcRect = new SKRect(x, y, x + width, y + height);
-                    // Draw the relevant portion of the texture onto the test bitmap.
-                    canvas.DrawBitmap(Texture.Bitmap, srcRect, destRect);
-                }
-
-                // Check for alpha using the SKBitmap extension we defined earlier.
-                bool cachedAlphaAnswer = testBmp.ContainsAlpha();
-                TileSet.containsAlpha.Add(ID, cachedAlphaAnswer);
-
-                testBmp.Dispose();
-                return cachedAlphaAnswer;
+                if (i % TileSet.TilesPerRow == 0 && i != 0)
+                    row++;
             }
+
+            int x = TileSet.TileWidth * step;
+            int y = TileSet.TileHeight * row;
+            int width = TileSet.TileWidth;
+            int height = TileSet.TileHeight;
+
+
+            // Create a new SKBitmap to hold the tile image using the texture's color type.
+            SKBitmap testBmp = new SKBitmap(width, height, Texture.ColorType, SKAlphaType.Premul);
+            using (var canvas = new SKCanvas(testBmp))
+            {
+                // Define destination and source rectangles.
+                SKRect destRect = new SKRect(0, 0, width, height);
+                SKRect srcRect = new SKRect(x, y, x + width, y + height);
+                // Draw the relevant portion of the texture onto the test bitmap.
+                canvas.DrawBitmap(Texture.Bitmap, srcRect, destRect);
+            }
+
+            // Check for alpha using the SKBitmap extension we defined earlier.
+            bool cachedAlphaAnswer = testBmp.ContainsAlpha();
+            TileSet.containsAlpha.Add(ID, cachedAlphaAnswer);
+
+            testBmp.Dispose();
+            return cachedAlphaAnswer;
         }
 
 

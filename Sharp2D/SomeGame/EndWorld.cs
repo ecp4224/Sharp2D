@@ -32,8 +32,6 @@ namespace SomeGame
             AddSprite(moon);
 
             Sprite background = Sprite.FromImage("sprites/map2.png");
-            background.X = background.Width/2f;
-            background.Y = background.Height/2f;
             background.NeverClip = true;
             background.Layer = 1f;
             AddSprite(background);

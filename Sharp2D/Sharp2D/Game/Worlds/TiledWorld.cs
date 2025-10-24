@@ -191,6 +191,8 @@ namespace Sharp2D.Game.Worlds
                 tileset.LoadTexture();
             }
 
+            Dictionary<string, TileSet> cache = new Dictionary<string, TileSet>();
+
             foreach (Layer layer in Layers)
             {
                 
@@ -209,15 +211,21 @@ namespace Sharp2D.Game.Worlds
                         id &= ~(Layer.FLIPPED_DIAGONALLY_FLAG | Layer.FLIPPED_HORIZONTALLY_FLAG | Layer.FLIPPED_VERTICALLY_FLAG);
 
                         TileSet set = FindTileset(id);
+                        
+                        cache.TryAdd(set.ImagePath, set);
 
                         TileSprite sprite = new TileSprite((int)id, set, layer, i, this);
 
                         sprite.Load();
 
                         layer.SetTile(i, sprite);
+
+                        sprite.CheckIfAlpha();
                     }
                 }
             }
+            
+            cache.Clear();
         }
 
         protected override void OnInitialDisplay()

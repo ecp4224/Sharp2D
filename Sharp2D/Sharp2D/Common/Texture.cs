@@ -1,17 +1,51 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using OpenTK.Graphics.OpenGL;
 using GLPixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 using GLPixelInternalFormat = OpenTK.Graphics.OpenGL.PixelInternalFormat;
 using System.IO;
+using System.Threading;
 using SkiaSharp;
 
 namespace Sharp2D
 {
     public class Texture : ICloneable
     {
-        private static Dictionary<string, Texture> cache = new Dictionary<string, Texture>();
+        public enum TextureState
+        {
+            Unloaded,
+            Decoding,
+            UploadPending,
+            Failed,
+            Created
+        }
+
+        public enum TextureSource
+        {
+            FileSystem,
+            Resources
+        }
+
+        public enum TextureBitmapRetentionPolicy
+        {
+            Dispose,
+            Keep
+        }
+
+        public enum TextureLoadingPolicy
+        {
+            LoadOnce,
+            AllowReload,
+        }
+        
+        public sealed class TextureStateChangedEventArgs : EventArgs {
+            public TextureState OldState { get; init; }
+            public TextureState NewState { get; init; }
+        }
+        
+        private static ConcurrentDictionary<string, Texture> cache = new ConcurrentDictionary<string, Texture>();
 
         public static Texture NewTexture(string resource)
         {
@@ -21,9 +55,48 @@ namespace Sharp2D
             Texture texture = new Texture();
             texture.Name = resource;
 
-            cache.Add(resource, texture);
+            cache.TryAdd(resource, texture);
 
             return texture;
+        }
+
+        private TextureState _state;
+
+        public TextureState State
+        {
+            get
+            {
+                return _state;
+            }
+            private set
+            {
+                var oldValue = _state;
+                _state = value;
+                
+                StateChanged?.Invoke(this, new TextureStateChangedEventArgs()
+                {
+                    OldState = oldValue,
+                    NewState = _state
+                });
+            }
+        }
+
+        public event EventHandler<TextureStateChangedEventArgs> StateChanged;
+
+        private TextureSource _source;
+        public TextureSource Source
+        {
+            get
+            {
+                return _source;
+            }
+            set
+            {
+                if (State == TextureState.Unloaded)
+                    _source = value;
+                else
+                    throw new AccessViolationException($"Cannot change texture source after its been loaded (in state {State})");
+            }
         }
 
         public int ID { get; private set; }
@@ -41,6 +114,10 @@ namespace Sharp2D
         public int TextureHeight { get; private set; }
 
         public SKColorType ColorType { get; set; } = SKColorType.Bgra8888;
+
+        public TextureBitmapRetentionPolicy BitmapRetentionPolicy { get; set; } = TextureBitmapRetentionPolicy.Dispose;
+
+        public TextureLoadingPolicy LoadingPolicy { get; set; } = TextureLoadingPolicy.LoadOnce;
 
         public GLPixelFormat PixelFormat
         {
@@ -72,7 +149,7 @@ namespace Sharp2D
         {
             get
             {
-                return Bitmap != null;
+                return State == TextureState.UploadPending || State == TextureState.Created || Bitmap != null;
             }
         }
 
@@ -88,23 +165,47 @@ namespace Sharp2D
 
         public string Name { get; private set; }
 
-        public SKBitmap Bitmap { get; private set; }
+        private SKBitmap _bitmap;
+
+        public SKBitmap Bitmap
+        {
+            get
+            {
+                ValidateBitmapAccess();
+                return _bitmap;
+            }
+            private set
+            {
+                ValidateBitmapAccess();
+                _bitmap = value;
+            }
+        }
 
         private Texture() { ID = -1; MinFilter = (int)TextureMinFilter.Nearest; MagFilter = (int)TextureMagFilter.Nearest; }
 
-        public void LoadTextureFromResource()
+        private void ValidateBitmapAccess()
         {
-            Screen.ValidateOpenGLUnsafe("Texture.LoadTextureFromResource", true);
+            if (BitmapRetentionPolicy == TextureBitmapRetentionPolicy.Dispose && State == TextureState.Created)
+                throw new AccessViolationException(
+                    "Bitmap retention policy set to dispose and texture already created");
+        }
+        
+        private void _LoadTextureFromResource()
+        {
             Assembly extender = Assembly.GetEntryAssembly();
             Assembly sharp2d = this.GetType().Assembly;
 
-            Stream stream = extender.GetManifestResourceStream(Name) ?? sharp2d.GetManifestResourceStream(Name);
+            SKBitmap temp;
+            using (Stream stream = extender?.GetManifestResourceStream(Name) ?? sharp2d.GetManifestResourceStream(Name))
+            {
 
-            if (stream == null)
-                throw new FileNotFoundException("Could not find resource " + Name);
+                if (stream == null)
+                    throw new FileNotFoundException("Could not find resource " + Name);
 
-            // Decode stream into SKBitmap
-            var temp = SKBitmap.Decode(stream);
+                // Decode stream into SKBitmap
+                temp = SKBitmap.Decode(stream);
+            }
+
             var info = new SKImageInfo(temp.Width, temp.Height, ColorType, SKAlphaType.Premul);
             Bitmap = new SKBitmap(info);
             temp.CopyTo(Bitmap);
@@ -113,24 +214,93 @@ namespace Sharp2D
             ValidateSize();
         }
 
-        public void LoadTextureFromFile()
+        private void _LoadTextureFromFile()
         {
-            Screen.ValidateOpenGLUnsafe("Texture.LoadTextureFromFile", true);
 
             SKBitmap temp;
             using (var fs = new FileStream(Name, FileMode.Open))
             {
-                temp = SKBitmap.Decode(fs);
+                using (var codec = SKCodec.Create(fs))
+                {
+                    var info = new SKImageInfo(codec.Info.Width, codec.Info.Height, ColorType, SKAlphaType.Premul);
+                    Bitmap = new SKBitmap(info);
+                    codec.GetPixels(info, Bitmap.GetPixels(out _));
+                }
             }
             
-            var info = new SKImageInfo(temp.Width, temp.Height, ColorType, SKAlphaType.Premul);
-            Bitmap = new SKBitmap(info);
-            temp.CopyTo(Bitmap);
-            temp.Dispose();
             HasAlpha = Bitmap.ContainsAlpha();
 
             ValidateSize();
         }
+
+        private void _LoadTexture()
+        {
+            switch (Source)
+            {
+                case TextureSource.FileSystem:
+                    _LoadTextureFromFile();
+                    break;
+                case TextureSource.Resources:
+                    _LoadTextureFromResource();
+                    break;
+            }
+
+            State = TextureState.UploadPending;
+        }
+
+        private bool CheckLoadPolicy()
+        {
+            if (State == TextureState.Unloaded) return true;
+            
+            if (LoadingPolicy == TextureLoadingPolicy.LoadOnce)
+            {
+                Logger.Debug($"Skipping already loaded texture {Name}");
+                return false;
+            }
+
+            State = TextureState.Unloaded;
+
+            return true;
+        }
+
+        public void TryLoadTexture(TextureSource source, bool loadInBackground = true)
+        {
+            if (!CheckLoadPolicy())
+                return;
+
+            Source = source;
+            LoadTexture(loadInBackground);
+        }
+
+        public void LoadTexture(bool loadInBackground = true)
+        {
+            Screen.ValidateOpenGLUnsafe("Texture.LoadTexture", true);
+            
+            if (!CheckLoadPolicy())
+                return;
+
+            State = TextureState.Decoding;
+            
+            if (!loadInBackground)
+                _LoadTexture();
+            else
+            {
+                ThreadPool.QueueUserWorkItem(_ => { _LoadTexture(); });
+            }
+        }
+        
+        [Obsolete("Use Source + LoadTexture or TryLoadTexture(Source) instead")]
+        public void LoadTextureFromResource()
+        {
+            TryLoadTexture(TextureSource.Resources);
+        }
+
+        [Obsolete("Use Source + LoadTexture or TryLoadTexture(Source) instead")]
+        public void LoadTextureFromFile()
+        {
+            TryLoadTexture(TextureSource.FileSystem);
+        }
+        
 
         private void ValidateSize()
         {
@@ -155,31 +325,89 @@ namespace Sharp2D
                     SKRect srcRect = new SKRect(0, 0, ImageWidth, ImageHeight);
                     canvas.DrawBitmap(Bitmap, srcRect, destRect);
                 }
+
+                var old = Bitmap;
                 Bitmap = newBitmap;
+                old?.Dispose();
             }
+        }
+
+        private bool _isWatching;
+        private void WatchTextureStateAndCreate()
+        {
+            if (_isWatching) return;
+            
+            this.StateChanged += CheckTextureReady;
+
+            void CheckTextureReady(object sender, TextureStateChangedEventArgs e)
+            {
+                if (this.State != TextureState.UploadPending) return;
+                    
+                Screen.Invoke(Create);
+                this.StateChanged -= CheckTextureReady;
+
+                _isWatching = false;
+            }
+
+            _isWatching = true;
         }
 
         public void Create()
         {
-            if (Created)
-                return;
-            Screen.ValidateOpenGLSafe("Texture.Create");
+            switch (State)
+            {
+                case TextureState.Created:
+                    return;
+                case TextureState.Failed:
+                    throw new AccessViolationException("Upload for texture already failed");
+                case TextureState.Unloaded:
+                    LoadTexture();
+                    WatchTextureStateAndCreate();
+                    return;
+                case TextureState.Decoding:
+                    WatchTextureStateAndCreate();
+                    return;
+                case TextureState.UploadPending:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
-            ID = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, ID);
+            try
+            {
+                Screen.ValidateOpenGLSafe("Texture.Create");
 
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
+                ID = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2D, ID);
 
-            
-            // Get pixel data from SKBitmap using the configured color type.
-            IntPtr pixelData = Bitmap.GetPixels();
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, Bitmap.Width, Bitmap.Height, 0, PixelFormat, PixelType.UnsignedByte, pixelData);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, MinFilter);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, MagFilter);
+
+
+                // Get pixel data from SKBitmap using the configured color type.
+                IntPtr pixelData = Bitmap.GetPixels();
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, Bitmap.Width, Bitmap.Height, 0,
+                    PixelFormat, PixelType.UnsignedByte, pixelData);
+
+                if (BitmapRetentionPolicy == TextureBitmapRetentionPolicy.Dispose)
+                {
+                    Bitmap.Dispose();
+                    Bitmap = null;
+                }
+                
+                State = TextureState.Created;
+            }
+            catch
+            {
+                State = TextureState.Failed;
+                throw;
+            }
         }
 
         public void CreateOrUpdate()
         {
             Screen.ValidateOpenGLSafe("Texture.CreateOrupdate");
+            ValidateBitmapAccess();
 
             if (!Created)
                 Create();
@@ -229,14 +457,30 @@ namespace Sharp2D
         {
             Bitmap = new SKBitmap(width, height, ColorType, SKAlphaType.Premul);
             ValidateSize();
+            State = TextureState.UploadPending;
         }
 
-        public Texture Clone()
+        public Texture Clone(bool cloneBitmap = true)
         {
+            var doCloneByRef = !cloneBitmap;
+            var nullClone = false;
+            if (cloneBitmap)
+            {
+                if (Bitmap == null)
+                {
+                    doCloneByRef = true;
+                }
+                else if (BitmapRetentionPolicy == TextureBitmapRetentionPolicy.Dispose && State == TextureState.Created)
+                {
+                    doCloneByRef = true;
+                    nullClone = true;
+                }
+            }
+            
             var texture = new Texture
             {
                 Name = Name,
-                Bitmap = Bitmap.Copy(ColorType), // SKBitmap.Copy() creates a duplicate
+                Bitmap = doCloneByRef ? nullClone ? null : Bitmap : Bitmap.Copy(ColorType), // SKBitmap.Copy() creates a duplicate
                 MagFilter = MagFilter,
                 MinFilter = MinFilter,
                 HasAlpha = HasAlpha,

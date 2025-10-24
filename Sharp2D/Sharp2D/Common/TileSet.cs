@@ -81,21 +81,14 @@ namespace Sharp2D
                 ImagePath = "worlds/" + ImagePath;
 
             TileTexture = Texture.NewTexture(ImagePath);
-            try
-            {
-                TileTexture.LoadTextureFromFile();
-            }
-            catch
-            {
-                try
-                {
-                    TileTexture.LoadTextureFromResource();
-                }
-                catch
-                {
-                    throw new System.IO.FileNotFoundException("Could not find texture for tileset", ImagePath);
-                }
-            }
+            TileTexture.LoadingPolicy = Texture.TextureLoadingPolicy.AllowReload;
+            
+            var source = File.Exists(ImagePath)
+                ? Texture.TextureSource.FileSystem
+                : Texture.TextureSource.Resources;
+            TileTexture.TryLoadTexture(source, false);
+
+            //TileTexture.BitmapRetentionPolicy = Texture.TextureBitmapRetentionPolicy.Keep;
 
             if (Properties == null)
                 Properties = new Dictionary<string, string>();
@@ -148,5 +141,7 @@ namespace Sharp2D
                 base["" + ID] = value;
             }
         }
+
+        
     }
 }

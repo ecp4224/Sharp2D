@@ -1,4 +1,5 @@
-﻿using Sharp2D;
+﻿using OpenTK.Windowing.GraphicsLibraryFramework;
+using Sharp2D;
 using Sharp2D.Core.Graphics;
 using Sharp2D.Game;
 using SkiaSharp;
@@ -141,6 +142,15 @@ namespace SomeGame
                         CurrentWorld.Camera.PanTo(X, 26*32, PanType.Smooth, 3500);
                     });
                 } 
+            }
+
+            if (Input.Keyboard.IsKeyDown(Keys.Escape))
+            {
+                var world = CurrentWorld as GameWorld;
+                if (world != null)
+                {
+                    world.FadeOut(() => new Thread(NextWorld).Start());
+                }
             }
         }
 

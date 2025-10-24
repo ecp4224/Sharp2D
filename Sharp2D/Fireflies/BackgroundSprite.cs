@@ -17,7 +17,7 @@ namespace Fireflies
         public BackgroundSprite()
         {
             Texture = Texture.NewTexture("sprites/background.png");
-            Texture.LoadTextureFromFile();
+            Texture.TryLoadTexture(Texture.TextureSource.FileSystem, false);
             Width = Texture.TextureWidth;
             Height = Texture.TextureHeight;
             NeverClip = true;

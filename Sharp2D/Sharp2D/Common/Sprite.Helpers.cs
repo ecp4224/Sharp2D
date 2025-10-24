@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Sharp2D
 {
@@ -72,8 +73,11 @@ namespace Sharp2D
                 {
                     _imagePath = value;
                     Texture = Texture.NewTexture(_imagePath);
-                    if (!Texture.Loaded)
-                        Texture.LoadTextureFromFile();
+                    
+                    var source = File.Exists(_imagePath)
+                        ? Texture.TextureSource.FileSystem
+                        : Texture.TextureSource.Resources;
+                    Texture.TryLoadTexture(source);
 
                     Width = Texture.TextureWidth;
                     Height = Texture.TextureHeight;
